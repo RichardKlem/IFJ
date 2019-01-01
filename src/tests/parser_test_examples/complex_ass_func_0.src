@@ -11,11 +11,6 @@ def main(a):
     print('uvnitr main')
     print(a)
 
-
-
-
-
-
     def foo(a, b):
         print('uvnitr foo')
         print(a)
