@@ -4,7 +4,7 @@
  *  Autoři: Beránek Tomáš (xberan46) - vedoucí
  *          Haderka Martin (xhader00)
  *          Slobodník Šimon (xslobo06)
- *          Klem Richard (xklem00)
+ *          Klem Richard (xklemr00)
  *  Datum vytvoření: 12.10.2019
  * ************************************************************************** */
 

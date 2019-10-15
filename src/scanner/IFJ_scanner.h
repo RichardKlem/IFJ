@@ -4,8 +4,8 @@
  *  Autoøi: Beránek Tomáš (xberan46) - vedoucí
  *          Haderka Martin (xhader00)
  *          Slobodník Šimon (xslobo06)
- *          Klem Richard (xklem00)
- *  Datum vytvoøení: 12.10.2019
+ *          Klem Richard (xklemr00)
+ *  Datum vytvoření: 12.10.2019
  * ************************************************************************** */
 
 #ifndef _IFJ_SCANNER_H_
