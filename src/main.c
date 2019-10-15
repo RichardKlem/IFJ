@@ -8,13 +8,17 @@
  *  Datum vytvoření: 12.10.2019
  * ************************************************************************** */
 
-
+#include <stdio.h>
 #include "scanner/IFJ_scanner.h"
 
-
-#include <stdio.h>
-
 int main () {
+    FILE* src_file = fopen("test.src", "r");
+    if (src_file == NULL)
+        return 10;
+
+    token_t token = get_token(src_file);
+    printf("%d\n", token.type);
+
 
     return 0;
 }
