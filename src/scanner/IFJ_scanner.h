@@ -93,6 +93,8 @@ typedef union {
     keyword keyword_value;
 } token_value;
 
+#define NO_PARAM (token_value)0 //pouzit, pokud token nema zadny parametr
+
 typedef struct token_t {
     token_type type;
     token_value value;

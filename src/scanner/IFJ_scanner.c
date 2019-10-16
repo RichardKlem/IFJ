@@ -38,20 +38,20 @@ token_t get_token(FILE* src_file){
             //TODO otatni stavy
             break;
         case STATE_PLUS:
-            return create_token(TOKEN_MATH_PLUS);
+            return create_token(TOKEN_MATH_PLUS, NO_PARAM);
         case STATE_MINUS:
-            return create_token(TOKEN_MATH_MINUS);
+            return create_token(TOKEN_MATH_MINUS, NO_PARAM);
         case STATE_MUL:
-            return create_token(TOKEN_MATH_MUL);
+            return create_token(TOKEN_MATH_MUL, NO_PARAM);
         case STATE_DIV:
             if (next_char == '/')
                 state = STATE_INT_DIV;
             else
-                return create_token(TOKEN_MATH_DIV);
+                return create_token(TOKEN_MATH_DIV, NO_PARAM);
             break;
 
         case STATE_INT_DIV:
-            return create_token(TOKEN_MATH_INT_DIV);
+            return create_token(TOKEN_MATH_INT_DIV, NO_PARAM);
 
 
 
