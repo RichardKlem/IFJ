@@ -10,10 +10,10 @@
 
 #include "IFJ_scanner.h"
 
-token_t create_token(int token_id){ //TODO upravit podle struktury tokenu
+token_t create_token(int token_id, token_value value){ //TODO upravit podle struktury tokenu
     token_t token;
-
     token.type = token_id;
+    token.value = value;
     return token;
 }
 
