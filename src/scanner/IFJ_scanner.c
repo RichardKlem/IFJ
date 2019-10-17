@@ -41,6 +41,7 @@ token_t get_token(FILE* src_file){
             if (next_char == '>') {state = STATE_GREATER; break;}
             if (next_char == '(') {state = STATE_LEFT_BRACKET; break;}
             if (next_char == ')') {state = STATE_RIGHT_BRACKET; break;}
+            if (next_char == EOF) {state = STATE_EOF; break;}
             //TODO otatni stavy
             break;
 
@@ -103,6 +104,8 @@ token_t get_token(FILE* src_file){
             push_char_back(1);
             return create_token(TOKEN_RIGHT_BRACKET, NO_PARAM);
 
+        case STATE_EOF:
+            return create_token(TOKEN_EOF, NO_PARAM);
 
         default:
             break;
