@@ -1,6 +1,6 @@
 /* ******************************* IFJ_scanner.c ****************************
- *  Pøedmìt: Formální jazyky a pøekladaèe (IFJ) - FIT VUT v Brnì
- *  Název projektu: Implementace pøekladaèe imperativního jazyka IFJ19
+ *  Předmìt: Formální jazyky a překladače (IFJ) - FIT VUT v Brně
+ *  Název projektu: Implementace překladaře imperativního jazyka IFJ19
  *  Autoøi: Beránek Tomáš (xberan46) - vedoucí
  *          Haderka Martin (xhader00)
  *          Slobodník Šimon (xslobo06)
