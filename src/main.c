@@ -1,11 +1,11 @@
 /* ******************************* main.c ***********************************
- *  Předmět: Formální jazyky a překladače (IFJ) - FIT VUT v Brně
- *  Název projektu: Implementace překladače imperativního jazyka IFJ19
- *  Autoři: Beránek Tomáš (xberan46) - vedoucí
+ *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
+ *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
+ *  Autori: Beranek Tomas (xberan46) - vedouci
  *          Haderka Martin (xhader00)
- *          Slobodník Šimon (xslobo06)
+ *          Slobodnik Simon (xslobo06)
  *          Klem Richard (xklemr00)
- *  Datum vytvoření: 12.10.2019
+ *  Datum vytvoreni: 12.10.2019
  * ************************************************************************** */
 
 #include <stdio.h>
