@@ -1,0 +1,19 @@
+Týdenní sprint každý čtvrtek 17-19.
+Ad-hoc pondělí 13-??.
+
+Na každou část aspoň dva lidi.
+
+SCANNER:
+    Je zavolán parserem a pomocí čtení znaků rozpozná token, který poté zašle nazpět parseru.
+ 
+ PARSER:
+    Volá si scanner, aby načetl kód ze zdrojového souboru. Scanner mu vrátí token, který uloží AST.
+
+
+PROBLÉMY:
+    Oddělení výrazů v syntaktickém zásobníku
+    Jak poznat dva výrazy na řádku a podobné chyby
+          a+1 b+2     <-- chyba
+          a+1 b       <-- chyba
+          b           <-- tohle asi neni chyba
+          apod.
