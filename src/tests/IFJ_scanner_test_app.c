@@ -1,11 +1,11 @@
-/* ******************************* main.c ***********************************
- *  Pøedmìt: Formální jazyky a pøekladaèe (IFJ) - FIT VUT v Brnì
- *  Název projektu: Implementace pøekladaèe imperativního jazyka IFJ19
- *  Autoøi: Beránek Tomáš (xberan46) - vedoucí
+/* ******************************* IFJ_scanner_test_app.c ***********************************
+ *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
+ *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
+ *  Autori: Beranek Tomas (xberan46) - vedouci
  *          Haderka Martin (xhader00)
- *          Slobodník Šimon (xslobo06)
+ *          Slobodnik Simon (xslobo06)
  *          Klem Richard (xklemr00)
- *  Datum vytvoøení: 16.10.2019
+ *  Datum vytvoreni: 12.10.2019
  * ************************************************************************** */
 
 #include <stdio.h>
@@ -30,4 +30,4 @@ int main (int argc, char *argv[]) {
     return 0;
 }
 
-/* konec souboru main.c */
+/* konec souboru IFJ_scanner_test_app.c */
