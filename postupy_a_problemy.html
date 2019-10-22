@@ -13,7 +13,12 @@ SCANNER:
 PROBLÉMY:
     Oddělení výrazů v syntaktickém zásobníku
     Jak poznat dva výrazy na řádku a podobné chyby
-          a+1 b+2     <-- chyba
-          a+1 b       <-- chyba
+          a+1 b+2     <-- chyba, vyřeší parser
+          a+1 b       <-- chyba, vyřeší parser
           b           <-- tohle asi neni chyba
-          apod.
+       
+Pokud bude 1 expression na řádku a řádek je ukončen EOLem, je to validní
+
+                          
+Pokud čtu prázdný řádek, tak ho zahodím a zůstávám ve stavu EOL+IN/DED
+Pokud řádek nebyl prázdný, tak se generuje token EOL.
