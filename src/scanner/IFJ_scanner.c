@@ -10,6 +10,7 @@
 
 #include <ctype.h>
 #include "IFJ_scanner.h"
+#include "IFJ_error.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -26,8 +27,7 @@ token_t create_token(int token_id, token_value value){ //TODO upravit podle stru
 char *load_to_str(FILE *src_file, size_t chars_loaded_cnt){
     char *str = (char *)malloc(chars_loaded_cnt + 1);
     if (str == NULL)
-        exit(99);
-
+        error_exit(ERROR_INTERNAL);
 
     //zkopiruje chars_loaded znaku z souboru do str
     for (size_t i = 0; i < chars_loaded_cnt; i++)
@@ -144,8 +144,7 @@ token_t get_token(FILE* src_file){
                 chars_loaded_cnt;
                 state = STATE_DOUBLE_WITHOUT_EXP;
             } else
-                exit(1);
-
+                error_exit(ERROR_LEX);
             break;
 
         default:

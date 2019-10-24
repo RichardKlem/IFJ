@@ -1,4 +1,4 @@
-/* ******************************* main.c ***********************************
+/* ******************************* IFJ_error.h ****************************
  *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
  *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
  *  Autori: Beranek Tomas (xberan46) - vedouci
@@ -8,20 +8,21 @@
  *  Datum vytvoreni: 12.10.2019
  * ************************************************************************** */
 
-#include <stdio.h>
-#include "scanner/IFJ_scanner.h"
-#include "IFJ_error.h"
+#ifndef _IFJ_ERROR_H_
+#define _IFJ_ERROR_H_
 
-int main () {
-    FILE* src_file = fopen("test.src", "r");
-    if (src_file == NULL)
-        error_exit(ERROR_INTERNAL);
+typedef enum {
+    ERROR_LEX,
+    ERROR_SYNTAX,
+    ERROR_SEM_UNDEF,
+    ERROR_SEM_TYPE,
+    ERROR_SEM_CALL,
+    ERROR_SEM_OTHER,
+    ERROR_DIVISION_BY_ZERO,
+    ERROR_INTERNAL
+} error_types;
 
-    token_t token = get_token(src_file);
-    printf("%d\n", token.type);
+void error_exit(int error_id);
 
-
-    return 0;
-}
-
-/* konec souboru main.c */
+#endif
+/* konec souboru IFJ_error.h */
