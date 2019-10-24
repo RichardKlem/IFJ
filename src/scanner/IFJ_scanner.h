@@ -50,6 +50,7 @@ typedef enum {
 } states;
 
 typedef enum {
+    TOKEN_EOL,
     TOKEN_MATH_PLUS,
     TOKEN_MATH_MINUS,
     TOKEN_MATH_MUL,
@@ -71,8 +72,7 @@ typedef enum {
     TOKEN_EOF,
     TOKEN_INDENT_DEDENT,
     TOKEN_INT,
-    TOKEN_DOUBLE_WITH_EXP,
-    TOKEN_DOUBLE_WITHOUT_EXP,
+    TOKEN_DOUBLE,
     TOKEN_STRING
 } token_type;
 
