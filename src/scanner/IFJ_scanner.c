@@ -13,13 +13,29 @@
 #include "IFJ_error.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 
 //posune offset o 1 byte zpet, implicitní soubor je src_file
 #define push_char_back(x) fseek(src_file, -(x), SEEK_CUR)
 
-token_t create_token(int token_id, token_value value){ //TODO upravit podle struktury tokenu
+token_t create_token(int token_id, token_value value){
     token_t token;
     token.type = token_id;
+
+    switch (token_id){
+        case TOKEN_DOUBLE:
+            token.value.double_value = strtod(value.string , NULL);
+            if (errno == ERANGE)
+                error_exit(ERROR_SEM_TYPE); //pri preteceni nebo podteceni
+            free(value.string);
+            break;
+
+
+
+
+    }
+
     token.value = value;
     return token;
 }
@@ -142,10 +158,55 @@ token_t get_token(FILE* src_file){
 
         case STATE_DOUBLE_DECIMAL_POINT:
             if (isdigit(next_char)){
-                chars_loaded_cnt;
+                chars_loaded_cnt++;
                 state = STATE_DOUBLE_WITHOUT_EXP;
-            } else
+            }
+            else
                 error_exit(ERROR_LEX);
+            break;
+
+        case STATE_DOUBLE_WITHOUT_EXP:
+            chars_loaded_cnt++;
+            if (isdigit(next_char))
+                state = STATE_DOUBLE_WITHOUT_EXP;
+            else if (next_char == 'E' ||  next_char == 'e')
+                state = STATE_DOUBLE_EXP;
+            else {
+                push_char_back(chars_loaded_cnt);
+                chars_loaded_cnt--;
+                value.string = load_to_str(src_file, chars_loaded_cnt);
+                return create_token(TOKEN_DOUBLE, value);
+            }
+            break;
+
+        case STATE_DOUBLE_EXP:
+            chars_loaded_cnt++;
+            if (isdigit(next_char))
+                state = STATE_DOUBLE_WITH_EXP;
+            else if (next_char == '+' || next_char == '-')
+                state = STATE_DOUBLE_EXP_SIGN;
+            else
+                error_exit(ERROR_LEX);
+            break;
+
+        case STATE_DOUBLE_EXP_SIGN:
+            chars_loaded_cnt++;
+            if (isdigit(next_char))
+                state = STATE_DOUBLE_EXP_SIGN;
+            else
+                error_exit(ERROR_LEX);
+            break;
+
+        case STATE_DOUBLE_WITH_EXP:
+            chars_loaded_cnt++;
+            if (isdigit(next_char))
+                state = STATE_DOUBLE_WITH_EXP;
+            else {
+                push_char_back(chars_loaded_cnt);
+                chars_loaded_cnt--;
+                value.string = load_to_str(src_file, chars_loaded_cnt);
+                return create_token(TOKEN_DOUBLE, value);
+            }
             break;
 
         default:
