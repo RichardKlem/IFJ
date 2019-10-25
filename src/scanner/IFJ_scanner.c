@@ -132,11 +132,12 @@ token_t get_token(FILE* src_file){
                 state = STATE_DOUBLE_DECIMAL_POINT;
             else if (next_char == 'E' || next_char == 'e')
                 state = STATE_DOUBLE_EXP;
-            else
+            else {
                 push_char_back(chars_loaded_cnt);
                 chars_loaded_cnt--;
                 value.string = load_to_str(src_file, chars_loaded_cnt);
                 return create_token(TOKEN_INT, value);
+            }
             break;
 
         case STATE_DOUBLE_DECIMAL_POINT:
