@@ -15,13 +15,118 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include "IFJ_stack.h"
 
 //posune offset o 1 byte zpet, implicitní soubor je src_file
 #define push_char_back(x) fseek(src_file, -(x), SEEK_CUR)
 
+typedef enum {
+    START,
+    ESCAPE_CHAR,
+    HEX_CHAR
+} convert_to_str_fsm_states;
+
+/*predpokladame, ze do funkce nepujdou jineho znaky nez 0-9,A-F,a-f
+  pro jine znaky ma funkce nedefinvane chovani*/
+char two_digit_hex_to_dec (char first, char second) {
+    char dec = 0;
+
+    if (isdigit(first))
+        dec = 16 * (first - '0');
+    else if (first >= 'A' && first <= 'F')
+        dec = 16 * (first - 'A' + 10);
+    else
+        dec = 16 * (first - 'a' + 10);
+
+    if (isdigit(first))
+        dec += first - '0';
+    else if (first >= 'A' && first <= 'F')
+        dec += first - 'A' + 10;
+    else
+        dec += first - 'a' + 10;
+
+    return dec;
+}
+
+/* funkce prevede retezec nacteny ze zdrojoveho souboru na retezec bez escape sekvenci
+   a koncoveho apostrofu */
+char* convert_to_str(char* input) {
+    size_t shift_left = 0;
+    int state = START;
+    char* input_cp = input;
+
+    input[strlen(input) - 1] = '\0'; //posledni znak (apostrof) nahradim ukoncujicim znakem
+
+    while (*input_cp) {
+        switch (state){
+            case START:
+                if (*input_cp == '\\')
+                    state = ESCAPE_CHAR;
+                else
+                    *(input_cp - shift_left) = *input_cp; //kopirovani normalnich znaku na prislusne misto
+                break;
+
+            case ESCAPE_CHAR:
+                if (*input_cp == 'x') {
+                    shift_left += 2; //jelikoz nahradime tri-znakovou sekvenci za jeden znak
+                    state = HEX_CHAR;
+                    break;
+                }
+
+                shift_left += 1; //jelikoz nahradime dvou-znakovou sekvenci za jeden znak
+                if (*input_cp == '\"')
+                    *(input_cp - shift_left) = '\"';
+                else if (*input_cp == '\'')
+                    *(input_cp - shift_left) = '\'';
+                else if (*input_cp == '\n')
+                    *(input_cp - shift_left) = '\n';
+                else if (*input_cp == '\t')
+                    *(input_cp - shift_left) = '\t';
+                else //jina moznost nenastane, to je osetreno v hlavnim fsm
+                    *(input_cp - shift_left) = '\\';
+                state = START;
+                break;
+
+            case HEX_CHAR:
+                //vezmeme aktualni a nasledujici znak, prevedeme je do desitkove soustavy a ulozime do pole
+                *(input - shift_left) = two_digit_hex_to_dec(*input, *(input + 1));
+                input++; //musime rucne posunout, jelikoz zpracovavame dva znaky najednou
+                state = START;
+                break;
+        } //switch
+        input_cp++;
+    } //while
+
+    *(input_cp - shift_left) = '\0'; //posunuti ukoncovaciho znaku
+
+    //realokace podle aktualni delky, delka noveho retezce je <= delka stareho
+    if (realloc((void *)input, strlen(input) + 1) == NULL)
+        error_exit(ERROR_INTERNAL);
+    return input;
+}
+
+int iskeyword(char *s){
+    if (!strcmp((const char*)s, "if"))
+        return IF;
+    if (!strcmp((const char*)s, "else"))
+        return ELSE;
+    if (!strcmp((const char*)s, "return"))
+        return RETURN;
+    if (!strcmp((const char*)s, "def"))
+        return DEF;
+    if (!strcmp((const char*)s, "while"))
+        return WHILE;
+    if (!strcmp((const char*)s, "none"))
+        return NONE;
+    if (!strcmp((const char*)s, "pass"))
+        return PASS;
+    return NOT_A_KEYWORD; //else
+}
+
 token_t create_token(int token_id, token_value value){
     token_t token;
     token.type = token_id;
+    int tmp = 0;
 
     switch (token_id){
         case TOKEN_DOUBLE:
@@ -31,12 +136,25 @@ token_t create_token(int token_id, token_value value){
             free(value.string);
             break;
 
+        case TOKEN_ID:
+            if (tmp = iskeyword(value.string)) { //pokud se jedna o klicove slovo, tak je v tmp jeho id, jinak 0
+                token.type = TOKEN_KEYWORD;
+                token.value.keyword_value = tmp;
+                free(value.string);
+            }
+            else     //pokud se jedna o identifikator pouze uloz jeho jmeno
+                token.value.string = value.string;
+            break;
 
+        case TOKEN_STRING:
+            token.value.string = convert_to_str(value.string);
+            break;
 
+        default:
+            token.value = value;
+            break;
+    } //switch
 
-    }
-
-    token.value = value;
     return token;
 }
 
@@ -52,17 +170,57 @@ char *load_to_str(FILE *src_file, size_t chars_loaded_cnt){
     return str;
 }
 
-token_t get_token(FILE* src_file){
+//funkce zjisti zda na vstupu ze souboru src_file je zacatek/konec
+//viceradkoveho komentare (sekvence znaku """)
+//funkce se vrati do puvodniho stavu bufferu souboru
+int multi_line_comm_follow(FILE* src_file, int next_char){
+    if (next_char == '"' && fgetc(src_file) == '"' && fgetc(src_file) == '"') {
+        push_char_back(2);
+        return 1;
+    }
+    else {
+        push_char_back(2);
+        return 0;
+    }
+}
+
+token_t get_token(FILE* src_file) {
     int next_char = EOF;
     int state = STATE_START;
+    int spaces_cnt = 0;
     size_t chars_loaded_cnt = 0;
     token_value value;
     value.string = NULL;
+    static int first_token = 1;
+    static int generate_indent = 0;
+    static int start_with_indentation = 1;
+    static tStack stack_indent;
 
-    while (1){
+
+    if (first_token) {
+            first_token = 0; //dalsi tokeny uz se neprovede
+            stackInit(&stack_indent);
+            stackPush(&stack_indent, 0); //vlozeni pomocne 0
+    }
+
+    //pokud se v predchozim behu neprestaly geenrovat DEDENTY, skoc zpet do smycky generovani
+    if (generate_indent) {
+        generate_indent = 0;
+        goto DEDENT;
+    }
+
+    //pri zpracovani prvniho radku zaciname kontrolou odsazeni
+    //nebo pri zpracovani noveho radku
+    if (start_with_indentation) {
+        state = STATE_INDENT_DEDENT;
+        start_with_indentation = 0; //pro pristi zavolani uz se bude zacinat v STATE_START
+    }
+
+    while (1) {
         next_char = fgetc(src_file);    //nacteni dalsiho znaku
 
-        switch(state){
+        switch(state) {
+        //TODO usporadat napr. podle principu Hammingova kodu pro vetsi rychlost
         case STATE_START:
             if (next_char == '+') {state = STATE_PLUS; break;} //break vlozen, aby se zbytecne nevyhodnocovali podminky
             if (next_char == '-') {state = STATE_MINUS; break;}
@@ -73,9 +231,116 @@ token_t get_token(FILE* src_file){
             if (next_char == '(') {state = STATE_LEFT_BRACKET; break;}
             if (next_char == ')') {state = STATE_RIGHT_BRACKET; break;}
             if (next_char == EOF) {state = STATE_EOF; break;}
-            if (isdigit(next_char)) {state = STATE_INT; break;}
-            //TODO otatni stavy
+            if (isdigit(next_char)) {state = STATE_INT; chars_loaded_cnt++; break;}
+            if (next_char == ',') {state = STATE_COMMA; break;}
+            if (next_char == ':') {state = STATE_COLON; break;}
+            if (next_char == '!') {state = STATE_NOT_EQ; break;}
+            if (next_char == '=') {state = STATE_ASSIGNMENT; break;}
+            if (next_char == '#') {state = STATE_SINGLE_LINE_COMM; break;}
+            if (next_char == '_' || isalpha(next_char)) {state = STATE_ID; chars_loaded_cnt++; break;}
+            if (next_char == '\'') {state = STATE_STRING; break;}
+            if (next_char == ' ' || next_char == '\t') {state = STATE_START; break;}
+            if (next_char == '\n') {
+                start_with_indentation = 1;
+                return create_token(TOKEN_EOL, NO_PARAM);
+            }
+            error_exit(ERROR_LEX); //jiny vstupni znak -> CHYBA
+
+        case STATE_INDENT_DEDENT:
+            if (next_char == ' ') {
+                spaces_cnt++;
+                state = STATE_INDENT_DEDENT;
+            }
+            else if (next_char == '\t') { //pokud je nacten tabulator, nejedna se indent/dedent
+                state = STATE_EMPTY_LINE; //muze nasledovat jedine prazdny radek nebo komentare
+                spaces_cnt = 0;
+            }
+            else if (next_char == '\n') { //pokud nacteme EOL, nechame reseni na stavu START
+                state = START;
+                push_char_back(1);
+            }
+            else if (multi_line_comm_follow(src_file, next_char)) { //pokud zacina komentar (na vstupu je """)
+                state = STATE_MULTI_LINE_COMM;
+                spaces_cnt = 0;
+            }
+            else if (next_char == '#') {
+                state = STATE_SINGLE_LINE_COMM;
+                spaces_cnt = 0;
+            }
+            else {  //pokud nasleduje nejaky prikaz
+                push_char_back(1);
+
+                //zpracovani indent/dedent
+                if (spaces_cnt % 2 != 0)
+                    error_exit(ERROR_LEX); //pokud neni pocet mezer nasobkem 2 -> CHYBA
+
+                if (spaces_cnt > stackTop(&stack_indent)) { //pokud je odsazeni vetsi na na vrcholu zasbinku -> INDENT
+                    stackPush(&stack_indent, spaces_cnt);
+                    return create_token(TOKEN_INDENT, NO_PARAM);
+                }
+                else if (spaces_cnt == stackTop(&stack_indent)) { //pokud je odsazeni stejne, tak nedelame nic
+                    state = START;
+                    spaces_cnt = 0;
+                }
+                else {  //pokud je odsazeni mensi nez na zaobniku, vyjimame ze zasobniku, dokud nenarazime na
+                        //stejnou hodnotu, pri kazdem vyjmuti generujeme dedent, pokud hodnotu nenajdeme -> CHYBA
+
+                    while (spaces_cnt < stackTop(&stack_indent)) {
+                        generate_indent = 1;
+                        stackPop(&stack_indent);
+                        return create_token(TOKEN_DEDENT, NO_PARAM);
+                        DEDENT:; //sem skocime, abychom mohli jednoduse pokracovat v generovani
+                    }
+                    //kontrola spravnosti odsazeni
+                    if (spaces_cnt != stackTop(&stack_indent)) //pokud se nejedna o hledanou hodnotu -> CHYBA
+                        error_exit(ERROR_LEX);
+                    state = START;
+                    spaces_cnt = 0;
+                }
+            }
             break;
+
+        case STATE_EMPTY_LINE:
+            if (next_char == EOF || next_char == '\n') { //nechame reseni na stavu START
+                push_char_back(1);
+                state = START;
+            }
+            else if (next_char == '#')
+                state = STATE_SINGLE_LINE_COMM;
+            else if (multi_line_comm_follow(src_file, next_char))
+                state = STATE_MULTI_LINE_COMM;
+            else if (next_char == ' ' || next_char == '\t')
+                state = STATE_EMPTY_LINE;
+            else
+                error_exit(ERROR_LEX); //pokud byl na zacatku radku tabulator a pokracuje necim jinym
+            break;                     //nez tab/space/EOL/komentarem -> CHYBA
+
+        case STATE_MULTI_LINE_COMM:
+            if (next_char == EOF) { //pokud skoncil soubor nechame reseni na stavu START
+                push_char_back(1);
+                state = START;
+            }
+            else if (next_char != '"') //jsme stale v komentari
+                state = STATE_MULTI_LINE_COMM;
+            else if (multi_line_comm_follow(src_file, next_char)) //kontrola zda nenasleduje """
+                state = STATE_MULTI_LINE_COMM_AFTER;
+            else   //nejednalo se o """, ale pouze o " nebo ""
+                state = STATE_MULTI_LINE_COMM;
+            break;
+
+        case STATE_MULTI_LINE_COMM_AFTER:
+            if (next_char == ' ' || next_char == '\t') //za viceradkovych komentarem mohou nasledovat pouze space znaky
+                state = STATE_MULTI_LINE_COMM_AFTER;
+            else if (next_char == EOF || next_char == '\n') { //nechame reseni na stavu START
+                push_char_back(1);
+                state = START;
+            }
+            else
+                error_exit(ERROR_LEX); //za komentarem byl prikaz -> CHYBA
+            break;
+
+
+
 
         case STATE_PLUS:
             push_char_back(1);
@@ -208,6 +473,107 @@ token_t get_token(FILE* src_file){
                 return create_token(TOKEN_DOUBLE, value);
             }
             break;
+
+        case STATE_COMMA:
+            push_char_back(1);
+            return create_token(TOKEN_COMMA, NO_PARAM);
+
+        case STATE_COLON:
+            push_char_back(1);
+            return create_token(TOKEN_COLON, NO_PARAM);
+
+        case STATE_NOT_EQ:
+            if (next_char == '=') //tento if simuluje mezistav
+                return create_token(TOKEN_NOT_EQ, NO_PARAM);
+            else
+                error_exit(ERROR_LEX);
+
+        case STATE_ASSIGNMENT:
+            if (next_char == '=')
+                state = STATE_EQ;
+            else {
+                push_char_back(1);
+                return create_token(TOKEN_ASSIGNMENT, NO_PARAM);
+            }
+            break;
+
+        case STATE_EQ:
+            push_char_back(1);
+            return create_token(TOKEN_EQ, NO_PARAM);
+
+        case STATE_SINGLE_LINE_COMM:
+            if (next_char == EOF) {
+                push_char_back(1);
+                state = START;
+            }
+            else if (next_char != '\n')
+                state = STATE_SINGLE_LINE_COMM; //jsme stale v komentari
+            else {
+                push_char_back(1);
+                state = STATE_START;
+            }
+            break;
+
+        case STATE_ID:
+            chars_loaded_cnt++;
+            if (next_char == '_' || isalnum(next_char))
+                state = STATE_ID;
+            else {
+                push_char_back(chars_loaded_cnt);
+                chars_loaded_cnt--;
+                value.string = load_to_str(src_file, chars_loaded_cnt);
+                return create_token(TOKEN_ID, value);
+            }
+            break;
+
+        case STATE_STRING_READ:
+            chars_loaded_cnt++;
+            if (next_char == '\'') {
+                push_char_back(chars_loaded_cnt); //simulace stavu STATE_STRING
+                value.string = load_to_str(src_file, chars_loaded_cnt);
+                return create_token(TOKEN_STRING, value);
+            }
+            else if (next_char == '\\')
+                state = STATE_STRING_BACKSLASH;
+            else if (next_char > (char)31)
+                state = STATE_STRING_READ;
+            else
+                error_exit(ERROR_LEX);
+            break;
+
+        case STATE_STRING_BACKSLASH:
+            chars_loaded_cnt++;
+            if (next_char == '\\' || next_char == '"' || next_char == '\''
+                || next_char == 'n' || next_char == 't') //uvazujeme, ze toto jsou jedine pripustne escape sekvence
+                state = STATE_STRING_READ;
+            else if (next_char == 'x')
+                state = STATE_STRING_HEX_START;
+            else
+                error_exit(ERROR_LEX);
+            break;
+
+        case STATE_STRING_HEX_START:
+            chars_loaded_cnt++;
+            if (isdigit(next_char) || (next_char >= 'A' && next_char <= 'F') ||
+                (next_char >= 'a' && next_char <= 'f'))
+                state = STATE_STRING_HEX_END;
+            else
+                error_exit(ERROR_LEX);
+            break;
+
+        case STATE_STRING_HEX_END:
+            chars_loaded_cnt++;
+            if (isdigit(next_char) || (next_char >= 'A' && next_char <= 'F') ||
+                (next_char >= 'a' && next_char <= 'f'))
+                state = STATE_STRING_READ;
+            else
+                error_exit(ERROR_LEX);
+            break;
+
+
+
+        //TODO  indent/dedent
+        //      multi line comment
 
         default:
             break;

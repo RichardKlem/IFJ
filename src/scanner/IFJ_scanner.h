@@ -34,8 +34,10 @@ typedef enum {
     STATE_ID,
     STATE_EOF,
     STATE_MULTI_LINE_COMM,
+    STATE_MULTI_LINE_COMM_AFTER,
     STATE_SINGLE_LINE_COMM,
     STATE_INDENT_DEDENT,
+    STATE_EMPTY_LINE,
     STATE_INT,
     STATE_DOUBLE_EXP,
     STATE_DOUBLE_EXP_SIGN,
@@ -70,13 +72,15 @@ typedef enum {
     TOKEN_ID,
     TOKEN_KEYWORD,
     TOKEN_EOF,
-    TOKEN_INDENT_DEDENT,
+    TOKEN_INDENT,
+    TOKEN_DEDENT,
     TOKEN_INT,
     TOKEN_DOUBLE,
     TOKEN_STRING
 } token_type;
 
 typedef enum {
+    NOT_A_KEYWORD,
     DEF,
     ELSE,
     IF,
