@@ -9,7 +9,7 @@
  * ************************************************************************** */
 
 #include <stdio.h>
-#include "scanner/IFJ_scanner.h"
+#include "IFJ_scanner.h"
 #include "IFJ_error.h"
 
 int main () {

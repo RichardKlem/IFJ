@@ -504,7 +504,7 @@ token_t get_token(FILE* src_file) {
         case STATE_SINGLE_LINE_COMM:
             if (next_char == EOF) {
                 push_char_back(1);
-                state = START;
+                state = STATE_START;
             }
             else if (next_char != '\n')
                 state = STATE_SINGLE_LINE_COMM; //jsme stale v komentari

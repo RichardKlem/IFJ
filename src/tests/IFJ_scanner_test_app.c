@@ -9,7 +9,7 @@
  * ************************************************************************** */
 
 #include <stdio.h>
-#include "scanner/IFJ_scanner.h"
+#include "IFJ_scanner.h"
 
 int main (int argc, char *argv[]) {
     if (argc != 2){
@@ -101,8 +101,12 @@ int main (int argc, char *argv[]) {
             printf("KLICOVE_SLOVO");
             break;
 
-        case TOKEN_INDENT_DEDENT:
-            printf("INDENT_DEDENT");
+        case TOKEN_INDENT:
+            printf("INDENT");
+            break;
+
+        case TOKEN_DEDENT:
+            printf("DEDENT");
             break;
 
         case TOKEN_INT:
