@@ -174,7 +174,9 @@ char *load_to_str(FILE *src_file, size_t chars_loaded_cnt){
 //viceradkoveho komentare (sekvence znaku """)
 //funkce se vrati do puvodniho stavu bufferu souboru
 int multi_line_comm_follow(FILE* src_file, int next_char){
-    if (next_char == '"' && fgetc(src_file) == '"' && fgetc(src_file) == '"') {
+    int next_next_char = fgetc(src_file);
+    int next_next_next_char = fgetc(src_file);
+    if ((next_char == '"') && (next_next_char == '"') && (next_next_next_char == '"')) {
         push_char_back(2);
         return 1;
     }
@@ -238,7 +240,7 @@ token_t get_token(FILE* src_file) {
             if (next_char == '=') {state = STATE_ASSIGNMENT; break;}
             if (next_char == '#') {state = STATE_SINGLE_LINE_COMM; break;}
             if (next_char == '_' || isalpha(next_char)) {state = STATE_ID; chars_loaded_cnt++; break;}
-            if (next_char == '\'') {state = STATE_STRING; break;}
+            if (next_char == '\'') {state = STATE_STRING_READ; break;}
             if (next_char == ' ' || next_char == '\t') {state = STATE_START; break;}
             if (next_char == '\n') {
                 start_with_indentation = 1;
@@ -256,8 +258,9 @@ token_t get_token(FILE* src_file) {
                 spaces_cnt = 0;
             }
             else if (next_char == '\n') { //pokud nacteme EOL, nechame reseni na stavu START
-                state = START;
+                state = STATE_START;
                 push_char_back(1);
+                spaces_cnt = 0;
             }
             else if (multi_line_comm_follow(src_file, next_char)) { //pokud zacina komentar (na vstupu je """)
                 state = STATE_MULTI_LINE_COMM;
@@ -279,7 +282,7 @@ token_t get_token(FILE* src_file) {
                     return create_token(TOKEN_INDENT, NO_PARAM);
                 }
                 else if (spaces_cnt == stackTop(&stack_indent)) { //pokud je odsazeni stejne, tak nedelame nic
-                    state = START;
+                    state = STATE_START;
                     spaces_cnt = 0;
                 }
                 else {  //pokud je odsazeni mensi nez na zaobniku, vyjimame ze zasobniku, dokud nenarazime na
@@ -294,7 +297,7 @@ token_t get_token(FILE* src_file) {
                     //kontrola spravnosti odsazeni
                     if (spaces_cnt != stackTop(&stack_indent)) //pokud se nejedna o hledanou hodnotu -> CHYBA
                         error_exit(ERROR_LEX);
-                    state = START;
+                    state = STATE_START;
                     spaces_cnt = 0;
                 }
             }
@@ -303,7 +306,7 @@ token_t get_token(FILE* src_file) {
         case STATE_EMPTY_LINE:
             if (next_char == EOF || next_char == '\n') { //nechame reseni na stavu START
                 push_char_back(1);
-                state = START;
+                state = STATE_START;
             }
             else if (next_char == '#')
                 state = STATE_SINGLE_LINE_COMM;
@@ -318,7 +321,7 @@ token_t get_token(FILE* src_file) {
         case STATE_MULTI_LINE_COMM:
             if (next_char == EOF) { //pokud skoncil soubor nechame reseni na stavu START
                 push_char_back(1);
-                state = START;
+                state = STATE_START;
             }
             else if (next_char != '"') //jsme stale v komentari
                 state = STATE_MULTI_LINE_COMM;
@@ -333,7 +336,7 @@ token_t get_token(FILE* src_file) {
                 state = STATE_MULTI_LINE_COMM_AFTER;
             else if (next_char == EOF || next_char == '\n') { //nechame reseni na stavu START
                 push_char_back(1);
-                state = START;
+                state = STATE_START;
             }
             else
                 error_exit(ERROR_LEX); //za komentarem byl prikaz -> CHYBA

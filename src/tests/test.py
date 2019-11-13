@@ -7,8 +7,8 @@ def main():
     print(x, y, z)
 
     # for i in range(start, stop, step)
-    for i in range(1, 6):
-        print(i)
+    while True:
+        print('1')
 
     #
 
