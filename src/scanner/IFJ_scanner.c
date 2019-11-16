@@ -187,9 +187,9 @@ int multi_line_comm_follow(FILE* src_file, int next_char){
 }
 
 token_t get_token(FILE* src_file) {
-    int next_char = EOF;
+    int next_char = -10; //hodnota, ktera nemuze z fgetc nastat
     int state = STATE_START;
-    int spaces_cnt = 0;
+    static int spaces_cnt = 0;
     size_t chars_loaded_cnt = 0;
     token_value value;
     value.string = NULL;
@@ -197,6 +197,7 @@ token_t get_token(FILE* src_file) {
     static int generate_indent = 0;
     static int start_with_indentation = 1;
     static tStack stack_indent;
+    static int eof_loaded = 0;
 
 
     if (first_token) {
@@ -210,6 +211,8 @@ token_t get_token(FILE* src_file) {
         generate_indent = 0;
         goto DEDENT;
     }
+    else
+        spaces_cnt = 0;
 
     //pri zpracovani prvniho radku zaciname kontrolou odsazeni
     //nebo pri zpracovani noveho radku
@@ -271,11 +274,12 @@ token_t get_token(FILE* src_file) {
                 spaces_cnt = 0;
             }
             else {  //pokud nasleduje nejaky prikaz
-                push_char_back(1);
-
-                //zpracovani indent/dedent
-                if (spaces_cnt % 2 != 0)
-                    error_exit(ERROR_LEX); //pokud neni pocet mezer nasobkem 2 -> CHYBA
+                if (next_char == EOF) {
+                    eof_loaded = 1;
+                    spaces_cnt = 0;
+                }
+                else
+                    push_char_back(1);
 
                 if (spaces_cnt > stackTop(&stack_indent)) { //pokud je odsazeni vetsi na na vrcholu zasbinku -> INDENT
                     stackPush(&stack_indent, spaces_cnt);
@@ -284,6 +288,8 @@ token_t get_token(FILE* src_file) {
                 else if (spaces_cnt == stackTop(&stack_indent)) { //pokud je odsazeni stejne, tak nedelame nic
                     state = STATE_START;
                     spaces_cnt = 0;
+                    if (next_char == EOF)
+                        return create_token(TOKEN_EOF, NO_PARAM);
                 }
                 else {  //pokud je odsazeni mensi nez na zaobniku, vyjimame ze zasobniku, dokud nenarazime na
                         //stejnou hodnotu, pri kazdem vyjmuti generujeme dedent, pokud hodnotu nenajdeme -> CHYBA
@@ -297,14 +303,20 @@ token_t get_token(FILE* src_file) {
                     //kontrola spravnosti odsazeni
                     if (spaces_cnt != stackTop(&stack_indent)) //pokud se nejedna o hledanou hodnotu -> CHYBA
                         error_exit(ERROR_LEX);
-                    state = STATE_START;
+
+                    if (next_char == EOF || eof_loaded) //eof mohl byt nacten pri predchozim generovani dedentu
+                        return create_token(TOKEN_EOF, NO_PARAM);
+                    else
+                        state = STATE_START;
                     spaces_cnt = 0;
                 }
             }
             break;
 
         case STATE_EMPTY_LINE:
-            if (next_char == EOF || next_char == '\n') { //nechame reseni na stavu START
+            if (next_char == EOF)
+                state = STATE_START;
+            else if (next_char == '\n') { //nechame reseni na stavu START
                 push_char_back(1);
                 state = STATE_START;
             }
@@ -319,10 +331,8 @@ token_t get_token(FILE* src_file) {
             break;                     //nez tab/space/EOL/komentarem -> CHYBA
 
         case STATE_MULTI_LINE_COMM:
-            if (next_char == EOF) { //pokud skoncil soubor nechame reseni na stavu START
-                push_char_back(1);
+            if (next_char == EOF) //pokud skoncil soubor nechame reseni na stavu START
                 state = STATE_START;
-            }
             else if (next_char != '"') //jsme stale v komentari
                 state = STATE_MULTI_LINE_COMM;
             else if (multi_line_comm_follow(src_file, next_char)) //kontrola zda nenasleduje """
@@ -334,16 +344,15 @@ token_t get_token(FILE* src_file) {
         case STATE_MULTI_LINE_COMM_AFTER:
             if (next_char == ' ' || next_char == '\t') //za viceradkovych komentarem mohou nasledovat pouze space znaky
                 state = STATE_MULTI_LINE_COMM_AFTER;
-            else if (next_char == EOF || next_char == '\n') { //nechame reseni na stavu START
+            else if (next_char == EOF)
+                state = STATE_START;
+            else if (next_char == '\n') { //nechame reseni na stavu START
                 push_char_back(1);
                 state = STATE_START;
             }
             else
                 error_exit(ERROR_LEX); //za komentarem byl prikaz -> CHYBA
             break;
-
-
-
 
         case STATE_PLUS:
             push_char_back(1);
