@@ -118,7 +118,7 @@ int main (int argc, char *argv[]) {
             break;
 
         case TOKEN_STRING:
-            printf("STRING");
+            printf("STRING, %s", token.value.string);
             break;
 
         default:

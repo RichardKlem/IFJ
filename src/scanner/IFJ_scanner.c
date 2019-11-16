@@ -38,13 +38,12 @@ char two_digit_hex_to_dec (char first, char second) {
     else
         dec = 16 * (first - 'a' + 10);
 
-    if (isdigit(first))
-        dec += first - '0';
-    else if (first >= 'A' && first <= 'F')
-        dec += first - 'A' + 10;
+    if (isdigit(second))
+        dec += second - '0';
+    else if (second >= 'A' && second <= 'F')
+        dec += second - 'A' + 10;
     else
-        dec += first - 'a' + 10;
-
+        dec += second - 'a' + 10;
     return dec;
 }
 
@@ -68,7 +67,7 @@ char* convert_to_str(char* input) {
 
             case ESCAPE_CHAR:
                 if (*input_cp == 'x') {
-                    shift_left += 2; //jelikoz nahradime tri-znakovou sekvenci za jeden znak
+                    shift_left += 3; //jelikoz nahradime ctyr-znakovou sekvenci za jeden znak
                     state = HEX_CHAR;
                     break;
                 }
@@ -78,9 +77,9 @@ char* convert_to_str(char* input) {
                     *(input_cp - shift_left) = '\"';
                 else if (*input_cp == '\'')
                     *(input_cp - shift_left) = '\'';
-                else if (*input_cp == '\n')
+                else if (*input_cp == 'n')
                     *(input_cp - shift_left) = '\n';
-                else if (*input_cp == '\t')
+                else if (*input_cp == 't')
                     *(input_cp - shift_left) = '\t';
                 else //jina moznost nenastane, to je osetreno v hlavnim fsm
                     *(input_cp - shift_left) = '\\';
@@ -88,9 +87,9 @@ char* convert_to_str(char* input) {
                 break;
 
             case HEX_CHAR:
-                //vezmeme aktualni a nasledujici znak, prevedeme je do desitkove soustavy a ulozime do pole
-                *(input - shift_left) = two_digit_hex_to_dec(*input, *(input + 1));
-                input++; //musime rucne posunout, jelikoz zpracovavame dva znaky najednou
+                input_cp++; //musime rucne posunout, jelikoz zpracovavame dva znaky najednou
+                //vezmeme aktualni a predchozi znak, prevedeme je do desitkove soustavy a ulozime do pole
+                *(input_cp - shift_left) = two_digit_hex_to_dec(*(input_cp - 1), *input_cp);
                 state = START;
                 break;
         } //switch
@@ -100,8 +99,6 @@ char* convert_to_str(char* input) {
     *(input_cp - shift_left) = '\0'; //posunuti ukoncovaciho znaku
 
     //realokace podle aktualni delky, delka noveho retezce je <= delka stareho
-    if (realloc((void *)input, strlen(input) + 1) == NULL)
-        error_exit(ERROR_INTERNAL);
     return input;
 }
 
