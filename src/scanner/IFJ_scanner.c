@@ -147,6 +147,13 @@ token_t create_token(int token_id, token_value value){
             token.value.string = convert_to_str(value.string);
             break;
 
+        case TOKEN_INT:
+            //token.value.int_value = strtol...  <- zde prevest value.string na int
+            //dulezite je korektne osetrit rozsah, strol to prevede na long int, ale my musime
+            //zajist, aby prevedene cislo nebylo vetsi nez kladna cast int (nzeavisle na architekture)
+            //ve stringu je pouze cislo a znak \0
+
+
         default:
             token.value = value;
             break;

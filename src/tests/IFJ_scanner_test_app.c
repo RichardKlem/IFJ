@@ -114,7 +114,7 @@ int main (int argc, char *argv[]) {
             break;
 
         case TOKEN_DOUBLE:
-            printf("DOUBLE, %f", token.value.double_value);
+            printf("DOUBLE, %lf", token.value.double_value);
             break;
 
         case TOKEN_STRING:
