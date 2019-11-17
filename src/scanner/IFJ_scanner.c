@@ -473,7 +473,7 @@ token_t get_token(FILE* src_file) {
         case STATE_DOUBLE_EXP_SIGN:
             chars_loaded_cnt++;
             if (isdigit(next_char))
-                state = STATE_DOUBLE_EXP_SIGN;
+                state = STATE_DOUBLE_WITH_EXP;
             else
                 error_exit(ERROR_LEX);
             break;
