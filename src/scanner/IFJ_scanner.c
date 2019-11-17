@@ -181,7 +181,7 @@ int multi_line_comm_follow(FILE* src_file, int next_char){
     int next_next_char = fgetc(src_file);
     int next_next_next_char = fgetc(src_file);
     if ((next_char == '"') && (next_next_char == '"') && (next_next_next_char == '"')) {
-        push_char_back(2);
+        //push_char_back(2); //multiline comment fix
         return 1;
     }
     else {
