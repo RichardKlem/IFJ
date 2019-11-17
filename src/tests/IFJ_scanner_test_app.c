@@ -110,11 +110,11 @@ int main (int argc, char *argv[]) {
             break;
 
         case TOKEN_INT:
-            printf("INTEGER");
+            printf("INTEGER, %d", token.value.int_value);
             break;
 
         case TOKEN_DOUBLE:
-            printf("DOUBLE");
+            printf("DOUBLE, %f", token.value.double_value);
             break;
 
         case TOKEN_STRING:
