@@ -37,7 +37,7 @@ def main():
         actual_output_file = file[:-5] + "actout"
         output_file = file[:-5] + "out"
 
-        command = "./a {} > {}".format(file, actual_output_file)
+        command = "./scanner_test_app {} > {}".format(file, actual_output_file)
         subprocess.run(command, shell=True, universal_newlines=True, check=True)
 
         actual_output = (open(actual_output_file).read()).splitlines()
