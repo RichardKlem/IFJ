@@ -62,6 +62,12 @@ def main():
                           "{}\n".format(line1) + Bcolors.BOLD +
                           "Got:\n" + Bcolors.ENDC +
                           "{}\n".format(line2))
+        if len(expected_output) != len(actual_output):
+            larger_file, larger_file_name = (expected_output, str(output_file.split('/')[-1])) \
+                    if expected_output > actual_output else (actual_output, str(actual_output_file.split('/')[-1]))
+            print( Bcolors.BOLD + "Extra lines in " + larger_file_name + Bcolors.ENDC)
+            for line in larger_file[-(abs(len(actual_output) - len(expected_output))):]:
+                print("+" + line)
         os.remove(actual_output_file)
 
 
