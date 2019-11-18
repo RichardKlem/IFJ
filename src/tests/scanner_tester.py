@@ -2,18 +2,16 @@ import sys
 import os
 import subprocess
 
-def compare(file1, file2):
-    with open(file1, 'r') as f:
-        d = set(f.readlines())
 
-    with open(file2, 'r') as f:
-        e = set(f.readlines())
-
-    open('file3.txt', 'w').close()
-
-    with open('file3.txt', 'a') as f:
-        for line in list(d-e):
-            f.write(line)
+class Bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 def main():
@@ -34,16 +32,27 @@ def main():
                 expected_output_files.append(os.path.join(r, file))
 
     for file in input_files:
-        output_name = file[:-5] + "actout"
-        command = "a.exe {}".format(file)# > {}".format(file, output_name)
-        results = subprocess.run(
-            command, shell=True, universal_newlines=True, check=True)
-        output = results.stdout
-        print(output)
-        if output == open((file[:-5] + "out")).read():
-            print('PASSED')
+        actual_output_file = file[:-5] + "actout"
+        output_file = file[:-5] + "out"
+
+        command = "./a {} > {}".format(file, actual_output_file)
+        subprocess.run(command, shell=True, universal_newlines=True, check=True)
+
+        actual_output = (open(actual_output_file).read()).splitlines()
+        expected_output = (open(output_file).read()).splitlines()
+
+        if actual_output == expected_output:
+            print(Bcolors.OKGREEN + Bcolors.BOLD + 'PASSED' + Bcolors.ENDC + file)
         else:
-            print('FAILED')
+            print(Bcolors.FAIL + Bcolors.BOLD + 'FAILED' + Bcolors.ENDC + file)
+            for line1, line2 in zip(expected_output, actual_output):
+                if line1.strip() and line2.strip() and line1 != line2:
+                    print(Bcolors.BOLD +
+                          "Expected:\n" + Bcolors.ENDC +
+                          "{}\n".format(line1) + Bcolors.BOLD +
+                          "Got:\n" + Bcolors.ENDC +
+                          "{}\n".format(line2))
+        #os.remove(actual_output_file)
 
 
 if __name__ == '__main__':
