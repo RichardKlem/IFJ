@@ -21,6 +21,7 @@ def main():
     expected_output_files = []
     src_ext = ('.ifj19', '.src')
     out_ext = '.out'
+    act_out_ext = '.actout'
 
     # r=root, d=directories, f = files
     for r, d, f in os.walk(path):
@@ -33,9 +34,15 @@ def main():
             if file.endswith(out_ext):
                 expected_output_files.append(os.path.join(r, file))
 
+    actual_output_file = ""
+    output_file = ""
     for file in input_files:
-        actual_output_file = file[:-5] + "actout"
-        output_file = file[:-5] + "out"
+        if file.endswith('.ifj19'):
+            actual_output_file = file[:-6] + act_out_ext
+            output_file = file[:-6] + out_ext
+        elif file.endswith('.src'):
+            actual_output_file = file[:-4] + act_out_ext
+            output_file = file[:-4] + out_ext
 
         command = "./scanner_test_app {} > {}".format(file, actual_output_file)
         subprocess.run(command, shell=True, universal_newlines=True, check=True)
@@ -49,13 +56,13 @@ def main():
         else:
             print(Bcolors.FAIL + Bcolors.BOLD + 'FAILED ' + Bcolors.ENDC + test_file_name)
             for line1, line2 in zip(expected_output, actual_output):
-                if line1.strip() and line2.strip() and line1 != line2:
+                if line1 != line2:
                     print(Bcolors.BOLD +
                           "Expected:\n" + Bcolors.ENDC +
                           "{}\n".format(line1) + Bcolors.BOLD +
                           "Got:\n" + Bcolors.ENDC +
                           "{}\n".format(line2))
-        #os.remove(actual_output_file)
+        os.remove(actual_output_file)
 
 
 if __name__ == '__main__':
