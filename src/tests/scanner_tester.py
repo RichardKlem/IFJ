@@ -16,7 +16,7 @@ class Bcolors:
 
 def main():
 
-    path = os.getcwd()
+    path = os.getcwd() + "/test_examples"
     input_files = []
     expected_output_files = []
     src_ext = ('.ifj19', '.src')
@@ -48,7 +48,12 @@ def main():
         subprocess.run(command, shell=True, universal_newlines=True, check=True)
 
         actual_output = (open(actual_output_file).read()).splitlines()
-        expected_output = (open(output_file).read()).splitlines()
+        try:
+            expected_output = (open(output_file).read()).splitlines()
+        except:
+            print("MISSING output_file.out for this source_file:\n{}".format(file))
+            exit(1)
+
         test_file_name = str(file.split('/')[-1])
 
         if actual_output == expected_output:
