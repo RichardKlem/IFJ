@@ -81,8 +81,11 @@ char* convert_to_str(char* input) {
                     *(input_cp - shift_left) = '\n';
                 else if (*input_cp == 't')
                     *(input_cp - shift_left) = '\t';
-                else //jina moznost nenastane, to je osetreno v hlavnim fsm
+                else if (*input_cp == '\\') //jina moznost nenastane, to je osetreno v hlavnim fsm
                     *(input_cp - shift_left) = '\\';
+                else {
+                    shift_left--;
+                }
                 state = START;
                 break;
 
@@ -584,6 +587,8 @@ token_t get_token(FILE* src_file) {
                 state = STATE_STRING_READ;
             else if (next_char == 'x')
                 state = STATE_STRING_HEX_START;
+            else if (next_char > (char)31)
+                state = STATE_STRING_READ;
             else
                 error_exit(ERROR_LEX);
             break;
