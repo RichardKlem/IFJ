@@ -53,11 +53,11 @@ char* convert_to_str(char* input) {
     size_t shift_left = 0;
     int state = START;
     char* input_cp = input;
-printf("%s", input);
+
     if (input[strlen(input) - 1] == '"') { //pokud se jedna o literal uvozeny """string"""
         input[strlen(input) - 1] = '\0';
-        input[strlen(input) - 2] = '\0';
-        input[strlen(input) - 3] = '\0';
+        input[strlen(input) - 1] = '\0';
+        input[strlen(input) - 1] = '\0';
     }
     else //pokud se jedna o literal uvozeny 'string'
         input[strlen(input) - 1] = '\0'; //posledni znak (apostrof) nahradim ukoncujicim znakem
@@ -67,6 +67,11 @@ printf("%s", input);
             case START:
                 if (*input_cp == '\\')
                     state = ESCAPE_CHAR;
+                else if (*input_cp == '\r') { //pokud se jedna o CR, tak musí nasledovat LF
+                    *(input_cp - shift_left) = *input_cp;
+                    if (*(input_cp + 1) != '\n') //zkontrolujeme, zda opravdu nasleduje LF
+                        error_exit(ERROR_LEX);
+                }
                 else
                     *(input_cp - shift_left) = *input_cp; //kopirovani normalnich znaku na prislusne misto
                 break;
@@ -294,7 +299,6 @@ token_t get_token(FILE* src_file) {
 
         case STATE_MULTI_LINE_LITERAL:
           chars_loaded_cnt++;
-printf("%c\n%d\n", next_char, chars_loaded_cnt);
             if (multi_line_comm_follow(src_file, next_char)) {//pokud je konec
                     chars_loaded_cnt += 2; //musime precit i nasledujici 2 uvozovky
                     push_char_back(chars_loaded_cnt); //simulace stavu STATE_STRING
@@ -303,12 +307,8 @@ printf("%c\n%d\n", next_char, chars_loaded_cnt);
             }
             else if (next_char == EOF)
                 error_exit(ERROR_LEX);
-            else if (next_char == '\r') {
-                chars_loaded_cnt--;
-                state = STATE_MULTI_LINE_LITERAL;
-            }
             else if (next_char > (char)31 || next_char == '"' || next_char == '\'' ||
-                     next_char ==  '\n' || next_char == '\t' || next_char == '\\')
+                     next_char ==  '\n' || next_char == '\t' || next_char == '\\' || next_char == '\r')
                 state = STATE_MULTI_LINE_LITERAL;
             else
                 error_exit(ERROR_LEX);
