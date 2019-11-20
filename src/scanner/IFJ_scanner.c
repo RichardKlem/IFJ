@@ -53,8 +53,14 @@ char* convert_to_str(char* input) {
     size_t shift_left = 0;
     int state = START;
     char* input_cp = input;
-
-    input[strlen(input) - 1] = '\0'; //posledni znak (apostrof) nahradim ukoncujicim znakem
+printf("%s", input);
+    if (input[strlen(input) - 1] == '"') { //pokud se jedna o literal uvozeny """string"""
+        input[strlen(input) - 1] = '\0';
+        input[strlen(input) - 2] = '\0';
+        input[strlen(input) - 3] = '\0';
+    }
+    else //pokud se jedna o literal uvozeny 'string'
+        input[strlen(input) - 1] = '\0'; //posledni znak (apostrof) nahradim ukoncujicim znakem
 
     while (*input_cp) {
         switch (state){
@@ -85,7 +91,8 @@ char* convert_to_str(char* input) {
                     *(input_cp - shift_left) = '\\';
                 else {
                     shift_left--;
-                    input_cp--;
+                    *(input_cp - shift_left -1) = '\\';
+                    *(input_cp - shift_left) = *input_cp;
                 }
                 state = START;
                 break;
@@ -253,7 +260,6 @@ token_t get_token(FILE* src_file) {
             eof_was_loaded = 1;
         }
 
-
         switch(state) {
         //TODO usporadat napr. podle principu Hammingova kodu pro vetsi rychlost
         case STATE_START:
@@ -280,7 +286,33 @@ token_t get_token(FILE* src_file) {
                 return create_token(TOKEN_EOL, NO_PARAM);
             }
             if (next_char == '\r') {state = STATE_CRLF; break;}
+            if (multi_line_comm_follow(src_file, next_char)) {
+                state = STATE_MULTI_LINE_LITERAL;
+                break;
+            }
             error_exit(ERROR_LEX); //jiny vstupni znak -> CHYBA
+
+        case STATE_MULTI_LINE_LITERAL:
+          chars_loaded_cnt++;
+printf("%c\n%d\n", next_char, chars_loaded_cnt);
+            if (multi_line_comm_follow(src_file, next_char)) {//pokud je konec
+                    chars_loaded_cnt += 2; //musime precit i nasledujici 2 uvozovky
+                    push_char_back(chars_loaded_cnt); //simulace stavu STATE_STRING
+                    value.string = load_to_str(src_file, chars_loaded_cnt);
+                    return create_token(TOKEN_STRING, value);
+            }
+            else if (next_char == EOF)
+                error_exit(ERROR_LEX);
+            else if (next_char == '\r') {
+                chars_loaded_cnt--;
+                state = STATE_MULTI_LINE_LITERAL;
+            }
+            else if (next_char > (char)31 || next_char == '"' || next_char == '\'' ||
+                     next_char ==  '\n' || next_char == '\t' || next_char == '\\')
+                state = STATE_MULTI_LINE_LITERAL;
+            else
+                error_exit(ERROR_LEX);
+            break;
 
         case STATE_CRLF:
             if (next_char == '\n')
@@ -621,12 +653,8 @@ token_t get_token(FILE* src_file) {
                 error_exit(ERROR_LEX);
             break;
 
-
-
-        //TODO  indent/dedent
-        //      multi line comment
-
         default:
+            error_exit(ERROR_INTERNAL);
             break;
         } //switch
     } //while
