@@ -48,7 +48,8 @@ typedef enum {
     STATE_STRING_READ,
     STATE_STRING_BACKSLASH,
     STATE_STRING_HEX_START,
-    STATE_STRING_HEX_END
+    STATE_STRING_HEX_END,
+    STATE_CRLF
 } states;
 
 typedef enum {

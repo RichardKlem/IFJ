@@ -253,7 +253,14 @@ token_t get_token(FILE* src_file) {
                 start_with_indentation = 1;
                 return create_token(TOKEN_EOL, NO_PARAM);
             }
+            if (next_char == '\r') {state = STATE_CRLF; break;}
             error_exit(ERROR_LEX); //jiny vstupni znak -> CHYBA
+
+        case STATE_CRLF:
+            if (next_char == '\n')
+                state = STATE_START;
+            else
+                error_exit(ERROR_LEX);
 
         case STATE_INDENT_DEDENT:
             if (next_char == ' ') {
