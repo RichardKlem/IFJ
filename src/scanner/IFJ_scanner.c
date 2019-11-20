@@ -120,6 +120,21 @@ int iskeyword(char *s){
     return NOT_A_KEYWORD; //else
 }
 
+int str_to_int(char* string_number) {
+    long int int_number = 0;
+
+    while (*string_number) {
+        if (int_number > (int)((unsigned)(-1)/2)) {
+            return 1;
+        }
+        int_number *= 10;
+        int_number += (string_number[0]-48);
+        string_number++;
+    }
+
+    return int_number;
+}
+
 token_t create_token(int token_id, token_value value){
     token_t token;
     token.type = token_id;
@@ -148,10 +163,8 @@ token_t create_token(int token_id, token_value value){
             break;
 
         case TOKEN_INT:
-            //token.value.int_value = strtol...  <- zde prevest value.string na int
-            //dulezite je korektne osetrit rozsah, strol to prevede na long int, ale my musime
-            //zajist, aby prevedene cislo nebylo vetsi nez kladna cast int (nzeavisle na architekture)
-            //ve stringu je pouze cislo a znak \0
+            token.value.int_value = str_to_int(value.string);
+            break;
 
 
         default:

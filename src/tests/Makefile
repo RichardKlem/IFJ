@@ -5,7 +5,7 @@ lib_include=-I../ -I../scanner/
 all: test_app
 
 test_app: ${src_c} ${src_h}
-	gcc ${src_c} ${lib_include} -o a
+	gcc ${src_c} ${lib_include} -o scanner_test_app
 
 clean:
-	rm -f a
+	rm -f scanner_test_app
