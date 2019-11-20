@@ -113,7 +113,7 @@ int iskeyword(char *s){
         return DEF;
     if (!strcmp((const char*)s, "while"))
         return WHILE;
-    if (!strcmp((const char*)s, "none"))
+    if (!strcmp((const char*)s, "None"))
         return NONE;
     if (!strcmp((const char*)s, "pass"))
         return PASS;
