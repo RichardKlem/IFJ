@@ -217,7 +217,7 @@ token_t get_token(FILE* src_file) {
     static int generate_indent = 0;
     static int start_with_indentation = 1;
     static tStack stack_indent;
-    static int eof_loaded = 0;
+    static int eof_was_loaded = 0;
 
 
     if (first_token) {
@@ -243,6 +243,15 @@ token_t get_token(FILE* src_file) {
 
     while (1) {
         next_char = fgetc(src_file);    //nacteni dalsiho znaku
+
+        if (eof_was_loaded == 1) {
+            state = STATE_INDENT_DEDENT;
+        }
+
+        if (next_char == EOF) { //pridani EOL pred EOF
+            eof_was_loaded = 1;
+        }
+
 
         switch(state) {
         //TODO usporadat napr. podle principu Hammingova kodu pro vetsi rychlost
@@ -302,7 +311,7 @@ token_t get_token(FILE* src_file) {
             }
             else {  //pokud nasleduje nejaky prikaz
                 if (next_char == EOF) {
-                    eof_loaded = 1;
+                    eof_was_loaded = 1;
                     spaces_cnt = 0;
                 }
                 else
@@ -331,7 +340,7 @@ token_t get_token(FILE* src_file) {
                     if (spaces_cnt != stackTop(&stack_indent)) //pokud se nejedna o hledanou hodnotu -> CHYBA
                         error_exit(ERROR_LEX);
 
-                    if (next_char == EOF || eof_loaded) //eof mohl byt nacten pri predchozim generovani dedentu
+                    if (next_char == EOF || eof_was_loaded) //eof mohl byt nacten pri predchozim generovani dedentu
                         return create_token(TOKEN_EOF, NO_PARAM);
                     else
                         state = STATE_START;
