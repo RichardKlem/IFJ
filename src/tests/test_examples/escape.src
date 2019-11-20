@@ -1,0 +1,29 @@
+print('\n')
+print('\f')
+print('\a')
+print('\b')
+print('\r')
+print('\t')
+print('\v')
+print('\\')
+print('\'')
+print('\"')
+print('"')
+print('\?')
+print('\x61')
+print('\0')
+""" test \n test """
+""" test
+\n
+test """
+""" test \f """
+""" test \"" """
+""" test "\" test """
+""" test '\n' test """
+""" test ' ' test """
+""" test "\\" test """
+""" test
+test """
+a = 'Ahoj\\\'\Ahoj'
+print(a)
+print('\x1')

@@ -1,0 +1,14 @@
+a = '\A'
+print(a)
+a = '\x21' #!
+b = '\x2a' #*
+c = '\x2A' #*
+e = '\x7a' #z
+f = '\x7E' #~
+d = '\X2A' #\X2A
+print(d)
+g = '\Aaa'
+h = '\AAA'
+i = '\ZFF'
+i = '\zFF'
+print(f)
