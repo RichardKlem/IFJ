@@ -85,6 +85,7 @@ char* convert_to_str(char* input) {
                     *(input_cp - shift_left) = '\\';
                 else {
                     shift_left--;
+                    input_cp--;
                 }
                 state = START;
                 break;
