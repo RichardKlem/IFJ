@@ -48,6 +48,7 @@ def main():
         #subprocess.run(command, shell=True, universal_newlines=True, check=True) --originalni prikaz
         subprocess.run(command, shell=True, universal_newlines=True) #novy prikaz, kvuli ocekavani return 1
 
+        expected_output = []
         actual_output = (open(actual_output_file).read()).splitlines()
         try:
             expected_output = (open(output_file).read()).splitlines()
@@ -71,7 +72,7 @@ def main():
         if len(expected_output) != len(actual_output):
             larger_file, larger_file_name = (expected_output, str(output_file.split('/')[-1])) \
                     if expected_output > actual_output else (actual_output, str(actual_output_file.split('/')[-1]))
-            print( Bcolors.BOLD + "Extra lines in " + larger_file_name + Bcolors.ENDC)
+            print(Bcolors.BOLD + "Extra lines in " + larger_file_name + Bcolors.ENDC)
             for line in larger_file[-(abs(len(actual_output) - len(expected_output))):]:
                 print("+" + line)
         os.remove(actual_output_file)
