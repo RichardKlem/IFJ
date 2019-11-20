@@ -1,2 +1,4 @@
 #ignoruje testovaci zdrojove soubory
 src/*.src
+src/tests/a
+src/tests/scanner_test_app
