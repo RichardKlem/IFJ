@@ -1,1 +1,29 @@
 a = 1
+
+#IF <expr> : EOL INDENT <state> EOL <st-list> DEDENT   #mozna spatne, protoze chybi else
+if a == 1:
+    print('eq')
+if a <= 1:
+    print('less_eq')
+if a >= 1:
+    print('greater_eq')
+if a != 1:
+    print('not_eq')
+
+#IF <expr> : EOL INDENT <state> EOL <st-list> DEDENT ELSE : EOL INDENT <state> EOL <st-list> DEDENT
+if a == 1:
+    print('eq')
+else:
+    print('else_eq')
+if a <= 1:
+    print('less_eq')
+else:
+    print('else_less_eq')
+if a >= 1:
+    print('greater_eq')
+else:
+    print('else_greater_eq')
+if a != 1:
+    print('not_eq')
+else:
+    print('else_not_eq')

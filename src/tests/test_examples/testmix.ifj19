@@ -1,0 +1,27 @@
+a=1
+
+def foo(a, b, c, d):
+    """ random
+    pomocna funkce
+    pro cokoliv, bere
+    parametr a,b,c,d"""
+
+    print(a)
+    e = b+c-d*b/d//d
+
+    print(e)
+
+while a+1>(1+3*a+4):
+    print(a)
+
+foo('', 0, 1)
+
+#random radkova funkce
+""" random vice radkova funkce na jednom radku"""
+
+""" random vice radkova
+funkce na vice "" "" "" \f \t \n
+radcich """
+
+foo("""string
+pro funkci""", 1, 2, 4)

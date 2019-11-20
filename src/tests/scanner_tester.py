@@ -44,8 +44,9 @@ def main():
             actual_output_file = file[:-4] + act_out_ext
             output_file = file[:-4] + out_ext
 
-        command = "./scanner_test_app {} > {}".format(file, actual_output_file)
-        subprocess.run(command, shell=True, universal_newlines=True, check=True)
+        command = "./scanner_test_app {} >> {} 2>&1".format(file, actual_output_file)
+        #subprocess.run(command, shell=True, universal_newlines=True, check=True) --originalni prikaz
+        subprocess.run(command, shell=True, universal_newlines=True) #novy prikaz, kvuli ocekavani return 1
 
         actual_output = (open(actual_output_file).read()).splitlines()
         try:

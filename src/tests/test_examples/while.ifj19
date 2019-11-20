@@ -1,0 +1,11 @@
+a = 1
+
+#WHILE <expr> : EOL INDENT <state> EOL <st-list> DEDENT
+while a == 1:
+    print('eq')
+while a <= 1:
+    print('less_eq')
+while a >= 1:
+    print('greater_eq')
+while a != 1:
+    print('not_eq')

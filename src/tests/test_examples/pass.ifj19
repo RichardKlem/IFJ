@@ -1,0 +1,16 @@
+def main():
+    def main1():
+        def main2():
+            def main3():
+                def main4():
+                    def main5():
+                        pass
+
+
+if 1<2:
+    if 1<2:
+        if 1<2:
+            if 1<2:
+                if 1<2:
+                    if 1<2:
+                        pass

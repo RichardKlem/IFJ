@@ -1,0 +1,21 @@
+""" funkce
+DEF ID ( <arg-list> ) : EOL INDENT <state> EOL <st-list> <return> <st-list> DEDENT """
+
+def main():
+    a = 1
+    print(a)
+
+def foo():
+    a = 1 + 2 + a
+    print(a)
+
+def foo1(a, b, c):
+    a = 1 + b + c
+    print(a)
+
+x = 1+2
+main()
+foo()
+foo1(1)
+foo1(x)
+input(i)
