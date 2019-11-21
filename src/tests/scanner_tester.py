@@ -36,6 +36,8 @@ def main():
 
     actual_output_file = ""
     output_file = ""
+    passed_count = 0
+    failed_count = 0
     for file in input_files:
         if file.endswith('.ifj19'):
             actual_output_file = file[:-6] + act_out_ext
@@ -59,8 +61,10 @@ def main():
         test_file_name = str(file.split('/')[-1])
 
         if actual_output == expected_output:
+            passed_count += 1
             print(Bcolors.OKGREEN + Bcolors.BOLD + 'PASSED ' + Bcolors.ENDC + test_file_name)
         else:
+            failed_count += 1
             print(Bcolors.FAIL + Bcolors.BOLD + 'FAILED ' + Bcolors.ENDC + test_file_name)
             for line1, line2 in zip(expected_output, actual_output):
                 if line1 != line2:
@@ -76,6 +80,8 @@ def main():
             for line in larger_file[-(abs(len(actual_output) - len(expected_output))):]:
                 print("+" + line)
         os.remove(actual_output_file)
+    print(Bcolors.OKGREEN + "\n{} passed\n".format(passed_count) + Bcolors.FAIL + "{} failed".format(failed_count)
+          + Bcolors.ENDC)
 
 
 if __name__ == '__main__':
