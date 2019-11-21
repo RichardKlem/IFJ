@@ -13,4 +13,10 @@ typedef enum {
 
 precedence_rule precdence_table = [8][8];
 
+
+ptr_tNode * expressionParse(token_t *args);
+void reduce_by_rules(tStack *stack);
+token_t find_top_terminal(tStack * stack);
+
+
 #endif //IFJ_PRECEDENCE_SYNTACTIC_ANALYSIS_H
