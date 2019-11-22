@@ -3,11 +3,9 @@
 
 #include "IFJ_stack.h"
 tStack psa_stack;
-ptr_psa_stac = &psa_stack;
+extern ptr_psa_stac = &psa_stack;
 
-token_t find_fisrt_terminal(ptr_psa_stac);
-
-ptr_tNode * expressionParse(token_t *args);
+void expressionParse(token_t *args);
 void reduce_by_rules(tStack *stack);
 
 
