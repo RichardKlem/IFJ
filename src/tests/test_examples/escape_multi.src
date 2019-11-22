@@ -1,0 +1,19 @@
+a = '\A\z\z\'\\\'\z\""\'\z\'\\\\\z\x7A\m\m'
+a= '\Z'
+print(a)
+print('\x61\X')
+
+import random
+alphanum_list = ["X","\\x", "\\\\",]
+for letter in range(65,70):
+    alphanum_list.append(chr(letter))
+
+for number in range(0,9+1):
+    alphanum_list.append(number)
+
+for j in range(0,20):
+    print('\'',end='')
+    for i in range(0,20):
+        a = "{}".format(random.choice(alphanum_list))
+        print(a, end='')
+    print('\'')
