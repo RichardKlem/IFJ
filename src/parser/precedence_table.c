@@ -2,8 +2,71 @@
 // Created by Richa on 21-Nov-19.
 //
 
+#include <stdlib.h>
+#include <stdbool.h>
+#include "IFJ_error.h"
 #include "precedence_table.h"
 
+void exprStackInit (tExprStack* s) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else
+        s->top = NULL;
+}
+
+int epxrStackEmpty (tExprStack* s) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else
+        return s->top == NULL;
+}
+
+int exprStackTop (tExprStack* s) {
+    if (stackEmpty(s) || stackEmpty(s))
+        error_exit(ERROR_INTERNAL);
+    else
+        return s->top->data;
+}
+
+void exprStackPop (tExprStack* s) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else if (!stackEmpty(s)) {
+        tElem* del = s->top;
+        s->top = s->top->next;
+        free (del);
+    }
+}
+
+void exprStackPush (tExprStack* s, expr_token_t item) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else {
+        tElem* insert = (tExprElem*)malloc(sizeof(tExprElem));
+        if (insert == NULL)
+            error_exit(ERROR_INTERNAL);
+
+        insert->exprToken = item;
+        insert->next = s->top;
+        s->top = insert;
+    }
+}
+
+expr_token_t* find_top_terminal(tExprStack* s)
+{
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else {
+        tExprElem* top_terminal= &(s->top);
+        while (top_terminal->exprToken.terminal == false)
+        {
+            if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
+                error_exit(ERROR_INTERNAL);
+            top_terminal = top_terminal->next;
+        }
+        return top_terminal;
+    }
+}
 
 precedence_table =
          {

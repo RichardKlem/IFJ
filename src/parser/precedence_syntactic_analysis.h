@@ -9,7 +9,6 @@ token_t find_fisrt_terminal(ptr_psa_stac);
 
 ptr_tNode * expressionParse(token_t *args);
 void reduce_by_rules(tStack *stack);
-token_t find_top_terminal(tStack * stack);
 
 
 #endif //IFJ_PRECEDENCE_SYNTACTIC_ANALYSIS_H
