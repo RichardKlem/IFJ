@@ -78,7 +78,8 @@ typedef enum {
     TOKEN_DEDENT,
     TOKEN_INT,
     TOKEN_DOUBLE,
-    TOKEN_STRING
+    TOKEN_STRING,
+    TOKEN_DOLAR
 } token_type;
 
 typedef enum {
