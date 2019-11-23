@@ -159,7 +159,13 @@ void printInst(tDLList *List)
                 printf("WRITE %s\n",(case *) tmpInst.arg1);
                 break;
             case CONCAT:
-                printF("CONCAT")
+                printf("CONCAT %s %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case STRLEN:
+                printf("STRLEN %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2);
+                break;
+            case GETCHAR:
+                printf("GETCHAR %s %s %s\n", )
         }
     }
 }
