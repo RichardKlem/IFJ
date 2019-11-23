@@ -8,9 +8,9 @@
  *  Datum vytvoreni: 12.10.2019
  * ************************************************************************** */
 
-#include "instGen.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "IFJ_inst_gen.h"
 
 void generateInst(tDLElemPtr *List, enInstruction instType, void *arg1, void *arg2, void *arg3)
 {

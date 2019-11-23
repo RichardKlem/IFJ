@@ -9,13 +9,13 @@
  * ************************************************************************** */
 
 #include <ctype.h>
-#include "IFJ_scanner.h"
-#include "IFJ_error.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 #include "IFJ_stack.h"
+#include "IFJ_scanner.h"
+#include "IFJ_error.h"
 
 //posune offset o 1 byte zpet, implicitní soubor je src_file
 #define push_char_back(x) fseek(src_file, -(x), SEEK_CUR)
