@@ -13,7 +13,7 @@
 
 void ExprDLError() {
 
-    fprintf (stderr,"*ERROR* Table of Instructions.\n");
+    fprintf (stderr,"*ERROR* PSA expression DLL\n");
     return;
 }
 
@@ -48,7 +48,7 @@ void ExprDLDisposeList (tExprDLList *L) {
     return;
 }
 
-void ExprDLInsertFirst (tExprDLList *L, tInstruction val) {
+void ExprDLInsertFirst (tExprDLList *L, t_token token) {
 
     tExprDLElemPtr newElem = (tExprDLElemPtr) malloc (sizeof(tExprDLElemPtr));// tExprDLElemPtr je struktura definovaná jako pointer, jak tedy mallocovat
     if (newElem == NULL)    //Ověření zda alokace proběhla úspěšně
@@ -56,7 +56,7 @@ void ExprDLInsertFirst (tExprDLList *L, tInstruction val) {
         ExprDLError();
         exit(1);
     }
-    newElem->instr = val;    //Přiřazení dat do nového prvku
+    newElem->token = token;    //Přiřazení dat do nového prvku
     newElem->lptr = NULL;
     if(L->First != NULL)    //Pokud už seznam nějaké prvky má
     {
@@ -73,7 +73,7 @@ void ExprDLInsertFirst (tExprDLList *L, tInstruction val) {
     return;
 }
 
-void ExprDLInsertLast(tExprDLList *L, tInstruction val) {
+void ExprDLInsertLast(tExprDLList *L, t_table token) {
 
     tExprDLElemPtr newElem = (tExprDLElemPtr) malloc(sizeof(tExprDLElemPtr));
     if (newElem == NULL)
@@ -81,7 +81,7 @@ void ExprDLInsertLast(tExprDLList *L, tInstruction val) {
         ExprDLError();
         exit(1);
     }
-    newElem->instr = val;
+    newElem->token = token;
     newElem->rptr = NULL;
     if(L->Last != NULL)
     {
@@ -110,26 +110,26 @@ void ExprDLLast (tExprDLList *L) {
     return;
 }
 
-void ExprDLCopyFirst (tExprDLList *L, tInstruction *val) {
+void ExprDLCopyFirst (tExprDLList *L, t_table *token) {
 
     if(L->First == NULL)
     {
         ExprDLError();
         return;
     }
-    *val = L->First->instr;
+    *token = L->First->token;
     return;
 
 }
 
-void ExprDLCopyLast (tExprDLList *L, tInstruction *val) {
+void ExprDLCopyLast (tExprDLList *L, t_table *token) {
 
     if(L->Last == NULL)
     {
         ExprDLError();
         return;
     }
-    *val = L->Last->instr;
+    *token = L->Last->token;
     return;
 }
 
@@ -215,7 +215,7 @@ void ExprDLPreDelete (tExprDLList *L) {
     return;
 }
 
-void ExprDLPostInsert (tExprDLList *L, tInstruction val) {
+void ExprDLPostInsert (tExprDLList *L, t_table token) {
 
     if(L->Act == NULL)
     {
@@ -228,7 +228,7 @@ void ExprDLPostInsert (tExprDLList *L, tInstruction val) {
         ExprDLError();
         exit(1);
     }
-    newElem->instr= val;
+    newElem->token= token;
     newElem->lptr = L->Act;
     newElem->rptr = L->Act->rptr;
     L->Act->rptr = newElem;
@@ -243,7 +243,7 @@ void ExprDLPostInsert (tExprDLList *L, tInstruction val) {
     return;
 }
 
-void ExprDLPreInsert (tExprDLList *L, tInstruction val) {
+void ExprDLPreInsert (tExprDLList *L, t_table token) {
 
     if(L->Act == NULL)
     {
@@ -256,7 +256,7 @@ void ExprDLPreInsert (tExprDLList *L, tInstruction val) {
         ExprDLError();
     }
 
-    newElem->instr = val;
+    newElem->token = token;
     newElem->rptr = L->Act;
     newElem->lptr = L->Act->lptr;
     L->Act->lptr = newElem;
@@ -271,24 +271,24 @@ void ExprDLPreInsert (tExprDLList *L, tInstruction val) {
     return;
 }
 
-void ExprDLCopy (tExprDLList *L, tInstruction *val) {
+void ExprDLCopy (tExprDLList *L, t_table *token) {
 
     if(ExprDLActive(L) == 0)
     {
         ExprDLError();
         return;
     }
-    *val = L->Act->instr;
+    *token = L->Act->token;
     return;
 }
 
-void ExprDLActualize (tExprDLList *L, tInstruction val) {
+void ExprDLActualize (tExprDLList *L, t_table token) {
 
     if(L->Act == NULL)
     {
         return;
     }
-    L->Act->instr = val;
+    L->Act->token = token;
     return;
 }
 
