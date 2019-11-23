@@ -110,4 +110,4 @@ token_t get_token(FILE* src_file);
 
 #endif
 
- /* konec souboru IFJ_scanner.h */
+/* konec souboru IFJ_scanner.h */
