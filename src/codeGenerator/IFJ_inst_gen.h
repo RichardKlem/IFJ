@@ -67,7 +67,9 @@ typedef enum
     JUMPIFNEQS,
     EXIT,
     BREAK,
-    DPRINT
+    DPRINT,
+    COMMENT,
+    HEADER
 } enInstruction;
 
 typedef struct
