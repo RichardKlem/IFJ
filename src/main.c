@@ -13,11 +13,13 @@
 #include "IFJ_error.h"
 
 int main () {
+    /*
     FILE* src_file = fopen("test.src", "r");
     if (src_file == NULL)
         error_exit(ERROR_INTERNAL);
+    */
 
-    token_t token = get_token(src_file);
+    token_t token = get_token(stdin);
     printf("%d\n", token.type);
 
 
