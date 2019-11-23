@@ -9,6 +9,8 @@
  * ************************************************************************** */
 
 #include "instGen.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 void generateInst(tDLElemPtr *List, enInstruction instType, void *arg1, void *arg2, void *arg3)
 {
@@ -34,7 +36,7 @@ void printInst(tDLList *List)
         switch (tmpInst.instType)
         {
             case MOVE:
-                printf("MOVE %s %s\n",(char) tmpInst->arg1,(char) tmpInst->arg2);
+                printf("MOVE %s %s\n",(char *) tmpInst.arg1,(char *) tmpInst.arg2);
                 break;
             case CREATEFRAME:
                 printf("CREATEFRAME\n");
@@ -43,17 +45,121 @@ void printInst(tDLList *List)
                 printf("POPFRAME\n");
                 break;
             case DEFVAR:
-                printf("DEFVAR %s\n",(char) tmpInst->arg1);
+                printf("DEFVAR %s\n",(char *) tmpInst.arg1);
                 break;
             case CALL:
-                printf("CALL %s\n",(char) tmpInst->arg1);
+                printf("CALL %s\n",(char *) tmpInst.arg1);
                 break;
             case RETURN:
                 printf("RETURN\n");
                 break;
             case PUSHS:
-                printf("PUSHS %s\n",(char) tmpInst.arg1);
+                printf("PUSHS %s\n",(char *) tmpInst.arg1);
                 break;
+            case POPS:
+                printf("POPS %s\n",(char *) tmpInst.arg1);
+                break;
+            case CLEAR:
+                printf("CLEARS\n");
+                break;
+            case ADD:
+                printf("ADD %s %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case SUB:
+                printf("SUB %s %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case MUL:
+                printf("MUL %s %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case DIV:
+                printf("DIV %s %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case IDIV:
+                printf("IDIV %s %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case ADDS:
+                printf("ADDS\n");
+                break;
+            case SUBS:
+                printf("SUBS\n");
+                break;
+            case MULS:
+                printf("MULS\n");
+                break;
+            case DIVS:
+                printf("DIVS\n");
+                break;
+            case IDIVS:
+                printf("IDIVS\n");
+                break;
+            case LT:
+                printf("LT %s %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case GT:
+                printf("LT %s %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case EQ:
+                printf("LT %s %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case LTS:
+                printf("LTS\n");
+                break;
+            case GTS:
+                printf("GTS\n");
+                break;
+            case EQS:
+                printf("EQS\n");
+                break;
+            case AND:
+                printf("AND %s %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case OR:
+                printf("OR %s %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case NOT:
+                printf("NOT %s %s %s\n", (case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case ANDS:
+                printf("ANDS\n");
+                break;
+            case ORS:
+                printf("ORS\n");
+                break;
+            case NOTS:
+                printf("NOTS\n");
+                break;
+            case INT2FLOAT:
+                printf("INT2FLOAT %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2);
+                break;
+            case FLOAT2INT:
+                printf("FLOAT2INT %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2);
+                break;
+            case INT2CHAR:
+                printf("INT2CHAR %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2);
+                break;
+            case STRI2INT:
+                printf("STRI2INT %s %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2, (case *) tmpInst.arg3);
+                break;
+            case INT2FLOATS:
+                printf("INT2FLOATS\n");
+                break;
+            case FLOAT2INTS:
+                printf("FLOAT2INTS\n");
+                break;
+            case INT2CHARS:
+                printf("INT2CHARS\n");
+                break;
+            case STRI2INTS:
+                printf("STRI2INTS\n");
+                break;
+            case READ:
+                printf("READ %s %s\n",(case *) tmpInst.arg1, (case *) tmpInst.arg2);
+                break;
+            case WRITE:
+                printf("WRITE %s\n",(case *) tmpInst.arg1);
+                break;
+            case CONCAT:
+                printF("CONCAT")
         }
     }
 }
