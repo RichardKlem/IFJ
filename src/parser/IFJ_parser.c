@@ -440,7 +440,7 @@ void fun_or_expr() {
     else if (next_token.type == TOKEN_ID){
         next_token = get_token(stdin);
         //fun_or_expr(); CHYBA
-        fun_or_expr2();
+        fun_or_expr_2();
     }
     //pravidlo 29
     else if (next_token.type == TOKEN_EOL)
@@ -449,7 +449,7 @@ void fun_or_expr() {
         error_exit(ERROR_SYNTAX);
 }
 
-void fun_or_expr2() {
+void fun_or_expr_2() {
     printf("In fun_or_expr2\n");
     //pravidlo 23*
     if (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
