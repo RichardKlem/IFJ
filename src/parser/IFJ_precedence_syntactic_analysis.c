@@ -125,6 +125,21 @@ precedence_rule get_precedence(expr_token_t first, expr_token_t second)
 }
 
 /**
+ * @brief funkce reduce_by_rules zpracuje tokeny na PSA zasobniku podle pravidel, provadi PRAVY rozbor
+ * @param stack ukazatel na PSA zasobnik
+ * @return vraci 1, kdyz je vse v poradku, jinak 0
+ */
+int reduce_by_rules(tExprStack * stack)
+{
+    //TODO dodelat tuto funkci, ktera pokud existuje pravidlo ,tak ho provede a provede patricen akce a vrati 1.
+    // Pokud pravidlo neexistuje, tak vraci 0, pokud je neco spatne jinak tak error_exit(ERROR_SYNTAX)
+    if(stack->top->exprToken.token.type == TOKEN_INT)
+        return 1;
+    return 0;
+}
+
+
+/**
  * @brief hlavni funkce, ktera se vola kdyz je potreba zpracovat vyraz
  *        muze byt predno 0 az 2 tokeny, kdyz nastane syntaxticka chyba, tak vyhodi chybu
  * @param first prvni token
