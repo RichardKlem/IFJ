@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include "IFJ_error.h"
 #include "IFJ_stack.h"
+#include "IFJ_scanner.h"
 #include "IFJ_precedence_table.h"
 
 void exprStackInit (tExprStack* s) {
@@ -35,11 +36,11 @@ int epxrStackEmpty (tExprStack* s) {
         return s->top == NULL;
 }
 
-int exprStackTop (tExprStack* s) {
+expr_token_t exprStackTop (tExprStack* s) {
     if (stackEmpty(s) || stackEmpty(s))
         error_exit(ERROR_INTERNAL);
     else
-        return s->top->data;
+        return s->top->exprToken;
 }
 
 void exprStackPop (tExprStack* s) {
@@ -52,37 +53,37 @@ void exprStackPop (tExprStack* s) {
     }
 }
 
-void exprStackPush (tExprStack* s, expr_token_t item) {
+void exprStackPush (tExprStack* s, tExprElem item) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else {
-        tElem* insert = (tExprElem*)malloc(sizeof(tExprElem));
+        tExprElem* insert = (tExprElem*)malloc(sizeof(tExprElem));
         if (insert == NULL)
             error_exit(ERROR_INTERNAL);
 
-        insert->exprToken = item;
+        insert->exprToken = item.exprToken;
         insert->next = s->top;
         s->top = insert;
     }
 }
 
-expr_token_t* find_top_terminal(tExprStack* s)
+expr_token_t find_top_terminal(tExprStack* s)
 {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else {
-        tExprElem* top_terminal= &(s->top);
-        while (top_terminal->exprToken.terminal == false)
+        tExprElem top_terminal = *(s->top);
+        while (top_terminal.exprToken.terminal == false)
         {
-            if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
+            if (top_terminal.next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
                 error_exit(ERROR_INTERNAL);
-            top_terminal = top_terminal->next;
+            top_terminal = *(top_terminal.next);
         }
-        return top_terminal;
+        return top_terminal.exprToken;
     }
 }
 
-precedence_table =
+precedence_rule precedence_table[8][8] =
          {
            //  |  +-  | // / *|   (   |    )  |   r   |   fc  |   var |    $  |
 /*|   +-   |*/ {REDUCE, SHIFT,  SHIFT,  REDUCE, XXXXXX, XXXXXX, SHIFT,  REDUCE},

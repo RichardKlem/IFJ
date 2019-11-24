@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include "IFJ_precedence_syntactic_analysis.h"
 #include "IFJ_scanner.h"
+#include "IFJ_precedence_syntactic_analysis.h"
 #include "IFJ_stack.h"
 #include "IFJ_error.h"
 #include "IFJ_precedence_table.h"
@@ -167,8 +167,8 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     //prvni inicializace promennych
     top_terminal.exprToken = find_top_terminal(ptr_psa_stack); //nactu si nevrchnejsi terminal
     top_terminal.exprToken.terminal = true;
-    exprDLCopyFirst(psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
-    exprDLDeleteFirst(psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
+    exprDLCopyFirst(&psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
+    exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
     input.exprToken.terminal = true;
     do
     {
@@ -177,24 +177,23 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
         if(precedence == SHIFT){
 
             //TODO zamen a za a<
-            exprStackPush(psa_stack, input.exprToken);
+            exprStackPush(&psa_stack, input.exprToken);
             top_terminal.exprToken = find_top_terminal(ptr_psa_stack); //nactu si nevrchnejsi terminal
             top_terminal.exprToken.terminal = true;
-            exprDLCopyFirst(psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
-            exprDLDeleteFirst(psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
+            exprDLCopyFirst(&psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
+            exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
             input.exprToken.terminal = true;
         }
         else if(precedence == EQUAL){
             // = :push(b) & přečti další symbol b ze vstupu
-            exprStackPush(psa_stack, input.exprToken);
+            exprStackPush(&psa_stack, input.exprToken);
             top_terminal.exprToken = find_top_terminal(ptr_psa_stack); //nactu si nevrchnejsi terminal
             top_terminal.exprToken.terminal = true;
-            exprDLCopyFirst(psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
-            exprDLDeleteFirst(psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
+            exprDLCopyFirst(&psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
+            exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
             input.exprToken.terminal = true;
         }
 
     } while (top_terminal.exprToken.token.type != TOKEN_DOLAR && input.exprToken.token.type != TOKEN_DOLAR);
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
-
