@@ -14,7 +14,7 @@
 typedef enum
 {
     MOVE,
-    CREAREFRAME,
+    CREATEFRAME,
     PUSHFRAME,
     POPFARME,
     DEFVAR,
@@ -32,6 +32,7 @@ typedef enum
     SUBS,
     MULS,
     DIVS,
+    IDIVS,
     LT,
     GT,
     EQ,
@@ -58,6 +59,7 @@ typedef enum
     STRLEN,
     GETCHAR,
     SETCHAR,
+    CONCAT,
     TYPE,
     LABEL,
     JUMP,
@@ -72,9 +74,30 @@ typedef enum
     HEADER
 } enInstruction;
 
+typedef enum
+{
+    GF,
+    LF,
+    TF
+} tFrame;
+
+typedef enum
+{
+    T_INT,
+    T_DOUBLE,
+    T_STRING
+} tDatTyp;
+
 typedef struct
 {
-    enIntruction instType;
+    //TODO
+    tFrame frame;
+    char* value;
+} tAgrument;
+
+typedef struct
+{
+    enInstruction instType;
     void* arg1;
     void* arg2;
     void* arg3;
