@@ -20,7 +20,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include "IFJ_scanner.h"
-#include "IFJ_precedence_syntactic_analysis.h"
 #include "IFJ_stack.h"
 #include "IFJ_error.h"
 #include "IFJ_precedence_table.h"
@@ -49,14 +48,18 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
     if(second_token != NULL)
         exprDLInsertLast(expr_DLL, *second_token);
 
-    token_t act_token = get_token(src_file); //nacteni tokenu ze vstupu
+    expr_token_t act_token;
+    act_token.token = get_token(src_file); //nacteni tokenu ze vstupu
+
     //dokud nenactu keyword, eol nebo eof
-    while (act_toke.type != TOKEN_KEYWORD || ||act_token.type != TOKEN_EOL || act_token.type != TOKEN_EOF)
+    while (act_token.token.type != TOKEN_KEYWORD || act_token.token.type != TOKEN_EOL || act_token.token.type != TOKEN_EOF)
     {
+        act_token.terminal = true;
+        act_token.shifted = false;
         exprDLInsertLast(expr_DLL, act_token);
-        act_token = get_token(src_file);
+        act_token.token = get_token(src_file);
     }
-    return act_token;
+    return act_token.token;
 }
 
 /**
@@ -140,40 +143,40 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
         error_exit(ERROR_INTERNAL);
     if(num_of_tokens >= 1)
     {
-        first_expr_token->token = first;
+        first_expr_token->token = *first;
         first_expr_token->terminal = true;
         first_expr_token->shifted = false;
         if(num_of_tokens == 2){
-            second_expr_token->token = second;
+            second_expr_token->token = *second;
             second_expr_token->terminal = true;
             second_expr_token->shifted = false;
         }
     }
 
     tExprDLList psa_exprDLL; //dvojsmerne vazany list v kterem bude cely vstup v tokenech
-    exprDLInitList(ptr_psa_exprDLL); //inicializace DL listu
+    exprDLInitList(&psa_exprDLL); //inicializace DL listu
     token_t last_token; //token ktery vratim do RS
     last_token = loadExpr(src_file, &psa_exprDLL, first_expr_token, second_expr_token);
 
     tExprStack psa_stack;
-    tExprElem end_token;
-    end_token.exprToken.token.type = TOKEN_DOLAR;
-    end_token.exprToken.token.value.string = "$";
-    end_token.exprToken.terminal = true;
+    expr_token_t end_token;
+    end_token.token.type = TOKEN_DOLAR;
+    end_token.token.value.string = "$";
+    end_token.terminal = true;
     exprStackPush(&psa_stack, end_token); //vlozim 'zarazku'
 
-    tExprElem top_terminal;
-    tExprElem input;
+    expr_token_t top_terminal;
+    expr_token_t input;
 
     //prvni inicializace promennych
-    top_terminal.exprToken = find_top_terminal(ptr_psa_stack); //nactu si nevrchnejsi terminal
-    top_terminal.exprToken.terminal = true;
-    exprDLCopyFirst(&psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
+    top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
+    top_terminal.terminal = true;
+    exprDLCopyFirst(&psa_exprDLL, &(input)); //dostanu prvni expr_token s atributem temrinal=true na vstupu
     exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
-    input.exprToken.terminal = true;
+    input.terminal = true; //mozna neni treba
     do
     {
-        precedence_rule precedence = get_precedence(top_terminal, input);
+        /*precedence_rule precedence = get_precedence(top_terminal, input);
             // < :zaměň a za a< na zásobníku & push(b) & přečti další symbol b ze vstupu
         if(precedence == SHIFT){
 
@@ -193,7 +196,7 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
             exprDLCopyFirst(&psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
             exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
             input.exprToken.terminal = true;
-        }
+        }*/;
 
     } while (top_terminal.exprToken.token.type != TOKEN_DOLAR && input.exprToken.token.type != TOKEN_DOLAR);
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
