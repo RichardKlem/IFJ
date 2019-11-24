@@ -439,7 +439,8 @@ void fun_or_expr() {
     //pravidlo 20
     else if (next_token.type == TOKEN_ID){
         next_token = get_token(stdin);
-        fun_or_expr();
+        //fun_or_expr(); CHYBA
+        fun_or_expr2();
     }
     //pravidlo 29
     else if (next_token.type == TOKEN_EOL)
