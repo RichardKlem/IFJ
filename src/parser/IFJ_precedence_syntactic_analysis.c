@@ -114,12 +114,12 @@ int get_prec_value(token_type type_of_token)
  * @param second druhy operand
  * @return vraci jednu z precedencnich hodnot typu precedence_rule
  */
-precedence_rule get_precedence(tExprElem first, tExprElem second)
+precedence_rule get_precedence(expr_token_t first, expr_token_t second)
 {
     int i = -1;
     int j = -1;
-    i = get_prec_value(first.exprToken.token.type);
-    j = get_prec_value(second.exprToken.token.type);
+    i = get_prec_value(first.token.type);
+    j = get_prec_value(second.token.type);
     precedence_rule precedence = precedence_table[i][j];
     return precedence;
 }
@@ -176,28 +176,43 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     input.terminal = true; //mozna neni treba
     do
     {
-        /*precedence_rule precedence = get_precedence(top_terminal, input);
-            // < :zaměň a za a< na zásobníku & push(b) & přečti další symbol b ze vstupu
+        //zjisteni precedecniho pravidla
+        precedence_rule precedence = get_precedence(top_terminal, input);
+
+        // < :zaměň a za a< na zásobníku & push(b) & přečti další symbol b ze vstupu
         if(precedence == SHIFT){
+            top_terminal.shifted = true; //zamen a za a<
+            exprStackPush(&psa_stack, input); //push(b)
 
-            //TODO zamen a za a<
-            exprStackPush(&psa_stack, input.exprToken);
-            top_terminal.exprToken = find_top_terminal(ptr_psa_stack); //nactu si nevrchnejsi terminal
-            top_terminal.exprToken.terminal = true;
-            exprDLCopyFirst(&psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
+            top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
+            exprDLCopyFirst(&psa_exprDLL, &(input)); //dostanu prvni token na vstupu
             exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
-            input.exprToken.terminal = true;
         }
-        else if(precedence == EQUAL){
-            // = :push(b) & přečti další symbol b ze vstupu
-            exprStackPush(&psa_stack, input.exprToken);
-            top_terminal.exprToken = find_top_terminal(ptr_psa_stack); //nactu si nevrchnejsi terminal
-            top_terminal.exprToken.terminal = true;
-            exprDLCopyFirst(&psa_exprDLL, &(input.exprToken.token)); //dostanu prvni token na vstupu
-            exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
-            input.exprToken.terminal = true;
-        }*/;
 
-    } while (top_terminal.exprToken.token.type != TOKEN_DOLAR && input.exprToken.token.type != TOKEN_DOLAR);
+        // = :push(b) & přečti další symbol b ze vstupu
+        else if(precedence == EQUAL){
+            exprStackPush(&psa_stack, input); //push(b)
+
+            top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
+            exprDLCopyFirst(&psa_exprDLL, &(input)); //dostanu prvni token na vstupu
+            exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
+        }
+
+        //if <y je na vrcholu zásobníku and r: A -> y € P
+        //      then zaměň <y za A & vypiš r na výstup
+        //else chyba
+        else if(precedence == REDUCE){
+            expr_token_t previous_expr_token = psa_stack.top->next->exprToken;
+            if(previous_expr_token.shifted == true) {
+                //reduce_by_rules vraci 1 kdyz je vse ok, jinak 0
+                if(! reduce_by_rules(&psa_stack))
+                    error_exit(ERROR_SYNTAX); // kdyz vrati 0, tak nastala chyba => ERROR_SYNTAX
+            }
+        }
+
+        else if(precedence == ERROR)
+            error_exit(ERROR_SYNTAX);
+
+    } while (top_terminal.token.type != TOKEN_DOLAR && input.token.type != TOKEN_DOLAR);
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
