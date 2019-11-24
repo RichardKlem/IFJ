@@ -11,11 +11,13 @@
 #ifndef IFJ_IFJ_PRECEDENCE_exprDLL_H
 #define IFJ_IFJ_PRECEDENCE_exprDLL_H
 
+/*
 typedef struct expr_token_t {
     bool terminal;
     bool shifted;
     token_t token; //je definovan kdyz je terminal, jinak = NULL (muzu to dat na null???)
 } expr_token_t;
+*/
 
 typedef struct tExprDLElem {
     expr_token_t exprToken;

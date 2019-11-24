@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include "IFJ_scanner.h"
 #include "IFJ_error.h"
 #include "IFJ_stack.h"
 #include "IFJ_precedence_table.h"
@@ -35,18 +36,18 @@ int epxrStackEmpty (tExprStack* s) {
         return s->top == NULL;
 }
 
-int exprStackTop (tExprStack* s) {
-    if (stackEmpty(s) || stackEmpty(s))
+expr_token_t exprStackTop (tExprStack* s) {
+    if (exprStackEmpty(s) || exprStackEmpty(s))
         error_exit(ERROR_INTERNAL);
     else
-        return s->top->data;
+        return s->top->exprToken;
 }
 
 void exprStackPop (tExprStack* s) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
-    else if (!stackEmpty(s)) {
-        tElem* del = s->top;
+    else if (!exprStackEmpty(s)) {
+        tExprElem* del = s->top;
         s->top = s->top->next;
         free (del);
     }
@@ -56,7 +57,7 @@ void exprStackPush (tExprStack* s, expr_token_t item) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else {
-        tElem* insert = (tExprElem*)malloc(sizeof(tExprElem));
+        tExprElem* insert = (tExprElem*)malloc(sizeof(tExprElem));
         if (insert == NULL)
             error_exit(ERROR_INTERNAL);
 
@@ -66,23 +67,23 @@ void exprStackPush (tExprStack* s, expr_token_t item) {
     }
 }
 
-expr_token_t* find_top_terminal(tExprStack* s)
+expr_token_t find_top_terminal(tExprStack* s)
 {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else {
-        tExprElem* top_terminal= &(s->top);
-        while (top_terminal->exprToken.terminal == false)
+        tExprElem top_terminal= *(s->top);
+        while (top_terminal.exprToken.terminal == false)
         {
-            if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
+            if (top_terminal.next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
                 error_exit(ERROR_INTERNAL);
-            top_terminal = top_terminal->next;
+            top_terminal = *(top_terminal.next);
         }
-        return top_terminal;
+        return top_terminal.exprToken;
     }
 }
 
-precedence_table =
+precedence_rule precedence_table[8][8] =
          {
            //  |  +-  | // / *|   (   |    )  |   r   |   fc  |   var |    $  |
 /*|   +-   |*/ {REDUCE, SHIFT,  SHIFT,  REDUCE, XXXXXX, XXXXXX, SHIFT,  REDUCE},

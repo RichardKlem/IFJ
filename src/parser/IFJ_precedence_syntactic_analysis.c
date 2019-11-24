@@ -19,12 +19,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
-#include "IFJ_precedence_syntactic_analysis.h"
 #include "IFJ_scanner.h"
 #include "IFJ_stack.h"
 #include "IFJ_error.h"
 #include "IFJ_precedence_table.h"
 #include "IFJ_precedence_DLL.h"
+#include "IFJ_precedence_syntactic_analysis.h"
 
 /**
  *  nactu si tokeny, pak je nacpu na zasobnik podle precedecni tabulky
@@ -39,7 +39,7 @@
  * @param second druhy token od RS
  * @return vraci posledni token typu KEYWORD nebo EOL
  */
-token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, token_t * first_token, token_t * second_token)
+token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_token, expr_token_t * second_token)
 {
     if(expr_DLL == NULL)
         error_exit(ERROR_INTERNAL);
