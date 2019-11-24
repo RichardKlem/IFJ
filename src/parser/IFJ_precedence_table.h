@@ -17,6 +17,7 @@ extern precedence_rule precedence_table[8][8];
 
 typedef struct expr_token_t {
     bool terminal;
+    bool shifted;
     t_token token; //je definovan kdyz je terminal, jinak = NULL (muzu to dat na null???)
 } expr_token_t;
 
