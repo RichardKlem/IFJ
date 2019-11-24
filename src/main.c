@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "IFJ_scanner.h"
 #include "IFJ_error.h"
+#include "IFJ_parser.h"
 
 int main () {
     /*
@@ -19,8 +20,7 @@ int main () {
         error_exit(ERROR_INTERNAL);
     */
 
-    token_t token = get_token(stdin);
-    printf("%d\n", token.type);
+    prog();
 
 
     return 0;

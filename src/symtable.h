@@ -15,28 +15,30 @@
 #include<stdlib.h>
 #include<stdarg.h>
 
-//funkce prevede jmeno promenne na unikatni klic
-int name_to_key(char * name);
-
 typedef struct record {
-    char * name;
-    int was_defined;
+    int defined;
     int is_variable;
     int param_num;
 } Record;
 
 typedef struct tBSTNode {
-	int Key;
+	char* Key;
 	Record BSTNodeCont;
 	struct tBSTNode * LPtr;
 	struct tBSTNode * RPtr;
 } *tBSTNodePtr;
 
-void BSTInit(tBSTNodePtr *);
-int BSTSearch(tBSTNodePtr, char*, Record*);
-void BSTInsert(tBSTNodePtr *, char*, Record);
-void BSTDelete(tBSTNodePtr *, char*);
-void BSTDispose(tBSTNodePtr *);
+
+//globalni tabulka symbolu - nutne pro soubor error.c, ktery ji v pripade
+//chyby korektne uvolni
+extern tBSTNodePtr symtable;
+
+
+void symtable_init(tBSTNodePtr *);
+int symtable_search(tBSTNodePtr, char*, Record*);
+void symtable_insert(tBSTNodePtr *, char*, Record);
+void symtable_delete(tBSTNodePtr *, char*);
+void symtable_dispose(tBSTNodePtr *);
 
 #endif // SYMTABLE_H_INCLUDED
 

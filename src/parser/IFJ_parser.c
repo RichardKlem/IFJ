@@ -22,8 +22,8 @@ LL tabulka
 <expr-or-assign>|18*|18*|18*|18*|18*|18*|18*|18*|18*|   |   |   |18*|18*|        |   |24 |   |29 |   |   |      |      |6  |       |        |         |        |          |      |   |
 <arg-list>		|   |   |   |   |   |   |   |   |   |25*|25*|25*|   |   |25*     |25*|   |26 |   |   |   |      |      |   |       |        |         |        |          |      |   |
 <arg-next>		|   |   |   |   |   |   |   |   |   |   |   |   |   |   |        |   |   |27 |   |28*|   |      |      |   |       |        |         |        |          |      |   |
-<fun-or-expr>	|   |   |   |   |   |   |   |   |   |22*|22*|22*|   |   |22*     |20 |22*|   |   |   |   |      |      |   |       |        |         |        |          |      |   |
-<fun-or-expr-2>	|23*|23*|23*|23*|23*|23*|23*|23*|23*|   |   |   |23*|23*|        |   |21 |   |   |   |   |      |      |   |       |        |         |        |          |      |   |
+<fun-or-expr>	|   |   |   |   |   |   |   |   |   |22*|22*|22*|   |   |22*     |20 |22*|   |29 |   |   |      |      |   |       |        |         |        |          |      |   |
+<fun-or-expr-2>	|23*|23*|23*|23*|23*|23*|23*|23*|23*|   |   |   |23*|23*|        |   |21 |   |30 |   |   |      |      |   |       |        |         |        |          |      |   |
 
 */
 
@@ -31,12 +31,18 @@ LL tabulka
 #include "IFJ_scanner.h"
 #include "IFJ_parser.h"
 #include "../IFJ_error.h"
+#include "symtable.h"
 
 token_t next_token; //globalni token
+Record id_param; //pomocna struktura pro ukladani informaci o promennych
+tBSTNodePtr symtable;
 
-void main(){
+void prog(){
     printf("In main\n");
     next_token = get_token(stdin);
+
+    //inicializace tabulky symbolu
+    symtable_init(&symtable);
 
     //pravidlo 1
     if (next_token.type == TOKEN_STRING ||
@@ -53,8 +59,13 @@ void main(){
         next_token.type == TOKEN_EOF){
             eol_opt();
             st_list();
-            if (next_token.type == TOKEN_EOF) //pokud se korekne zpracovali vsechny tokeny, koncime
+            if (next_token.type == TOKEN_EOF){ //pokud se korekne zpracovali vsechny tokeny, koncime
+
+
+
+                symtable_dispose(&symtable);
                 return;
+            }
             else
                 error_exit(ERROR_SYNTAX);
     }
@@ -430,6 +441,9 @@ void fun_or_expr() {
         next_token = get_token(stdin);
         fun_or_expr();
     }
+    //pravidlo 29
+    else if (next_token.type == TOKEN_EOL)
+        /*DO NOTHING*/;
     else
         error_exit(ERROR_SYNTAX);
 }
@@ -454,6 +468,9 @@ void fun_or_expr2() {
         else
             error_exit(ERROR_SYNTAX);
     }
+    //pravidlo 30
+    else if (next_token.type == TOKEN_EOL)
+        /*DO NOTHING*/;
     else
         error_exit(ERROR_SYNTAX);
 }
