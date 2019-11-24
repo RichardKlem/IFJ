@@ -1,32 +1,18 @@
 #include "symtable.h"
-#include "string.h"
+#include <string.h>
+#include "IFJ_error.h"
 
-int name_to_key(char * name){
-    int key = 0;
-    while (*name){
-        key = key*256 + *name;
-        name++;
-    }
-    return key;
-}
-
-void BSTInit (tBSTNodePtr *RootPtr) {
-    if (RootPtr == NULL) {
-        fprintf(stderr, "ERROR: Do funkce BSTInit byl predan chybny ukazatel"
-                        "na RootPtr\n");
-        exit(1);
-    }
-
+void symtable_init(tBSTNodePtr *RootPtr) {
+    if (RootPtr == NULL)
+        error_exit(ERROR_INTERNAL);
     *RootPtr = NULL;
 }
 
-int BSTSearch (tBSTNodePtr RootPtr, char * name, Record *Content)	{
-    int K = name_to_key(name);
-
+int symtable_search(tBSTNodePtr RootPtr, char * K, Record *Content)	{
     if(RootPtr == NULL)
         return 0;
     else {
-        if (RootPtr->Key == K)) {
+        if (!strcmp(RootPtr->Key, K)) {
             if (Content != NULL) {
                 *Content = RootPtr->BSTNodeCont;
                 return 1;
@@ -37,30 +23,24 @@ int BSTSearch (tBSTNodePtr RootPtr, char * name, Record *Content)	{
                 return 1;
             }
     }
-	if (RootPtr->Key < K)
-        return BSTSearch(RootPtr->RPtr, K, Content);
+	if (strcmp(RootPtr->Key, K) < 0)
+        return symtable_search(RootPtr->RPtr, K, Content);
 	else
-	    return BSTSearch(RootPtr->LPtr, K, Content);
+	    return symtable_search(RootPtr->LPtr, K, Content);
     }
 }
 
-void BSTInsert (tBSTNodePtr* RootPtr, char * name, Record Content)	{
-	int K = name_to_key(name);
-
-	if (RootPtr == NULL){
-	    fprintf(stderr, "ERROR: Do funkce BSTInsert byl predan neplatny ukazatel na RootPtr\n");
-	    exit(1); //uvnitr teto funkce nelze osetrit zadny mozny memory_leak
-	}
+void symtable_insert(tBSTNodePtr* RootPtr, char * K, Record Content)	{
+	if (RootPtr == NULL)
+        error_exit(ERROR_INTERNAL);
 
 	if (*RootPtr == NULL){ //jsme v koncovem uzlu, vytvorime zde novy uzel
         tBSTNodePtr new = (tBSTNodePtr)malloc(sizeof(struct tBSTNode));
 
-        if (new == NULL){
-            fprintf(stderr, "ERROR: Chyba alokace uzlu stromu\n");
-            BSTDispose(RootPtr);
-            exit(1);
-        }
-		new->Key = K;
+        if (new == NULL)
+            error_exit(ERROR_INTERNAL);
+
+        new->Key = K;
 		//nastveni hodnot
 		new->BSTNodeCont = Content;
 		new->LPtr = NULL;
@@ -69,52 +49,45 @@ void BSTInsert (tBSTNodePtr* RootPtr, char * name, Record Content)	{
 		return;
 	}
 	else{
-		if ((*RootPtr)->Key == K){ //narazili jsme na uzel se shodnym klicem, aktualizujeme
+		if (!strcmp((*RootPtr)->Key,K)){ //narazili jsme na uzel se shodnym klicem, aktualizujeme
 			(*RootPtr)->BSTNodeCont = Content;
 			return;
 		}
 		else{
-			if ((*RootPtr)->Key < K) //pokud je klic v pravem podstromu
-				BSTInsert(&(*RootPtr)->RPtr, K, Content);
+			if (!strcmp((*RootPtr)->Key, K) < 0) //pokud je klic v pravem podstromu
+				symtable_insert(&(*RootPtr)->RPtr, K, Content);
 			else
-				BSTInsert(&(*RootPtr)->LPtr, K, Content);
+				symtable_insert(&(*RootPtr)->LPtr, K, Content);
 		}
 	}
 }
 
 void ReplaceByRightmost (tBSTNodePtr PtrReplaced, tBSTNodePtr *RootPtr) {
-    if (RootPtr == NULL || *RootPtr == NULL) {
-        fprintf(stderr, "Do funkce ReplaByRightMost byl predan chybny ukazatel\n");
-        exit(1);
-    }
+    if (RootPtr == NULL || *RootPtr == NULL)
+        error_exit(ERROR_INTERNAL);
 
     if ((*RootPtr)->RPtr != NULL) //pokud ma uzel praveho syna
         ReplaceByRightmost(PtrReplaced, &(*RootPtr)->RPtr); //hledame prvek k vymene v pravem podstromu
     else { //nasli jsme nejpravejsi prvek
         PtrReplaced->Key = (*RootPtr)->Key;
         PtrReplaced->BSTNodeCont = (*RootPtr)->BSTNodeCont;
-        BSTDelete(RootPtr, (*RootPtr)->Key); //smazeme prvek
+        symtable_delete(RootPtr, (*RootPtr)->Key); //smazeme prvek
     }
 }
 
-void BSTDelete (tBSTNodePtr *RootPtr, char * name) {
-    int K = name_to_key(name);
-
-    if (RootPtr == NULL) {
-        fprintf(stderr, "WARNING: Funkci BTDisposeTree byl predan chybny"
-                        "ukazatel na RootPtr\n");
+void symtable_delete(tBSTNodePtr *RootPtr, char * K) {
+    if (RootPtr == NULL)
         return; //zde pouze vypisi warning, ale mohlo by byt brano i jako error
-    }
 
     if (*RootPtr == NULL) //dorazili jsme na konec a nic se nenaslo, nedelame nic
         return;
 
-    if ((*RootPtr)->Key > K) {
-        BSTDelete(&(*RootPtr)->LPtr, K); //pokracujeme v hledani v levem podstromu
+    if (strcmp((*RootPtr)->Key, K) > 0) {
+        symtable_delete(&(*RootPtr)->LPtr, K); //pokracujeme v hledani v levem podstromu
         return;
     }
-    else if ((*RootPtr)->Key < K) {
-        BSTDelete(&(*RootPtr)->RPtr, K); //pokracujeme v hledani v pravem podstromu
+    else if (strcmp((*RootPtr)->Key, K) < 0) {
+        symtable_delete(&(*RootPtr)->RPtr, K); //pokracujeme v hledani v pravem podstromu
         return;
     }
     else { //nasli jsme uzel ke smazani
@@ -142,11 +115,11 @@ void BSTDelete (tBSTNodePtr *RootPtr, char * name) {
     }
 }
 
-void BSTDispose (tBSTNodePtr *RootPtr) {
+void symtable_dispose(tBSTNodePtr *RootPtr) {
     if (RootPtr != NULL && *RootPtr != NULL) {
-        BSTDispose(&((*RootPtr)->LPtr));
-        BSTDispose(&((*RootPtr)->RPtr));
+        symtable_dispose(&((*RootPtr)->LPtr));
+        symtable_dispose(&((*RootPtr)->RPtr));
         free(*RootPtr);
-        BSTInit(RootPtr);
+        symtable_init(RootPtr);
     }
 }

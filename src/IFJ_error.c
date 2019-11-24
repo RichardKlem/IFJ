@@ -9,6 +9,8 @@
  * ************************************************************************** */
 
 #include "IFJ_error.h"
+#include "IFJ_parser.h"
+#include "symtable.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -55,6 +57,7 @@ void error_exit(int error_id) {
    *        -tabulku retezcu a retezce v ni
    */
 
+  symtable_dispose(&symtable);
   exit(error_num);
 }
 /* konec souboru IFJ_error.c */
