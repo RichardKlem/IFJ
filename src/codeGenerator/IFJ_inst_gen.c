@@ -13,6 +13,14 @@
 #include <string.h>
 #include "IFJ_inst_gen.h"
 
+void setArg(tArgument *argument, tFrame frame, tDatTyp datTyp, char* value)
+{
+    argument->datTyp = datTyp;
+    argument->frame = frame;
+    argument->value = value;
+    return
+}
+
 void generateInst(tDLElemPtr *List, enInstruction instType, void *arg1, void *arg2, void *arg3)
 {
     //Vytvoříme 

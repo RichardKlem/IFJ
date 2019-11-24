@@ -83,9 +83,12 @@ typedef enum
 
 typedef enum
 {
-    T_INT,
-    T_DOUBLE,
-    T_STRING
+    DT_INT,
+    DT_DOUBLE,
+    DT_STRING,
+    DT_BOOL,
+    DT_NIL,
+    DT_ID
 } tDatTyp;
 
 typedef struct
@@ -93,7 +96,8 @@ typedef struct
     //TODO
     tFrame frame;
     char* value;
-} tAgrument;
+    tDatTyp datTyp;
+} tArgument;
 
 typedef struct
 {
