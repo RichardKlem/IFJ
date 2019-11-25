@@ -1,0 +1,11 @@
+#should fail
+
+def main(a):
+    print('in main')
+    if a-1 > 2:
+        print(a)
+    else:
+        print('else')
+
+a = 'str'
+main(a)

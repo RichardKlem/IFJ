@@ -1,0 +1,9 @@
+#error function redefinition + func not defined
+
+def main():
+    print('in main')
+
+def main():
+    print('in main2')
+
+main2()
