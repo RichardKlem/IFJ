@@ -32,10 +32,16 @@ LL tabulka
 #include "IFJ_parser.h"
 #include "../IFJ_error.h"
 #include "symtable.h"
+#include "IFJ_stack_semantic.h"
 
 token_t next_token; //globalni token
+token_t first, second; //pomocne tokeny pro uchovani tokenu pri predavani ke zpracovani vyrazu
 Record id_param; //pomocna struktura pro ukladani informaci o promennych
-tBSTNodePtr symtable;
+tBSTNodePtr symtable; //tabulka symbolu
+tStack stack_semantic; //zasobnik pro semantickou analyzu
+tStack stack_semantic_params;
+int param_num;
+int arg_num;
 
 void prog(){
     printf("In main\n");
@@ -43,6 +49,9 @@ void prog(){
 
     //inicializace tabulky symbolu
     symtable_init(&symtable);
+    //inicializace zasobniku na semantickou kontrolu
+    stack_sem_init(&stack_semantic);
+    stack_sem_init(&stack_semantic_params);
 
     //pravidlo 1
     if (next_token.type == TOKEN_STRING ||
@@ -62,7 +71,8 @@ void prog(){
             if (next_token.type == TOKEN_EOF){ //pokud se korekne zpracovali vsechny tokeny, koncime
 
 
-
+                while (stack_sem_empty(&stack_semantic))
+                    stack_sem_pop(&stack_semantic);
                 symtable_dispose(&symtable);
                 return;
             }
@@ -102,36 +112,15 @@ void st_list(){
 void stat(){
     printf("In stat\n");
     //pravidlo 19*
-    if (next_token.type == TOKEN_STRING){
-        //TODO <expr1>
-        if (next_token.type == TOKEN_EOL)
-            next_token = get_token(stdin);
-        else
-            error_exit(ERROR_SYNTAX);
-    }
-    else if (next_token.type == TOKEN_DOUBLE){
-        //TODO <expr1>
-        if (next_token.type == TOKEN_EOL)
-            next_token = get_token(stdin);
-        else
-            error_exit(ERROR_SYNTAX);
-    }
-    else if (next_token.type == TOKEN_INT){
-        //TODO <expr1>
-        if (next_token.type == TOKEN_EOL)
-            next_token = get_token(stdin);
-        else
-            error_exit(ERROR_SYNTAX);
-    }
-    else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE){
-        //TODO <expr1>
-        if (next_token.type == TOKEN_EOL)
-            next_token = get_token(stdin);
-        else
-            error_exit(ERROR_SYNTAX);
-    }
-    else if (next_token.type == TOKEN_LEFT_BRACKET){
-        //TODO <expr1>
+    if (next_token.type == TOKEN_STRING || next_token.type == TOKEN_DOUBLE
+        || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
+        || next_token.type == TOKEN_LEFT_BRACKET){
+            first = next_token;
+/********************************************************************************************
+        SIMULACE RESENI VYRAZU first
+            //TODO <expr1>
+
+*********************************************************************************************/
         if (next_token.type == TOKEN_EOL)
             next_token = get_token(stdin);
         else
@@ -139,6 +128,8 @@ void stat(){
     }
     //pravidlo 5
     else if (next_token.type == TOKEN_ID){
+        //uchovani identifikatoru
+        first = next_token;
         next_token = get_token(stdin);
         expr_or_assign();
         if (next_token.type == TOKEN_EOL)
@@ -146,16 +137,28 @@ void stat(){
         else
             error_exit(ERROR_SYNTAX);
     }
-    //pravidlo 11
+    //pravidlo 11 - definice funkce
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == DEF){
+        char * fun_name; //pomocna promenna pro uchovani jmena funkce
+
         next_token = get_token(stdin);
-        if (next_token.type == TOKEN_ID)
+        if (next_token.type == TOKEN_ID) {
+            fun_name = next_token.value.string;
             next_token = get_token(stdin);
-        else error_exit(ERROR_SYNTAX);
+        }
+        else
+            error_exit(ERROR_SYNTAX);
+
         if (next_token.type == TOKEN_LEFT_BRACKET)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
+
+        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
+        param_num = 0; //vynuluje pocet parametru
         param_list();
+        //stack_sem_push se interne diva na globalni promennou param_num a zaroven vlozi funkci na symtable
+        stack_sem_push(&stack_semantic, FUN_DEF, fun_name);
+
         if (next_token.type == TOKEN_RIGHT_BRACKET)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -171,8 +174,12 @@ void stat(){
         else error_exit(ERROR_SYNTAX);
         st_list();
         ret();
-        if (next_token.type == TOKEN_DEDENT)
+        if (next_token.type == TOKEN_DEDENT) {
+            //konec definice funkce, uvolnime semanticky zasobnik
+            stack_sem_pop_until_block_start(&stack_semantic);
+
             next_token = get_token(stdin);
+        }
         else error_exit(ERROR_SYNTAX);
     }
     //pravidlo 17
@@ -189,7 +196,12 @@ void stat(){
         if (next_token.type == TOKEN_INDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
+
+        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
+        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
         st_list();
+        stack_sem_pop_until_block_start(&stack_semantic);
+
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -215,7 +227,12 @@ void stat(){
         if (next_token.type == TOKEN_INDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
+
+        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
+        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
         st_list();
+        stack_sem_pop_until_block_start(&stack_semantic);
+
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -232,7 +249,12 @@ void stat(){
         if (next_token.type == TOKEN_INDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
+
+        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
+        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
         st_list();
+        stack_sem_pop_until_block_start(&stack_semantic);
+
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -292,6 +314,8 @@ void param_list(){
     printf("In param_list\n");
     //pravidlo 12
     if (next_token.type == TOKEN_ID) {
+        param_num++;
+        stack_sem_push(&stack_semantic_params, VAR_DEF, next_token.value.string);
         next_token = get_token(stdin);
         param_next();
     }
@@ -311,6 +335,8 @@ void param_next(){
     else if (next_token.type == TOKEN_COMMA) {
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_ID){
+            param_num++;
+            stack_sem_push(&stack_semantic_params, VAR_DEF, next_token.value.string);
             next_token = get_token(stdin);
             param_next();
         }
@@ -329,13 +355,22 @@ void expr_or_assign() {
         next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
         next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
         next_token.type == TOKEN_EQ) {
+        second = next_token;
+/********************************************************************************************
+        SIMULACE RESENI VYRAZU first,second
             //TODO <expr2>
+
+*********************************************************************************************/
             ;
     }
     //pravidlo 24
     else if (next_token.type == TOKEN_LEFT_BRACKET){
         next_token = get_token(stdin);
+
+        arg_num = 0;
         arg_list();
+        stack_sem_push(&stack_semantic, FUN_CALL, first.value.string);
+
         if (next_token.type == TOKEN_RIGHT_BRACKET) {
             next_token = get_token(stdin);
         } else error_exit(ERROR_SYNTAX);
@@ -347,8 +382,10 @@ void expr_or_assign() {
     //pravidlo 6
     else if (next_token.type == TOKEN_ASSIGNMENT) {
         next_token = get_token(stdin);
+        //bylo prirazeno do promenne, je nutna vlozit ji do stack_semantic
+        stack_sem_push(&stack_semantic, VAR_DEF, first.value.string);
         fun_or_expr();
-        }
+    }
     else
         error_exit(ERROR_SYNTAX);
 }
@@ -357,22 +394,28 @@ void arg_list() {
     printf("In arg_list\n");
     //pravidlo 25*
     if (next_token.type == TOKEN_STRING){
+        arg_num++;
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_DOUBLE){
+        arg_num++;
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_INT){
+        arg_num++;
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE){
+        arg_num++;
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_ID){
+        arg_num++;
+        stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
         next_token = get_token(stdin);
         arg_next();
     }
@@ -392,22 +435,29 @@ void arg_next() {
     else if (next_token.type == TOKEN_COMMA) {
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_STRING) {
+            arg_num++;
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_DOUBLE) {
+            arg_num++;
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_INT) {
+            arg_num++;
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE) {
+            arg_num++;
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_ID) {
+            arg_num++;
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
             next_token = get_token(stdin);
             arg_next();
         }
@@ -421,23 +471,19 @@ void arg_next() {
 void fun_or_expr() {
     printf("In fun_or_expr\n");
     //pravidlo 22*
-    if (next_token.type == TOKEN_STRING) {
-        //TODO <expr1>
-    }
-    else if (next_token.type == TOKEN_DOUBLE) {
-        //TODO <expr1>
-    }
-    else if (next_token.type == TOKEN_INT) {
-        //TODO <expr1>
-    }
-    else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE) {
-        //TODO <expr1>
-    }
-    else if (next_token.type == TOKEN_LEFT_BRACKET) {
-        //TODO <expr1>
+    if (next_token.type == TOKEN_STRING || next_token.type == TOKEN_DOUBLE
+        || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
+        || next_token.type == TOKEN_LEFT_BRACKET) {
+        first = next_token;
+/********************************************************************************************
+        SIMULACE RESENI VYRAZU first
+            //TODO <expr>
+
+*********************************************************************************************/
     }
     //pravidlo 20
     else if (next_token.type == TOKEN_ID){
+        first = next_token;
         next_token = get_token(stdin);
         fun_or_expr();
     }
@@ -457,12 +503,22 @@ void fun_or_expr2() {
         next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
         next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
         next_token.type == TOKEN_EQ) {
+            second = next_token;
+/********************************************************************************************
+        SIMULACE RESENI VYRAZU first,second
             //TODO <expr2>
+
+*********************************************************************************************/
     }
     //pravidlo 21
     else if (next_token.type == TOKEN_LEFT_BRACKET) {
         next_token = get_token(stdin);
+
+        arg_num = 0;
         arg_list();
+        stack_sem_push(&stack_semantic, FUN_CALL, first.value.string);
+        arg_num = 0;
+
         if (next_token.type == TOKEN_RIGHT_BRACKET)
             next_token = get_token(stdin);
         else

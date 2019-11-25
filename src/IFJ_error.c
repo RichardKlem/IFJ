@@ -11,6 +11,7 @@
 #include "IFJ_error.h"
 #include "IFJ_parser.h"
 #include "symtable.h"
+#include "IFJ_stack_semantic.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -57,7 +58,12 @@ void error_exit(int error_id) {
    *        -tabulku retezcu a retezce v ni
    */
 
-  symtable_dispose(&symtable);
-  exit(error_num);
+    //uvolneni zasobniku pro semnatickou analyzu
+    while (!stack_sem_empty(&stack_semantic))
+        stack_sem_pop(&stack_semantic);
+
+    //uvolneni tabulky symbolu
+    symtable_dispose(&symtable);
+    exit(error_num);
 }
 /* konec souboru IFJ_error.c */
