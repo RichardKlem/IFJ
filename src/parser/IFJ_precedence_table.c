@@ -72,14 +72,17 @@ expr_token_t find_top_terminal(tExprStack* s)
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else {
-        tExprElem top_terminal= *(s->top);
-        while (top_terminal.exprToken.terminal == false)
+        tExprElem * top_terminal= s->top;
+        while (top_terminal->exprToken.terminal == false)
         {
-            if (top_terminal.next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
+            if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
                 error_exit(ERROR_INTERNAL);
-            top_terminal = *(top_terminal.next);
+            top_terminal = top_terminal->next;
         }
-        return top_terminal.exprToken;
+        if (top_terminal->exprToken.terminal == true)
+            return top_terminal->exprToken;
+        else
+            error_exit(ERROR_INTERNAL);
     }
 }
 

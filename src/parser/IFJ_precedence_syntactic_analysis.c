@@ -125,17 +125,92 @@ precedence_rule get_precedence(expr_token_t first, expr_token_t second)
 }
 
 /**
+ * @brief funkce get_top_shifted_terminal vraci nejvrchnejsi terminal, ktery je shifted
+ * @param s ukazatel na PSA zasobnik
+ * @return vraci raci nejvrchnejsi terminal s atributem shifted
+ */
+int get_members_count(tExprStack * s)
+{
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else {
+        tExprElem * top_terminal= s->top;
+        int members_count = 1;
+        while (top_terminal->exprToken.terminal == false || top_terminal->exprToken.shifted == false)
+        {
+            if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
+                error_exit(ERROR_INTERNAL);
+            top_terminal = top_terminal->next;
+            members_count++;
+        }
+        if (top_terminal->exprToken.terminal == true && top_terminal->exprToken.shifted == true){
+            top_terminal->exprToken.shifted = false;
+            return members_count;
+        }
+        else
+            error_exit(ERROR_SYNTAX); //neni zadny terminal, to je chyba
+    }
+}
+
+/**
+ * @brief funkce reduce_var_val redukuje terminal identifikator/promennou anebo konstantu na NEterminal
+ * @param stack ukazatel na PSA zasobnik
+ */
+void reduce_var_val(tExprStack * stack)
+{
+    if (stack == NULL)
+        error_exit(ERROR_SYNTAX);
+    stack->top->exprToken.terminal = false;
+}
+
+/**
+ * @brief funkce reduce_brackets redukuje posloupnost (terminal NEterminal terminal) na jeden NEterminal
+ * @param stack ukazatel na PSA zasobnik
+ */
+void reduce_brackets(tExprStack * stack)
+{
+    if (stack == NULL)
+        error_exit(ERROR_SYNTAX);
+    exprStackPop(stack);
+    exprStackPop(stack);
+    stack->top->exprToken.terminal = false;
+}
+
+/**
+ * @brief funkce reduce_bin_op redukuje osloupnost (NEterminal terminal NEterminal) na jeden NEterminal
+ * @param stack ukazatel na PSA zasobnik
+ */
+void reduce_bin_op(tExprStack * stack)
+{
+    if (stack == NULL)
+        error_exit(ERROR_SYNTAX);
+    //TODO kontolovat operator
+    exprStackPop(stack);
+    exprStackPop(stack);
+    stack->top->exprToken.terminal = false;
+}
+/**
  * @brief funkce reduce_by_rules zpracuje tokeny na PSA zasobniku podle pravidel, provadi PRAVY rozbor
  * @param stack ukazatel na PSA zasobnik
+ * @param members_count pocet operandu kteri budou zasazeni redukci
  * @return vraci 1, kdyz je vse v poradku, jinak 0
  */
-int reduce_by_rules(tExprStack * stack)
+int reduce_by_rules(tExprStack * stack, int members_count)
 {
-    //TODO dodelat tuto funkci, ktera pokud existuje pravidlo ,tak ho provede a provede patricen akce a vrati 1.
-    // Pokud pravidlo neexistuje, tak vraci 0, pokud je neco spatne jinak tak error_exit(ERROR_SYNTAX)
-    if(stack->top->exprToken.token.type == TOKEN_INT)
-        return 1;
-    return 0;
+
+    if(members_count == 1)
+        reduce_var_val(stack);
+    else if(members_count == 3)
+    {
+        if(/* terminal NEterminal terminal */ )
+            reduce_brackets(stack);
+        else if(/* NEterminal terminal NEterminal */)
+            reduce_bin_op(stack);
+        else
+            error_exit(ERROR_SYNTAX);
+    }
+    else
+        error_exit(ERROR_SYNTAX);
 }
 
 
@@ -185,10 +260,8 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
     //prvni inicializace promennych
     top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
-    top_terminal.terminal = true;
     exprDLCopyFirst(&psa_exprDLL, &(input)); //dostanu prvni expr_token s atributem temrinal=true na vstupu
     exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
-    input.terminal = true; //mozna neni treba
     do
     {
         //zjisteni precedecniho pravidla
@@ -217,12 +290,18 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
         //      then zaměň <y za A & vypiš r na výstup
         //else chyba
         else if(precedence == REDUCE){
-            expr_token_t previous_expr_token = psa_stack.top->next->exprToken;
-            if(previous_expr_token.shifted == true) {
-                //reduce_by_rules vraci 1 kdyz je vse ok, jinak 0
-                if(! reduce_by_rules(&psa_stack))
-                    error_exit(ERROR_SYNTAX); // kdyz vrati 0, tak nastala chyba => ERROR_SYNTAX
-            }
+            //TODO zavolat funkci, ktera najde shifted prvek nejblize vrcholu zasobniku
+            // napriklad pro  $<E+<i to je +< a pro $<E+E to je $<
+            // po te se odstrani atribut shifted a vse napravo se musi zpracovat,
+            // kdyz pro to neni pravidlo, tak se jedna o chybu
+
+            //zjistim pocet operandu na PSA stacku, ktere budu redukovat , nejvrchnejsi shifted terminal je touto funkci prenastavem na shifted == false
+            int members_count = get_members_count(&psa_stack);
+
+            //reduce_by_rules vraci 1 kdyz je vse ok, jinak 0
+            if(! reduce_by_rules(&psa_stack, members_count))
+                error_exit(ERROR_SYNTAX); // kdyz vrati 0, tak nastala chyba => ERROR_SYNTAX
+
         }
 
         else if(precedence == ERROR)
