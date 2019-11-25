@@ -21,7 +21,7 @@ void exprDLError() {
     return;
 }
 
-void eInitList (tExprDLList *L) {
+void exprDLInitList (tExprDLList *L) {
 
     L->First = NULL;
     L->Act = NULL;

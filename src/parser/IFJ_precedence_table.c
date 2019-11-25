@@ -29,7 +29,7 @@ void exprStackInit (tExprStack* s) {
         s->top = NULL;
 }
 
-int epxrStackEmpty (tExprStack* s) {
+int exprStackEmpty (tExprStack* s) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else
