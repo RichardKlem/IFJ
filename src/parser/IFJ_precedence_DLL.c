@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "IFJ_scanner.h"
+#include "IFJ_precedence_table.h"
 #include "IFJ_precedence_DLL.h"
 
 
@@ -20,7 +21,7 @@ void exprDLError() {
     return;
 }
 
-void eInitList (tExprDLList *L) {
+void exprDLInitList (tExprDLList *L) {
 
     L->First = NULL;
     L->Act = NULL;

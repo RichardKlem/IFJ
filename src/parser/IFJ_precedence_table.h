@@ -21,7 +21,7 @@ typedef struct expr_token_t {
     token_t token; //je definovan kdyz je terminal, jinak = NULL (muzu to dat na null???)
 } expr_token_t;
 
-typedef struct texrpelem{
+typedef struct texprelem{
     expr_token_t exprToken;
     struct texprelem* next;
 } tExprElem;
@@ -31,10 +31,10 @@ typedef struct {
 } tExprStack;
 
 void exprStackInit (tExprStack* s);
-int epxrStackEmpty (tExprStack* s);
+int exprStackEmpty (tExprStack* s);
 expr_token_t exprStackTop (tExprStack* s);
 void exprStackPop (tExprStack* s);
-void exprStackPush (tExprStack* s, tExprElem item);
+void exprStackPush (tExprStack* s, expr_token_t item);
 expr_token_t find_top_terminal(tExprStack* s);
 
 

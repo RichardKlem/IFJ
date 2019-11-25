@@ -1,0 +1,12 @@
+#error undefined function
+
+a = 1
+b = a
+c = b + a
+
+def foo(a, b):
+    print('in foo')
+    print(a)
+    print(a)
+
+foo2()

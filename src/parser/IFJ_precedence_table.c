@@ -17,9 +17,9 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include "IFJ_scanner.h"
 #include "IFJ_error.h"
 #include "IFJ_stack.h"
-#include "IFJ_scanner.h"
 #include "IFJ_precedence_table.h"
 
 void exprStackInit (tExprStack* s) {
@@ -29,7 +29,7 @@ void exprStackInit (tExprStack* s) {
         s->top = NULL;
 }
 
-int epxrStackEmpty (tExprStack* s) {
+int exprStackEmpty (tExprStack* s) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else
@@ -37,7 +37,7 @@ int epxrStackEmpty (tExprStack* s) {
 }
 
 expr_token_t exprStackTop (tExprStack* s) {
-    if (stackEmpty(s) || stackEmpty(s))
+    if (exprStackEmpty(s) || exprStackEmpty(s))
         error_exit(ERROR_INTERNAL);
     else
         return s->top->exprToken;
@@ -46,14 +46,14 @@ expr_token_t exprStackTop (tExprStack* s) {
 void exprStackPop (tExprStack* s) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
-    else if (!stackEmpty(s)) {
-        tElem* del = s->top;
+    else if (!exprStackEmpty(s)) {
+        tExprElem* del = s->top;
         s->top = s->top->next;
         free (del);
     }
 }
 
-void exprStackPush (tExprStack* s, tExprElem item) {
+void exprStackPush (tExprStack* s, expr_token_t item) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else {
@@ -61,7 +61,7 @@ void exprStackPush (tExprStack* s, tExprElem item) {
         if (insert == NULL)
             error_exit(ERROR_INTERNAL);
 
-        insert->exprToken = item.exprToken;
+        insert->exprToken = item;
         insert->next = s->top;
         s->top = insert;
     }
@@ -72,14 +72,17 @@ expr_token_t find_top_terminal(tExprStack* s)
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else {
-        tExprElem top_terminal = *(s->top);
-        while (top_terminal.exprToken.terminal == false)
+        tExprElem * top_terminal= s->top;
+        while (top_terminal->exprToken.terminal == false)
         {
-            if (top_terminal.next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
+            if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
                 error_exit(ERROR_INTERNAL);
-            top_terminal = *(top_terminal.next);
+            top_terminal = top_terminal->next;
         }
-        return top_terminal.exprToken;
+        if (top_terminal->exprToken.terminal == true)
+            return top_terminal->exprToken;
+        else
+            error_exit(ERROR_INTERNAL);
     }
 }
 

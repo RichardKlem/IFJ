@@ -1,0 +1,3 @@
+#should fail
+a = 1
+b = a + 'str'

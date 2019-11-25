@@ -1,0 +1,13 @@
+#should fail on func call
+
+def main():
+    a = 'str' + 'str'
+
+    def inner_main(var):
+        print(var)
+
+    inner_main(a)
+
+main()
+a = 'str'
+inner_main(a)

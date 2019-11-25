@@ -1,0 +1,9 @@
+#should fail
+
+def main(a):
+    print('in main')
+    while a-1 > 2:
+        print(a)
+
+a = 'str'
+main(a)

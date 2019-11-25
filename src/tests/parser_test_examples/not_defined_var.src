@@ -1,0 +1,4 @@
+#error undefined variables
+
+a = 1
+a = b

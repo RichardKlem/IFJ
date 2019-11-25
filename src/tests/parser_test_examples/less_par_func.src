@@ -1,0 +1,9 @@
+#error missing params
+
+def main(a, b, c):
+    print('in main')
+    print(a)
+    print(b)
+    print(c)
+
+main('1',2)

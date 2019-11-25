@@ -1,0 +1,57 @@
+#should be ok
+a = 1
+
+if a < 1:
+    print('not here')
+else:
+    print('else')
+if a <= 1:
+    print('ok')
+else:
+    print('else')
+if a > 1:
+    print('not here')
+else:
+    print('else')
+if a >= 1:
+    print('ok')
+else:
+    print('else')
+if a == 1:
+    print('ok')
+else:
+    print('else')
+if a != 1:
+    print('not here')
+else:
+    print('else')
+
+def check(a):
+    if a < 1 + 2*3/4:
+        print('not here')
+    else:
+        print('else')
+    if 6-a <= 1:
+        print('ok')
+    else:
+        print('else')
+    if a > 1:
+        print('ok')
+    else:
+        print('else')
+    if a >= 1:
+        print('ok')
+    else:
+        print('else')
+    if a == 1:
+        print('not here')
+    else:
+        print('else')
+    if a != 1:
+        print('ok')
+    else:
+        print('else')
+
+
+b = 5
+check(b)
