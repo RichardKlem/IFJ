@@ -54,7 +54,7 @@ void symtable_insert(tBSTNodePtr* RootPtr, char * K, Record Content)	{
 			return;
 		}
 		else{
-			if (!strcmp((*RootPtr)->Key, K) < 0) //pokud je klic v pravem podstromu
+			if (strcmp((*RootPtr)->Key, K) < 0) //pokud je klic v pravem podstromu
 				symtable_insert(&(*RootPtr)->RPtr, K, Content);
 			else
 				symtable_insert(&(*RootPtr)->LPtr, K, Content);
