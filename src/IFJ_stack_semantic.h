@@ -24,26 +24,26 @@ typedef struct tdata {
     char * name;
 } tdata;
 
-typedef struct telem{
+typedef struct telem_sem{
     tdata data;
-    struct telem* next;
-} tElem;
+    struct telem_sem* next;
+} tElem_sem;
 
 typedef struct {
-        tElem* top;
-} tStack;
+        tElem_sem* top;
+} tStack_sem;
 
-extern tStack stack_semantic;
-extern tStack stack_semantic_params;
+extern tStack_sem stack_semantic;
+extern tStack_sem stack_semantic_params;
 extern int param_num;
 extern int arg_num;
 
-void stack_sem_init (tStack* s);
-int stack_sem_empty (tStack* s);
-tdata stack_sem_top (tStack* s);
-void stack_sem_pop (tStack* s);
-void stack_sem_push (tStack* s, taction action, char * name);
-void stack_sem_pop_until_block_start(tStack* s);
+void stack_sem_init (tStack_sem* s);
+int stack_sem_empty (tStack_sem* s);
+tdata stack_sem_top (tStack_sem* s);
+void stack_sem_pop (tStack_sem* s);
+void stack_sem_push (tStack_sem* s, taction action, char * name);
+void stack_sem_pop_until_block_start(tStack_sem* s);
 
 
 #endif // IFJ_STACK_SEMANTIC_H_INCLUDED

@@ -38,8 +38,8 @@ token_t next_token; //globalni token
 token_t first, second; //pomocne tokeny pro uchovani tokenu pri predavani ke zpracovani vyrazu
 Record id_param; //pomocna struktura pro ukladani informaci o promennych
 tBSTNodePtr symtable; //tabulka symbolu
-tStack stack_semantic; //zasobnik pro semantickou analyzu
-tStack stack_semantic_params;
+tStack_sem stack_semantic; //zasobnik pro semantickou analyzu
+tStack_sem stack_semantic_params;
 int param_num;
 int arg_num;
 

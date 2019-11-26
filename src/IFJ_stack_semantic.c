@@ -13,42 +13,42 @@
 #include <stdlib.h>
 #include "symtable.h"
 
-void stack_sem_init (tStack* s) {
+void stack_sem_init (tStack_sem* s) {
 	if (s == NULL)
         error_exit(ERROR_INTERNAL);
 	else
 		s->top = NULL;
 }
 
-int stack_sem_empty (tStack* s) {
+int stack_sem_empty (tStack_sem* s) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
     else
         return s->top == NULL;
 }
 
-tdata stack_sem_top (tStack* s) {
+tdata stack_sem_top (tStack_sem* s) {
 	if (s == NULL || stack_sem_empty(s))
 		error_exit(ERROR_INTERNAL);
 	else
 		return s->top->data;
 }
 
-void stack_sem_pop (tStack* s) {
+void stack_sem_pop (tStack_sem* s) {
 	if (s == NULL)
         error_exit(ERROR_INTERNAL);
 	else if (!stack_sem_empty(s)) {
-            tElem* del = s->top;
+            tElem_sem* del = s->top;
             s->top = s->top->next;
             free (del);
         }
 }
 
-void stack_sem_push (tStack* s, taction action, char * name) {
+void stack_sem_push (tStack_sem* s, taction action, char * name) {
 	if (s == NULL)
 		error_exit(ERROR_INTERNAL);
 
-    tElem* insert = (tElem*)malloc(sizeof(tElem));
+    tElem_sem* insert = (tElem_sem*)malloc(sizeof(tElem_sem));
     if (insert == NULL)
         error_exit(ERROR_INTERNAL);
 
@@ -127,7 +127,7 @@ void stack_sem_push (tStack* s, taction action, char * name) {
     }
 }
 
-void stack_sem_pop_until_block_start(tStack* s) {
+void stack_sem_pop_until_block_start(tStack_sem* s) {
     tdata data = stack_sem_top(s);
     Record tmp;
 
