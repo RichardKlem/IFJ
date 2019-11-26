@@ -1,18 +1,5 @@
--#should be ok
--a = 1
--b = a
--c = b + a
--
--def foo(par1, par2, par3):
--    print(par1)
--    print(par2)
--    print(par3)
--
--foo(a, b, c)
--
--a = 'str'
--b = 'str2'
--c = 'str3'
--
--foo(a, b, c)
+def foo(a):
+    pass
 
+a=1
+foo(a)
