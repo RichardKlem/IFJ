@@ -30,7 +30,7 @@ LL tabulka
 #include <stdio.h>
 #include "IFJ_scanner.h"
 #include "IFJ_parser.h"
-#include "../IFJ_error.h"
+#include "IFJ_error.h"
 #include "symtable.h"
 #include "IFJ_stack_semantic.h"
 
