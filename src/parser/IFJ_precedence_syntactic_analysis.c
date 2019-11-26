@@ -96,6 +96,9 @@ int get_prec_value(token_type type_of_token)
             break;
         //case FUNC: index = 5; break; --zatim nepodporovane
         case TOKEN_ID:
+        case TOKEN_INT:
+        case TOKEN_DOUBLE:
+        case TOKEN_STRING:
             index = 6;
             break;
         case TOKEN_DOLAR:
@@ -270,11 +273,14 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     last_token = loadExpr(src_file, &psa_exprDLL, first_expr_token, second_expr_token);
 
     tExprStack psa_stack;
+    exprStackInit(&psa_stack);
+
     expr_token_t end_token;
     end_token.token.type = TOKEN_DOLAR;
     end_token.token.value.string = "$";
     end_token.terminal = true;
-    exprStackPush(&psa_stack, end_token); //vlozim 'zarazku'
+    end_token.shifted = false;
+    exprStackPush(&psa_stack, end_token); //vlozim 'zarazku' $
 
     expr_token_t top_terminal;
     expr_token_t input;

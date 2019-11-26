@@ -76,13 +76,13 @@ expr_token_t find_top_terminal(tExprStack* s)
         while (top_terminal->exprToken.terminal == false)
         {
             if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
-                error_exit(ERROR_INTERNAL);
+                error_exit(ERROR_SYNTAX);
             top_terminal = top_terminal->next;
         }
         if (top_terminal->exprToken.terminal == true)
             return top_terminal->exprToken;
         else
-            error_exit(ERROR_INTERNAL);
+            error_exit(ERROR_SYNTAX);//prosli jsme cely stack a zadny temrinal zde neni ackoli by mel byt
     }
 }
 
