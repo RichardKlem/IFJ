@@ -185,7 +185,12 @@ void stat(){
     //pravidlo 17
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == WHILE){
         next_token = get_token(stdin);
-        //TODO <expr20>
+        first = next_token;
+/********************************************************************************************
+        SIMULACE RESENI VYRAZU first
+            //TODO <expr1>
+
+*********************************************************************************************/
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -216,7 +221,12 @@ void stat(){
     //pravidlo 16
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF){
         next_token = get_token(stdin);
-        //TODO <expr20>
+        first = next_token;
+/********************************************************************************************
+        SIMULACE RESENI VYRAZU first
+            //TODO <expr1>
+
+*********************************************************************************************/
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -298,7 +308,11 @@ void ret(){
     //pravidlo 7
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) {
         next_token = get_token(stdin);
-        //TODO <expr20>
+/********************************************************************************************
+        SIMULACE RESENI VYRAZU
+            //TODO <expr0>
+
+*********************************************************************************************/
         if (next_token.type == TOKEN_EOL) {
             next_token = get_token(stdin);
             eol_opt();
@@ -485,7 +499,6 @@ void fun_or_expr() {
     else if (next_token.type == TOKEN_ID){
         first = next_token;
         next_token = get_token(stdin);
-        //fun_or_expr(); CHYBA
         fun_or_expr_2();
     }
     //pravidlo 29
