@@ -220,7 +220,7 @@ reduction_type get_type_of_reduction(tExprStack * stack)
  */
 int reduce_by_rules(tExprStack * stack, int members_count)
 {
-
+    //kdyz reduji jeden, je to bud konstanta nebo promenna
     if(members_count == 1)
         reduce_var_val(stack);
     else if(members_count == 3)
@@ -282,34 +282,34 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     end_token.shifted = false;
     exprStackPush(&psa_stack, end_token); //vlozim 'zarazku' $
 
-    expr_token_t top_terminal;
-    expr_token_t input;
+    expr_token_t * top_terminal;
+    expr_token_t * input;
 
     //prvni inicializace promennych
     top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
-    exprDLCopyFirst(&psa_exprDLL, &(input)); //dostanu prvni expr_token s atributem temrinal=true na vstupu
+    exprDLCopyFirst(&psa_exprDLL, input); //dostanu prvni expr_token s atributem temrinal=true na vstupu
     exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
     do
     {
         //zjisteni precedecniho pravidla
-        precedence_rule precedence = get_precedence(top_terminal, input);
+        precedence_rule precedence = get_precedence(*top_terminal, *input);
 
         // < :zaměň a za a< na zásobníku & push(b) & přečti další symbol b ze vstupu
         if(precedence == SHIFT){
-            top_terminal.shifted = true; //zamen a za a<
-            exprStackPush(&psa_stack, input); //push(b)
+            top_terminal->shifted = true; //zamen a za a<
+            exprStackPush(&psa_stack, *input); //push(b)
 
             top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
-            exprDLCopyFirst(&psa_exprDLL, &(input)); //dostanu prvni token na vstupu
+            exprDLCopyFirst(&psa_exprDLL, input); //dostanu prvni token na vstupu
             exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
         }
 
         // = :push(b) & přečti další symbol b ze vstupu
         else if(precedence == EQUAL){
-            exprStackPush(&psa_stack, input); //push(b)
+            exprStackPush(&psa_stack, *input); //push(b)
 
             top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
-            exprDLCopyFirst(&psa_exprDLL, &(input)); //dostanu prvni token na vstupu
+            exprDLCopyFirst(&psa_exprDLL, input); //dostanu prvni token na vstupu
             exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
         }
 
@@ -332,6 +332,6 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
         else if(precedence == ERROR)
             error_exit(ERROR_SYNTAX);
 
-    } while (top_terminal.token.type != TOKEN_DOLAR && input.token.type != TOKEN_DOLAR);
+    } while (top_terminal->token.type != TOKEN_DOLAR && input->token.type != TOKEN_DOLAR);
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }

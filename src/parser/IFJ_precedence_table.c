@@ -67,7 +67,7 @@ void exprStackPush (tExprStack* s, expr_token_t item) {
     }
 }
 
-expr_token_t find_top_terminal(tExprStack* s)
+expr_token_t * find_top_terminal(tExprStack* s)
 {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
@@ -80,7 +80,7 @@ expr_token_t find_top_terminal(tExprStack* s)
             top_terminal = top_terminal->next;
         }
         if (top_terminal->exprToken.terminal == true)
-            return top_terminal->exprToken;
+            return &(top_terminal->exprToken);
         else
             error_exit(ERROR_SYNTAX);//prosli jsme cely stack a zadny temrinal zde neni ackoli by mel byt
     }

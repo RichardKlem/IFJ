@@ -35,7 +35,7 @@ int exprStackEmpty (tExprStack* s);
 expr_token_t exprStackTop (tExprStack* s);
 void exprStackPop (tExprStack* s);
 void exprStackPush (tExprStack* s, expr_token_t item);
-expr_token_t find_top_terminal(tExprStack* s);
+expr_token_t * find_top_terminal(tExprStack* s);
 
 
 #endif //IFJ_PRECEDENCE_TABLE_H
