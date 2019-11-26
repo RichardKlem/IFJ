@@ -491,6 +491,7 @@ void fun_or_expr() {
         || next_token.type == TOKEN_LEFT_BRACKET) {
         first = next_token;
         next_token = expressionParse(stdin, &first, NULL, 1);
+        printf("Vylezl jsem tu z EXPR\n");
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
             //TODO <expr>

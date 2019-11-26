@@ -44,22 +44,34 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
 {
     if(expr_DLL == NULL)
         error_exit(ERROR_INTERNAL);
-    if(first_token != NULL)
+    if(first_token != NULL){
+        //printf("VKLADAM do DL listu PRVNI token\n");
         exprDLInsertLast(expr_DLL, *first_token);
-    if(second_token != NULL)
+        //printf("VLOZIL JSEM do DL listu PRVNI token\n");
+        }
+    if(second_token != NULL){
+        //printf("Vkladam do DL listu DRUHY token\n");
         exprDLInsertLast(expr_DLL, *second_token);
+        }
 
     expr_token_t act_token;
     act_token.token = get_token(src_file); //nacteni tokenu ze vstupu
 
     //dokud nenactu keyword krome None, EOL nebo EOF
-    while ((act_token.token.type != TOKEN_KEYWORD && act_token.token.value.keyword_value != NONE) || act_token.token.type != TOKEN_EOL || act_token.token.type != TOKEN_EOF)
+    while (act_token.token.type != TOKEN_KEYWORD && act_token.token.type != TOKEN_EOL && act_token.token.type != TOKEN_EOF)
     {
+        /*printf("Cyklim????\n");
+        if(act_token.token.type == TOKEN_INT)
+            printf("%d\n", act_token.token.value.int_value);
+        if(act_token.token.type == TOKEN_KEYWORD)
+            printf("%d\n", act_token.token.value.keyword_value);*/
         act_token.terminal = true;
         act_token.shifted = false;
         exprDLInsertLast(expr_DLL, act_token);
         act_token.token = get_token(src_file);
+        //printf("Cyklim za\n");
     }
+    //printf("PRED returnem\n");
     return act_token.token;
 }
 
@@ -107,12 +119,16 @@ int get_prec_value(token_t token)
             if (token.value.keyword_value == NONE)
                 index = 6;
             else
+            {
+                printf("Chci zjistit precedenci tokenu KEYWORD, ktery nnei NONE\n");
                 error_exit(ERROR_SYNTAX);
+            }
             break;
         case TOKEN_DOLAR:
             index = 7;
             break;
         default:
+            printf("dostal jsem neocekavany token\n");
             error_exit(ERROR_SYNTAX);
             break;
     }
@@ -146,7 +162,7 @@ int get_members_count(tExprStack * s)
         error_exit(ERROR_INTERNAL);
     else {
         tExprElem * top_terminal= s->top;
-        int members_count = 1;
+        int members_count = 0; //prvni to nikdy nebude, takze se aspon jednou navyssi pocitadlo v cyklu
         while (top_terminal->exprToken.terminal == false || top_terminal->exprToken.shifted == false)
         {
             if (top_terminal->next == NULL) //uz neni zadny prvek a my jsme nenasli zadny terminal
@@ -159,7 +175,10 @@ int get_members_count(tExprStack * s)
             return members_count;
         }
         else
+        {
+            printf("get_members_count funkce nema zadny terminal\n");
             error_exit(ERROR_SYNTAX); //neni zadny terminal, to je chyba
+        }
     }
 }
 
@@ -170,7 +189,10 @@ int get_members_count(tExprStack * s)
 void reduce_var_val(tExprStack * stack)
 {
     if (stack == NULL)
-        error_exit(ERROR_SYNTAX);
+    {
+        printf("neni stack ve funkci reduce_var_val\n");
+        error_exit(ERROR_INTERNAL);
+    }
 
     // zjisteni zda byla promenna deklarovana
     if (stack->top->exprToken.token.type == TOKEN_ID)
@@ -186,7 +208,10 @@ void reduce_var_val(tExprStack * stack)
 void reduce_brackets(tExprStack * stack)
 {
     if (stack == NULL)
-        error_exit(ERROR_SYNTAX);
+    {
+        printf("neni stack ve funkci reduce_brackets\n");
+        error_exit(ERROR_INTERNAL);
+    }
     exprStackPop(stack);
     exprStackPop(stack);
     stack->top->exprToken.terminal = false;
@@ -199,7 +224,10 @@ void reduce_brackets(tExprStack * stack)
 void reduce_bin_op(tExprStack * stack)
 {
     if (stack == NULL)
-        error_exit(ERROR_SYNTAX);
+    {
+        printf("neni stack ve funkci reduce_bin_op\n");
+        error_exit(ERROR_INTERNAL);
+    }
     //TODO kontolovat operator
     exprStackPop(stack);
     exprStackPop(stack);
@@ -262,22 +290,40 @@ int reduce_by_rules(tExprStack * stack, int members_count)
  */
 token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int num_of_tokens)
 {
-    expr_token_t* first_expr_token = NULL;
-    expr_token_t* second_expr_token = NULL;
+    expr_token_t prvni_expr_token;
+    expr_token_t druhy_expr_token;
+    expr_token_t* first_expr_token = &prvni_expr_token;
+    expr_token_t* second_expr_token = &druhy_expr_token;
 
-    //
     if(num_of_tokens < 0 || num_of_tokens > 2 || src_file == NULL)
         error_exit(ERROR_INTERNAL);
     if(num_of_tokens >= 1)
-    {
-        first_expr_token->token = *first;
-        first_expr_token->terminal = true;
-        first_expr_token->shifted = false;
-        if(num_of_tokens == 2){
-            second_expr_token->token = *second;
-            second_expr_token->terminal = true;
-            second_expr_token->shifted = false;
+    {   if (first == NULL)
+            error_exit(ERROR_INTERNAL);
+        else
+        {
+            first_expr_token->token = *first;
+            first_expr_token->terminal = true;
+            first_expr_token->shifted = false;
+
+            if(num_of_tokens == 2){
+                if (second == NULL)
+                    error_exit(ERROR_INTERNAL);
+                else
+                {
+                    second_expr_token->token = *second;
+                    second_expr_token->terminal = true;
+                    second_expr_token->shifted = false;
+                }
+            }
+            else
+                second_expr_token = NULL;
         }
+    }
+    else
+    {
+        first_expr_token = NULL;
+        second_expr_token = NULL;
     }
 
     tExprDLList psa_exprDLL; //dvojsmerne vazany list v kterem bude cely vstup v tokenech
@@ -337,13 +383,19 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
             //zjistim pocet operandu na PSA stacku, ktere budu redukovat , nejvrchnejsi shifted terminal je touto funkci prenastavem na shifted == false
             int members_count = get_members_count(&psa_stack);
-
+            //printf("%d\n", members_count);
             //reduce_by_rules vraci 1 kdyz je vse ok, jinak 0
-            if(! reduce_by_rules(&psa_stack, members_count))
+            if(! reduce_by_rules(&psa_stack, members_count)){
+                printf("PO redukci\n");
                 error_exit(ERROR_SYNTAX); // kdyz vrati 0, tak nastala chyba => ERROR_SYNTAX
+            }
+
         }
         else if(precedence == ERROR)
+        {
+            printf("Precedence vratila ERROR\n");
             error_exit(ERROR_SYNTAX);
+        }
 
     } while (top_terminal->token.type != TOKEN_DOLAR && input->token.type != TOKEN_DOLAR);
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS

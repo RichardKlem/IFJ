@@ -72,7 +72,7 @@ void exprDLInsertFirst (tExprDLList *L, expr_token_t exprToken) {
 
 void exprDLInsertLast(tExprDLList *L, expr_token_t exprToken) {
 
-    tExprDLElemPtr newElem = (tExprDLElemPtr) malloc(sizeof(tExprDLElemPtr));
+    tExprDLElemPtr newElem = malloc(sizeof(struct tExprDLElem));
     if (newElem == NULL)
     {
         exprDLError();
@@ -94,6 +94,7 @@ void exprDLInsertLast(tExprDLList *L, expr_token_t exprToken) {
     }
 
     L->Last = newElem;
+    //printf("PO VLOZENI\n");
     return;
 }
 
