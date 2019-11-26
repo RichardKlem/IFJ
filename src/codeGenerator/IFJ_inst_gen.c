@@ -18,10 +18,11 @@ void setArg(tArgument *argument, tFrame frame, tDatTyp datTyp, char* value)
     argument->datTyp = datTyp;
     argument->frame = frame;
     argument->value = value;
-    return
+    return;
 }
 
-void generateInst(tDLElemPtr *List, enInstruction instType, void *arg1, void *arg2, void *arg3)
+//Generuje a vloží instrukci do seznamu
+void generateInst(tDLElemPtr *List, enInstruction instType, char *arg1, char *arg2, char *arg3)
 {
     //Vytvoříme 
     tInstruction instruction;
@@ -30,6 +31,27 @@ void generateInst(tDLElemPtr *List, enInstruction instType, void *arg1, void *ar
     instruction.arg3 = arg3;
     instruction.instType = instType;
     DLInsertLast(List, instruction);
+}
+
+void writeInstruction(tDLElemPtr *List, enInstruction instType, tArgument *arg1, tArgument *arg2, tArgument *arg3)
+{
+    if(arg1 == NULL)    //Generujeme instrukci bez argumentu
+    {
+        generateInst(List, instType, NULL, NULL, NULL);
+    }
+    else if(arg2 == NULL)   //Generujeme instrukci s jednim argumentem
+    {
+        generateInst(List, instType, arg1->value, NULL, NULL);
+    }
+    else if(arg3 == NULL)   //Generujeme instrukci se dvema argumenty
+    {
+        generateInst(List, instType, arg1->value, arg2->value, NULL);
+    }
+    else    //Generujeme instrukci se tremi argumenty
+    {
+        generateInst(List, instType, arg1->value, arg2->value, arg3->value);
+    }
+    return;
 }
 
 void printInst(tDLList *List)
@@ -46,7 +68,7 @@ void printInst(tDLList *List)
         switch (tmpInst->instType)
         {
             case MOVE:
-                printf("MOVE %s %s\n",(char *) tmpInst->arg1,(char *) tmpInst->arg2);
+                printf("MOVE %s %s\n",(char *) tmpInst->arg1,(char *) tmpInst->arg2);   //hodota arg2 do promenne arg1
                 break;
             case CREATEFRAME:
                 printf("CREATEFRAME\n");
@@ -55,37 +77,37 @@ void printInst(tDLList *List)
                 printf("POPFRAME\n");
                 break;
             case DEFVAR:
-                printf("DEFVAR %s\n",(char *) tmpInst->arg1);
+                printf("DEFVAR %s\n",(char *) tmpInst->arg1);   //promenna napr.: GF@prom
                 break;
             case CALL:
-                printf("CALL %s\n",(char *) tmpInst->arg1);
+                printf("CALL %s\n",(char *) tmpInst->arg1); //nazev navesti
                 break;
             case RETURN:
                 printf("RETURN\n");
                 break;
             case PUSHS:
-                printf("PUSHS %s\n",(char *) tmpInst->arg1);
+                printf("PUSHS %s\n",(char *) tmpInst->arg1);    //hodnota
                 break;
             case POPS:
-                printf("POPS %s\n",(char *) tmpInst->arg1);
+                printf("POPS %s\n",(char *) tmpInst->arg1); //promenna do ktere se ulozi promenna
                 break;
             case CLEARS:
                 printf("CLEARS\n");
                 break;
             case ADD:
-                printf("ADD %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("ADD %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 promenna do ktere se ulozi hodnota,arg2 + arg3
                 break;
             case SUB:
-                printf("SUB %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("SUB %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 promenna do ktere se ulozi hodnota,arg2 - arg3
                 break;
             case MUL:
-                printf("MUL %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("MUL %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 promenna do ktere se ulozi hodnota,arg2 * arg3
                 break;
             case DIV:
-                printf("DIV %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("DIV %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 promenna do ktere se ulozi hodnota,arg2 / arg3
                 break;
             case IDIV:
-                printf("IDIV %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("IDIV %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);   //arg1 promenna do ktere se ulozi hodnota,arg2 // arg3
                 break;
             case ADDS:
                 printf("ADDS\n");
@@ -103,13 +125,13 @@ void printInst(tDLList *List)
                 printf("IDIVS\n");
                 break;
             case LT:
-                printf("LT %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("LT %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 je bool promenna, arg2 < arg3
                 break;
             case GT:
-                printf("LT %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("LT %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 je bool promenna, arg2 > arg3
                 break;
             case EQ:
-                printf("LT %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("LT %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 je bool promenna, arg2 == arg3
                 break;
             case LTS:
                 printf("LTS\n");
@@ -121,13 +143,13 @@ void printInst(tDLList *List)
                 printf("EQS\n");
                 break;
             case AND:
-                printf("AND %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("AND %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);   //arg1 promenna typu bool, arg2 AND arg3
                 break;
             case OR:
-                printf("OR %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("OR %s %s %s\n", (char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);    //arg1 promenna typu bool, arg2 OR arg3
                 break;
             case NOT:
-                printf("NOT %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2, (char *) tmpInst->arg3);
+                printf("NOT %s %s %s\n",(char *) tmpInst->arg1, (char *) tmpInst->arg2);    //arg1 je promenna typu bool, NOT arg2
                 break;
             case ANDS:
                 printf("ANDS\n");
