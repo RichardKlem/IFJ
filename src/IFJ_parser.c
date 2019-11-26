@@ -117,11 +117,29 @@ void stat(){
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
         || next_token.type == TOKEN_LEFT_BRACKET){
             first = next_token;
-/********************************************************************************************
+/*******************************************************************************************
         SIMULACE RESENI VYRAZU first
-            //TODO <expr1>
+            //TODO <expr1> */
 
-*********************************************************************************************/
+        if (first.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+        next_token = get_token(stdin);
+
+        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
+        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
+        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
+        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
+        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
+        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
+        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
+        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
+        next_token.type == TOKEN_ID) {
+            if (next_token.type == TOKEN_ID)
+                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            next_token = get_token(stdin);
+        }
+
+/*********************************************************************************************/
         if (next_token.type == TOKEN_EOL)
             next_token = get_token(stdin);
         else
@@ -189,9 +207,27 @@ void stat(){
         first = next_token;
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
-            //TODO <expr1>
+            //TODO <expr1> */
 
-*********************************************************************************************/
+        if (first.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+        next_token = get_token(stdin);
+
+        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
+        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
+        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
+        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
+        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
+        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
+        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
+        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
+        next_token.type == TOKEN_ID) {
+            if (next_token.type == TOKEN_ID)
+                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            next_token = get_token(stdin);
+        }
+
+/*********************************************************************************************/
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -225,9 +261,27 @@ void stat(){
         first = next_token;
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
-            //TODO <expr1>
+            //TODO <expr1> */
 
-*********************************************************************************************/
+        if (first.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+        next_token = get_token(stdin);
+
+        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
+        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
+        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
+        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
+        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
+        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
+        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
+        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
+        next_token.type == TOKEN_ID) {
+            if (next_token.type == TOKEN_ID)
+                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            next_token = get_token(stdin);
+        }
+
+/*********************************************************************************************/
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -311,9 +365,23 @@ void ret(){
         next_token = get_token(stdin);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU
-            //TODO <expr0>
+            //TODO <expr0> */
 
-*********************************************************************************************/
+        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
+        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
+        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
+        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
+        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
+        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
+        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
+        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
+        next_token.type == TOKEN_ID) {
+            if (next_token.type == TOKEN_ID)
+                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            next_token = get_token(stdin);
+        }
+
+/*********************************************************************************************/
         if (next_token.type == TOKEN_EOL) {
             next_token = get_token(stdin);
             eol_opt();
@@ -371,13 +439,33 @@ void expr_or_assign() {
         next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
         next_token.type == TOKEN_EQ) {
         second = next_token;
-        next_token = get_token(stdin);
         //next_token = expressionParse(stdin, &first, &second, 2);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first,second
-            //TODO <expr2>
+            //TODO <expr2> */
 
-*********************************************************************************************/
+        if (first.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+
+        if (second.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+        next_token = get_token(stdin);
+
+        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
+        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
+        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
+        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
+        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
+        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
+        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
+        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
+        next_token.type == TOKEN_ID) {
+            if (next_token.type == TOKEN_ID)
+                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            next_token = get_token(stdin);
+        }
+
+/*********************************************************************************************/
             ;
     }
     //pravidlo 24
@@ -491,14 +579,30 @@ void fun_or_expr() {
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
         || next_token.type == TOKEN_LEFT_BRACKET) {
         first = next_token;
-        next_token = get_token(stdin);
         //next_token = expressionParse(stdin, &first, NULL, 1);
-        //printf("Vylezl jsem tu z EXPR\n");
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
-            //TODO <expr>
+            //TODO <expr> */
 
-*********************************************************************************************/
+        if (first.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+        next_token = get_token(stdin);
+
+        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
+        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
+        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
+        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
+        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
+        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
+        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
+        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
+        next_token.type == TOKEN_ID) {
+            if (next_token.type == TOKEN_ID)
+                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            next_token = get_token(stdin);
+        }
+
+/*********************************************************************************************/
     }
     //pravidlo 20
     else if (next_token.type == TOKEN_ID){
@@ -525,9 +629,30 @@ void fun_or_expr_2() {
             second = next_token;
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first,second
-            //TODO <expr2>
+            //TODO <expr2> */
 
-*********************************************************************************************/
+        if (first.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+
+        if (second.type == TOKEN_ID)
+            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+        next_token = get_token(stdin);
+
+        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
+        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
+        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
+        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
+        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
+        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
+        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
+        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
+        next_token.type == TOKEN_ID) {
+            if (next_token.type == TOKEN_ID)
+                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            next_token = get_token(stdin);
+        }
+
+/*********************************************************************************************/
     }
     //pravidlo 21
     else if (next_token.type == TOKEN_LEFT_BRACKET) {
