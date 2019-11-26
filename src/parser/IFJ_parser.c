@@ -450,7 +450,6 @@ void arg_next() {
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_STRING) {
             arg_num++;
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
             next_token = get_token(stdin);
             arg_next();
         }
