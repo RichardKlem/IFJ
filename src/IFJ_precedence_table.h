@@ -9,6 +9,8 @@
 #ifndef IFJ_PRECEDENCE_TABLE_H
 #define IFJ_PRECEDENCE_TABLE_H
 
+#include <stdbool.h>
+
 typedef enum {
     ERROR, REDUCE, EQUAL, SHIFT, XXXXXX
 } precedence_rule;

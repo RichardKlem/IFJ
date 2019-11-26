@@ -1,6 +1,9 @@
 #ifndef IFJ_PRECEDENCE_SYNTACTIC_ANALYSIS_H
 #define IFJ_PRECEDENCE_SYNTACTIC_ANALYSIS_H
 
+#include "IFJ_precedence_table.h"
+#include "IFJ_precedence_DLL.h"
+
 
 /**
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

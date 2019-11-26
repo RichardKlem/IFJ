@@ -33,6 +33,7 @@ LL tabulka
 #include "IFJ_error.h"
 #include "symtable.h"
 #include "IFJ_stack_semantic.h"
+#include "IFJ_precedence_syntactic_analysis.h"
 
 token_t next_token; //globalni token
 token_t first, second; //pomocne tokeny pro uchovani tokenu pri predavani ke zpracovani vyrazu
@@ -370,6 +371,7 @@ void expr_or_assign() {
         next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
         next_token.type == TOKEN_EQ) {
         second = next_token;
+        next_token = expressionParse(stdin, &first, &second, 2);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first,second
             //TODO <expr2>
@@ -488,6 +490,7 @@ void fun_or_expr() {
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
         || next_token.type == TOKEN_LEFT_BRACKET) {
         first = next_token;
+        next_token = expressionParse(stdin, &first, NULL, 1);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
             //TODO <expr>
