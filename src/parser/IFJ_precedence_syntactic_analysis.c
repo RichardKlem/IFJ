@@ -189,6 +189,26 @@ void reduce_bin_op(tExprStack * stack)
     exprStackPop(stack);
     stack->top->exprToken.terminal = false;
 }
+
+/**
+ * @brief funkce get_type_of_reduction vraci typ vyrazu, ktery se bude zpracovavat
+ * @param stack ukazatel na PSA zasobnik
+ * @return vraci BRACKETS kdyz se jedna o (E) nebo BINARY kdyz se jedna o E op E jinak RT_ERROR
+ */
+reduction_type get_type_of_reduction(tExprStack * stack)
+{
+    int first = stack->top->exprToken.terminal;
+    int second = stack->top->next->exprToken.terminal;
+    int third = stack->top->next->next->exprToken.terminal;
+
+    if (first == 1 && second == 0 && third ==1)
+        return BRACKETS;
+    else if (first == 0 && second == 1 && third ==0)
+        return BINARY;
+    else
+        return RT_ERROR;
+}
+
 /**
  * @brief funkce reduce_by_rules zpracuje tokeny na PSA zasobniku podle pravidel, provadi PRAVY rozbor
  * @param stack ukazatel na PSA zasobnik
@@ -202,9 +222,10 @@ int reduce_by_rules(tExprStack * stack, int members_count)
         reduce_var_val(stack);
     else if(members_count == 3)
     {
-        if(/* terminal NEterminal terminal */ )
+        reduction_type type_of_reduction = get_type_of_reduction(stack);
+        if(type_of_reduction == BRACKETS)
             reduce_brackets(stack);
-        else if(/* NEterminal terminal NEterminal */)
+        else if(type_of_reduction == BINARY)
             reduce_bin_op(stack);
         else
             error_exit(ERROR_SYNTAX);
@@ -286,8 +307,8 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
             exprDLDeleteFirst(&psa_exprDLL); //zaroven ho i smazu, jiz je nacteny
         }
 
-        //if <y je na vrcholu zásobníku and r: A -> y € P
-        //      then zaměň <y za A & vypiš r na výstup
+        //if <y je na vrcholu zásobníku && r: A -> y € P
+        //      then zaměň <y za A && vypiš r na výstup
         //else chyba
         else if(precedence == REDUCE){
             //TODO zavolat funkci, ktera najde shifted prvek nejblize vrcholu zasobniku
@@ -301,9 +322,7 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
             //reduce_by_rules vraci 1 kdyz je vse ok, jinak 0
             if(! reduce_by_rules(&psa_stack, members_count))
                 error_exit(ERROR_SYNTAX); // kdyz vrati 0, tak nastala chyba => ERROR_SYNTAX
-
         }
-
         else if(precedence == ERROR)
             error_exit(ERROR_SYNTAX);
 
