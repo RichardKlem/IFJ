@@ -24,6 +24,7 @@
 #include "IFJ_error.h"
 #include "IFJ_precedence_table.h"
 #include "IFJ_precedence_DLL.h"
+#include "IFJ_stack_semantic.h"
 #include "IFJ_precedence_syntactic_analysis.h"
 
 /**
@@ -51,8 +52,8 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
     expr_token_t act_token;
     act_token.token = get_token(src_file); //nacteni tokenu ze vstupu
 
-    //dokud nenactu keyword, eol nebo eof
-    while (act_token.token.type != TOKEN_KEYWORD || act_token.token.type != TOKEN_EOL || act_token.token.type != TOKEN_EOF)
+    //dokud nenactu keyword krome None, EOL nebo EOF
+    while ((act_token.token.type != TOKEN_KEYWORD && act_token.token.value.keyword_value != NONE) || act_token.token.type != TOKEN_EOL || act_token.token.type != TOKEN_EOF)
     {
         act_token.terminal = true;
         act_token.shifted = false;
@@ -67,9 +68,10 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
  * @param type_of_token zpracuje typ tokenu
  * @return vraci index do precedencni tabulky
  */
-int get_prec_value(token_type type_of_token)
+int get_prec_value(token_t token)
 {
     int index = -1;
+    token_type type_of_token = token.type;
     switch (type_of_token){
         case TOKEN_MATH_PLUS:
         case TOKEN_MATH_MINUS:
@@ -101,6 +103,12 @@ int get_prec_value(token_type type_of_token)
         case TOKEN_STRING:
             index = 6;
             break;
+        case TOKEN_KEYWORD:
+            if (token.value.keyword_value == NONE)
+                index = 6;
+            else
+                error_exit(ERROR_SYNTAX);
+            break;
         case TOKEN_DOLAR:
             index = 7;
             break;
@@ -121,8 +129,8 @@ precedence_rule get_precedence(expr_token_t first, expr_token_t second)
 {
     int i = -1;
     int j = -1;
-    i = get_prec_value(first.token.type);
-    j = get_prec_value(second.token.type);
+    i = get_prec_value(first.token);
+    j = get_prec_value(second.token);
     precedence_rule precedence = precedence_table[i][j];
     return precedence;
 }
@@ -163,7 +171,12 @@ void reduce_var_val(tExprStack * stack)
 {
     if (stack == NULL)
         error_exit(ERROR_SYNTAX);
-    stack->top->exprToken.terminal = false;
+
+    // zjisteni zda byla promenna deklarovana
+    if (stack->top->exprToken.token.type == TOKEN_ID)
+        stack_sem_push(&stack_semantic, VAR_USE, stack->top->exprToken.token.value.string);
+
+    stack->top->exprToken.terminal = false; //prenastavim terminal na NEterminal
 }
 
 /**
