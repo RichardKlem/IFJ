@@ -487,9 +487,13 @@ void expr_or_assign() {
     //pravidlo 6
     else if (next_token.type == TOKEN_ASSIGNMENT) {
         next_token = get_token(stdin);
-        //bylo prirazeno do promenne, je nutna vlozit ji do stack_semantic
-        stack_sem_push(&stack_semantic, VAR_DEF, first.value.string);
+        //ulozeni jmena promenne, jelikoz nejdrive semanticky zkontroluje vyraz
+        char * tmp = first.value.string;
+
         fun_or_expr();
+
+        //bylo prirazeno do promenne, je nutna vlozit ji do stack_semantic
+        stack_sem_push(&stack_semantic, VAR_DEF, tmp);
     }
     else
         error_exit(ERROR_SYNTAX);
