@@ -674,7 +674,7 @@ void fun_or_expr_2() {
     }
     //pravidlo 30
     else if (next_token.type == TOKEN_EOL)
-        /*DO NOTHING*/;
+        stack_sem_push(&stack_semantic, VAR_USE, first.value.string); //pouze kontrola samotneho identifikatoru
     else
         error_exit(ERROR_SYNTAX);
 }
