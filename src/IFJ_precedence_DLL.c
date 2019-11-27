@@ -18,7 +18,6 @@
 void exprDLError() {
 
     fprintf (stderr,"*ERROR* PSA expression DLL\n");
-    return;
 }
 
 void exprDLInitList (tExprDLList *L) {
@@ -26,7 +25,6 @@ void exprDLInitList (tExprDLList *L) {
     L->First = NULL;
     L->Act = NULL;
     L->Last = NULL;
-    return;
 }
 
 void exprDLDisposeList (tExprDLList *L) {
@@ -67,7 +65,6 @@ void exprDLInsertFirst (tExprDLList *L, expr_token_t exprToken) {
     }
 
     L->First = newElem;
-    return;
 }
 
 void exprDLInsertLast(tExprDLList *L, expr_token_t exprToken) {
@@ -94,20 +91,16 @@ void exprDLInsertLast(tExprDLList *L, expr_token_t exprToken) {
     }
 
     L->Last = newElem;
-    //printf("PO VLOZENI\n");
-    return;
 }
 
 void exprDLFirst (tExprDLList *L) {
 
     L->Act = L->First;
-    return;
 }
 
 void exprDLLast (tExprDLList *L) {
 
     L->Act = L->Last;
-    return;
 }
 
 void exprDLCopyFirst (tExprDLList *L, expr_token_t *exprToken) {
@@ -118,8 +111,6 @@ void exprDLCopyFirst (tExprDLList *L, expr_token_t *exprToken) {
         return;
     }
     *exprToken = L->First->exprToken;
-    return;
-
 }
 
 void exprDLCopyLast (tExprDLList *L, expr_token_t *exprToken) {
@@ -130,25 +121,26 @@ void exprDLCopyLast (tExprDLList *L, expr_token_t *exprToken) {
         return;
     }
     *exprToken = L->Last->exprToken;
-    return;
 }
 
 void exprDLDeleteFirst (tExprDLList *L) {
-
-    if (L->First == NULL)
+    if(L->First != NULL)
     {
-        return;
+        if(L->First == L->Act)
+            L->Act = NULL;
+        if(L->First == L->Last)
+        {
+            free(L->First);
+            L->First = NULL;
+            L->Last = NULL;
+        }
+        else
+        {
+            (L->First->rptr)->lptr = NULL;
+            L->First = L->First->rptr;
+            free((L->First)->lptr);
+        }
     }
-    else if (L->First == L->Act)
-    {
-        L->Act = NULL;
-    }
-    tExprDLElemPtr tempElem;
-    tempElem = L->First;
-    L->First = L->First->rptr;
-    L->First->lptr = NULL;
-    free(tempElem);
-    return;
 }
 
 void exprDLDeleteLast (tExprDLList *L) {
@@ -166,7 +158,6 @@ void exprDLDeleteLast (tExprDLList *L) {
     L->Last = L->Last->lptr;
     L->Last->rptr = NULL;
     free(tempElem);
-    return;
 }
 
 void exprDLPostDelete (tExprDLList *L) {
@@ -189,7 +180,6 @@ void exprDLPostDelete (tExprDLList *L) {
         L->Act->rptr->rptr->lptr = L->Act;
         free(tempElem);
     }
-    return;
 }
 
 void exprDLPreDelete (tExprDLList *L) {
@@ -212,7 +202,6 @@ void exprDLPreDelete (tExprDLList *L) {
         L->Act->lptr->lptr->rptr = L->Act;
         free(tempElem);
     }
-    return;
 }
 
 void exprDLPostInsert (tExprDLList *L, expr_token_t exprToken) {
@@ -240,7 +229,6 @@ void exprDLPostInsert (tExprDLList *L, expr_token_t exprToken) {
     {
         newElem->rptr->lptr = newElem;
     }
-    return;
 }
 
 void exprDLPreInsert (tExprDLList *L, expr_token_t exprToken) {
@@ -268,7 +256,6 @@ void exprDLPreInsert (tExprDLList *L, expr_token_t exprToken) {
     {
         newElem->lptr->rptr = newElem;
     }
-    return;
 }
 
 void exprDLCopy (tExprDLList *L, expr_token_t *exprToken) {
@@ -279,7 +266,7 @@ void exprDLCopy (tExprDLList *L, expr_token_t *exprToken) {
         return;
     }
     *exprToken = L->Act->exprToken;
-    return;
+
 }
 
 void exprDLActualize (tExprDLList *L, expr_token_t exprToken) {
@@ -289,7 +276,6 @@ void exprDLActualize (tExprDLList *L, expr_token_t exprToken) {
         return;
     }
     L->Act->exprToken = exprToken;
-    return;
 }
 
 void exprDLSucc (tExprDLList *L) {
@@ -306,8 +292,6 @@ void exprDLSucc (tExprDLList *L) {
     {
         L->Act = L->Act->rptr;
     }
-    return;
-
 }
 
 
@@ -325,7 +309,6 @@ void exprDLPred (tExprDLList *L) {
     {
         L->Act = L->Act->lptr;
     }
-    return;
 }
 
 int exprDLActive (tExprDLList *L) {
