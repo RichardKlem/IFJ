@@ -122,7 +122,7 @@ void stat(){
             //TODO <expr1> */
 
         if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
         next_token = get_token(stdin);
 
         while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
@@ -218,7 +218,7 @@ void stat(){
             //TODO <expr1> */
 
         if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
         next_token = get_token(stdin);
 
         while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
@@ -272,7 +272,7 @@ void stat(){
             //TODO <expr1> */
 
         if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
         next_token = get_token(stdin);
 
         while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
@@ -453,10 +453,10 @@ void expr_or_assign() {
             //TODO <expr2> */
 
         if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
 
         if (second.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, second.value.string);
         next_token = get_token(stdin);
 
         while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
@@ -597,7 +597,7 @@ void fun_or_expr() {
             //TODO <expr> */
 
         if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
         next_token = get_token(stdin);
 
         while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
@@ -644,10 +644,10 @@ void fun_or_expr_2() {
             //TODO <expr2> */
 
         if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
 
         if (second.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+            stack_sem_push(&stack_semantic, VAR_USE, second.value.string);
         next_token = get_token(stdin);
 
         while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
