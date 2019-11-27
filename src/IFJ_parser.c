@@ -101,7 +101,7 @@ void st_list(){
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == WHILE) ||
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == PASS) ||
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF) ||
-            (fun_def_nesting > 0) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN)){
+            ((fun_def_nesting > 0) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN))){
                 stat();
                 eol_opt();
                 st_list();
