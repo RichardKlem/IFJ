@@ -1,5 +1,8 @@
 #error more params in func call
 
+def print(a):
+    pass
+
 def main(a):
     print('in main')
     print(a)

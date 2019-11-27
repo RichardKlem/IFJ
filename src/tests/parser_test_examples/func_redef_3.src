@@ -1,4 +1,6 @@
 #error function redefinition + func not defined
+def print(a):
+    pass
 
 def main():
     print('in main')

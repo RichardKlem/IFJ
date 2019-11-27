@@ -1,6 +1,9 @@
 #should be ok
 a = 1
 
+def print(a):
+    pass
+
 if a < 1:
     print('not here')
 else:
@@ -53,5 +56,5 @@ def check(a):
         print('else')
 
 
-b = 5
+b = 1
 check(b)

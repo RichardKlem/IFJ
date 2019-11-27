@@ -1,8 +1,11 @@
 #should fail
 
+def print(a):
+  pass
+
 def main(a):
     print('in main')
-    if a-1 > 2:
+    if a-1 > 2: #nevím jestli teda kontrolujeme typy
         print(a)
     else:
         print('else')

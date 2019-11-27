@@ -4,6 +4,9 @@ a = 1
 b = a
 c = b + a
 
+def print(a):
+    pass
+
 def foo(a, b):
     print('in foo')
     print(a)

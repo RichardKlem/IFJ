@@ -1,7 +1,10 @@
 #should fail on func call
 
+def print(a):
+   pass
+
 def main():
-    a = 'str' + 'str'
+    a = 'str'
 
     def inner_main(var):
         print(var)

@@ -1,6 +1,9 @@
 #should be ok
+def print(a):
+    pass
+
 def main(a):
-    if 1:
+    if a:
         print('uvnitr if')
     else:
         print('uvnitr else')
@@ -17,5 +20,6 @@ def main(a):
             print(c)
         foo2('\x32')
     foo('a', 2)
+    return
 
 main(1)

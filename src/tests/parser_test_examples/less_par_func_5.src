@@ -1,5 +1,8 @@
 #error missing params
 
+def print(a):
+   pass
+
 def main(a, b, c):
     print('in main')
     print(a)
