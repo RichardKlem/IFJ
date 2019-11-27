@@ -1,0 +1,14 @@
+def ahoj(a,b):
+   if (a):
+     a=2
+   else:
+     b=3
+     return 20
+     while (10):
+       b = 1
+
+
+
+
+
+
