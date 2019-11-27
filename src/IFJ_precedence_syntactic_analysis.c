@@ -296,6 +296,7 @@ int reduce_by_rules(tExprStack * stack, int members_count)
  */
 token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int num_of_tokens)
 {
+    //printf("\nfirst-%d",first->type);
     expr_token_t prvni_expr_token;
     expr_token_t druhy_expr_token;
     expr_token_t* first_expr_token = &prvni_expr_token;
@@ -360,7 +361,7 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     {
         //zjisteni precedecniho pravidla
         precedence_rule precedence = get_precedence(*top_terminal, *input);
-
+        //printf("\n%d \ntt-%d \ninput-%d \n\n", precedence, top_terminal->token.type, input->token.type);
         // < :zaměň a za a< na zásobníku & push(b) & přečti další symbol b ze vstupu
         if(precedence == SHIFT){
             top_terminal->shifted = true; //zamen a za a<
@@ -406,5 +407,6 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
         }
 
     } while (top_terminal->token.type != TOKEN_DOLAR && input->token.type != TOKEN_DOLAR);
+    //printf("\nJDU VEN\n");
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
