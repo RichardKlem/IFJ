@@ -72,6 +72,12 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
         //printf("Cyklim za\n");
     }
     //printf("PRED returnem\n");
+    expr_token_t end_token;
+    end_token.token.type = TOKEN_DOLAR;
+    end_token.token.value.string = "$";
+    end_token.terminal = true;
+    end_token.shifted = false;
+    exprDLInsertLast(expr_DLL, end_token);
     return act_token.token;
 }
 
@@ -341,8 +347,10 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     end_token.shifted = false;
     exprStackPush(&psa_stack, end_token); //vlozim 'zarazku' $
 
-    expr_token_t * top_terminal;
-    expr_token_t * input;
+    expr_token_t top_terminal_obj;
+    expr_token_t * top_terminal = &top_terminal_obj;
+    expr_token_t input_obj;
+    expr_token_t * input = &input_obj;
 
     //prvni inicializace promennych
     top_terminal = find_top_terminal(&psa_stack); //nactu si nevrchnejsi terminal
