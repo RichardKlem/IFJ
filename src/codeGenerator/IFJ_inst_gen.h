@@ -119,7 +119,7 @@ typedef struct {
     tDLElemPtr Last;
 } tDLList;
 /* funkce pro spracovani instrukci*/
-void generateInst(tDLElemPtr *List, enInstruction instType, void *arg1, void *arg2, void *arg3);
+void generateInst(tDLElemPtr *List, enInstruction instType, char *arg1, char *arg2, char *arg3);
 void writeInstruction(tDLElemPtr *List, enInstruction insType, tArgument *arg1, tArgument *arg2, tArgument *arg3);
 void printInst(tDLList *List);
 /* funkce dvousmerne vazaneho seznamu */

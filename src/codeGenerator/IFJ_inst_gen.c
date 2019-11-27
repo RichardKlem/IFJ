@@ -33,6 +33,74 @@ void generateInst(tDLElemPtr *List, enInstruction instType, char *arg1, char *ar
     DLInsertLast(List, instruction);
 }
 
+void sendToGenerator(char *str, char *arg1, char *arg2, char *arg3)
+{
+    if (strcmp(str, "+") == 0)
+    {
+        if () 
+    }
+    else if (strcmp(str,"-") == 0)
+    {
+
+    }
+    else if (strcmp(str,"*") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"/") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"=") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"==") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"!=") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"<") == 0)
+    {
+        
+    }
+    else if (strcmp(str,">") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"<=") == 0)
+    {
+        
+    }
+    else if (strcmp(str,">=") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"IF") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"WHEN") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"DEF") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"ELSE") == 0)
+    {
+        
+    }
+    else if (strcmp(str,"CALL") == 0)
+    {
+        if(arg3 == NULL)
+    }
+}
+
 void writeInstruction(tDLElemPtr *List, enInstruction instType, tArgument *arg1, tArgument *arg2, tArgument *arg3)
 {
     if(arg1 == NULL)    //Generujeme instrukci bez argumentu
