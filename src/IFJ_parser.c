@@ -41,8 +41,7 @@ Record id_param; //pomocna struktura pro ukladani informaci o promennych
 tBSTNodePtr symtable; //tabulka symbolu
 tStack_sem stack_semantic; //zasobnik pro semantickou analyzu
 tStack_sem stack_semantic_params;
-int param_num;
-int arg_num;
+int param_num, arg_num, fun_def_nesting = 0;
 
 void prog(){
     printf("In main\n");
@@ -88,7 +87,7 @@ void st_list(){
     printf("In st_list\n");
     //pravidlo 4
     if (next_token.type == TOKEN_DEDENT ||
-        (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) ||
+        //(next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) ||
         next_token.type == TOKEN_EOF)
         /*DO NOTHING*/;
     //pravidlo 2
@@ -101,7 +100,8 @@ void st_list(){
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == DEF) ||
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == WHILE) ||
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == PASS) ||
-            (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF)){
+            (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF) ||
+            (fun_def_nesting > 0) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN)){
                 stat();
                 eol_opt();
                 st_list();
@@ -156,6 +156,10 @@ void stat(){
         else
             error_exit(ERROR_SYNTAX);
     }
+    //pravidlo 7*/8 sloucene a pouze za podminky, ze jsme ve funkci
+    else if ((fun_def_nesting > 0) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN)){
+        ret(); //pouze presmerujeme do puvodniho pravidla 7/8
+    }
     //pravidlo 11 - definice funkce
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == DEF){
         char * fun_name; //pomocna promenna pro uchovani jmena funkce
@@ -172,6 +176,7 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
+        fun_def_nesting++; //zacina blok prikazu fce, muze nastat return
         //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
         param_num = 0; //vynuluje pocet parametru
         param_list();
@@ -191,8 +196,11 @@ void stat(){
         if (next_token.type == TOKEN_INDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
+
         st_list();
-        ret();
+       // ret();
+        fun_def_nesting--; //konci blok fce, pokud je fun_def_nesting > 0, znamena to, ze jsme stale v definici funkce
+
         if (next_token.type == TOKEN_DEDENT) {
             //konec definice funkce, uvolnime semanticky zasobnik
             stack_sem_pop_until_block_start(&stack_semantic);
