@@ -447,11 +447,11 @@ void expr_or_assign() {
         next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
         next_token.type == TOKEN_EQ) {
         second = next_token;
-        //next_token = expressionParse(stdin, &first, &second, 2);
+        next_token = expressionParse(stdin, &first, &second, 2);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first,second
             //TODO <expr2> */
-
+/*
         if (first.type == TOKEN_ID)
             stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
 
@@ -472,7 +472,7 @@ void expr_or_assign() {
                 stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
             next_token = get_token(stdin);
         }
-
+*/
 /*********************************************************************************************/
             ;
     }
@@ -591,11 +591,11 @@ void fun_or_expr() {
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
         || next_token.type == TOKEN_LEFT_BRACKET) {
         first = next_token;
-        //next_token = expressionParse(stdin, &first, NULL, 1);
+        next_token = expressionParse(stdin, &first, NULL, 1);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
             //TODO <expr> */
-
+/*
         if (first.type == TOKEN_ID)
             stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
         next_token = get_token(stdin);

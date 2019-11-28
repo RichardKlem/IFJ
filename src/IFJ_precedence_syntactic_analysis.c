@@ -398,7 +398,7 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
                 printf("PO redukci\n");
                 error_exit(ERROR_SYNTAX); // kdyz vrati 0, tak nastala chyba => ERROR_SYNTAX
             }
-
+        top_terminal = find_top_terminal(&psa_stack);
         }
         else if(precedence == ERROR)
         {
@@ -406,7 +406,7 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
             error_exit(ERROR_SYNTAX);
         }
 
-    } while (top_terminal->token.type != TOKEN_DOLAR && input->token.type != TOKEN_DOLAR);
+    } while (top_terminal->token.type != TOKEN_DOLAR || input->token.type != TOKEN_DOLAR);
     //printf("\nJDU VEN\n");
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
