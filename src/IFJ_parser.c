@@ -71,7 +71,7 @@ void prog(){
             if (next_token.type == TOKEN_EOF){ //pokud se korekne zpracovali vsechny tokeny, koncime
 
 
-                while (stack_sem_empty(&stack_semantic))
+                while (!stack_sem_empty(&stack_semantic))
                     stack_sem_pop(&stack_semantic);
                 symtable_dispose(&symtable);
                 return;
@@ -117,9 +117,11 @@ void stat(){
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
         || next_token.type == TOKEN_LEFT_BRACKET){
             first = next_token;
+            /*****PSA*******/
+            next_token = expressionParse(stdin, &first, NULL, 1);
 /*******************************************************************************************
         SIMULACE RESENI VYRAZU first
-            //TODO <expr1> */
+            //TODO <expr1>
 
         if (first.type == TOKEN_ID)
             stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
@@ -213,9 +215,11 @@ void stat(){
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == WHILE){
         next_token = get_token(stdin);
         first = next_token;
+        /*****PSA*******/
+        next_token = expressionParse(stdin, &first, NULL, 1);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
-            //TODO <expr1> */
+            //TODO <expr1>
 
         if (first.type == TOKEN_ID)
             stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
@@ -267,9 +271,11 @@ void stat(){
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF){
         next_token = get_token(stdin);
         first = next_token;
+        /*****PSA*******/
+        next_token = expressionParse(stdin, &first, NULL, 1);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
-            //TODO <expr1> */
+            //TODO <expr1>
 
         if (first.type == TOKEN_ID)
             stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
@@ -371,9 +377,11 @@ void ret(){
     //pravidlo 7
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) {
         next_token = get_token(stdin);
+        /*****PSA*******/
+        next_token = expressionParse(stdin, NULL, NULL, 0);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU
-            //TODO <expr0> */
+            //TODO <expr0>
 
         while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
         next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
@@ -447,6 +455,7 @@ void expr_or_assign() {
         next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
         next_token.type == TOKEN_EQ) {
         second = next_token;
+        /*****PSA*******/
         next_token = expressionParse(stdin, &first, &second, 2);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first,second
@@ -591,6 +600,7 @@ void fun_or_expr() {
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
         || next_token.type == TOKEN_LEFT_BRACKET) {
         first = next_token;
+        /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first
@@ -623,8 +633,8 @@ void fun_or_expr() {
         fun_or_expr_2();
     }
     //pravidlo 29
-    else if (next_token.type == TOKEN_EOL)
-        /*DO NOTHING*/;
+    //else if (next_token.type == TOKEN_EOL)
+    //    /*DO NOTHING*/;
     else
         error_exit(ERROR_SYNTAX);
 }
@@ -639,9 +649,11 @@ void fun_or_expr_2() {
         next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
         next_token.type == TOKEN_EQ) {
             second = next_token;
+            /*****PSA*******/
+            next_token = expressionParse(stdin, &first, &second, 2);
 /********************************************************************************************
         SIMULACE RESENI VYRAZU first,second
-            //TODO <expr2> */
+            //TODO <expr2>
 
         if (first.type == TOKEN_ID)
             stack_sem_push(&stack_semantic, VAR_USE, first.value.string);

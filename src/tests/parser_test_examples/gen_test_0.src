@@ -1,0 +1,16 @@
+a = 1
+
+def print(x):
+    pass
+
+while a:
+    print(a)
+
+#DEFVAR GF@res
+#LABEL while
+
+#EQ GF@res GF@a bool@true ##PSA
+#JUMPIFEQ end GF@res bool@false  ##PSA
+
+#JUMP while0
+#LABEL end
