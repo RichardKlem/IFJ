@@ -401,7 +401,7 @@ token_t get_token(FILE* src_file) {
 
         case STATE_MULTI_LINE_COMM:
             if (next_char == EOF) //pokud skoncil soubor nechame reseni na stavu START
-                state = STATE_START;
+                error_exit(ERROR_LEX);
             else if (next_char != '"') //jsme stale v komentari
                 state = STATE_MULTI_LINE_COMM;
             else if (multi_line_comm_follow(src_file, next_char)) //kontrola zda nenasleduje """
