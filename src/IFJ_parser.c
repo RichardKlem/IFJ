@@ -376,7 +376,7 @@ void ret(){
         /*DO NOTHING*/;
     //pravidlo 7
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) {
-        next_token = get_token(stdin);
+        //next_token = get_token(stdin);
         /*****PSA*******/
         next_token = expressionParse(stdin, NULL, NULL, 0);
 /********************************************************************************************
