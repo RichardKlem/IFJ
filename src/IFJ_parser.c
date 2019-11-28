@@ -376,9 +376,13 @@ void ret(){
         /*DO NOTHING*/;
     //pravidlo 7
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) {
-        //next_token = get_token(stdin);
-        /*****PSA*******/
-        next_token = expressionParse(stdin, NULL, NULL, 0);
+        next_token = get_token(stdin);
+        if (next_token.type != TOKEN_EOL && next_token.type != TOKEN_EOF) {
+            /*****PSA*******/
+            next_token = expressionParse(stdin, &next_token, NULL, 1);
+        }
+
+
 /********************************************************************************************
         SIMULACE RESENI VYRAZU
             //TODO <expr0>
