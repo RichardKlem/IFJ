@@ -8,55 +8,50 @@
  *  Datum vytvoreni: 12.10.2019
  * ************************************************************************** */
 
-#include "IFJ_precedence_ExprDLL.h"
+#include <stdlib.h>
+#include <stdbool.h>
+#include "IFJ_scanner.h"
+#include "IFJ_precedence_table.h"
+#include "IFJ_precedence_DLL.h"
 
 
-void ExprDLError() {
+void exprDLError() {
 
-    fprintf (stderr,"*ERROR* Table of Instructions.\n");
-    return;
+    fprintf (stderr,"*ERROR* PSA expression DLL\n");
 }
 
-void ExprDLInitList (tExprDLList *L) {
+void exprDLInitList (tExprDLList *L) {
 
     L->First = NULL;
     L->Act = NULL;
     L->Last = NULL;
-    return;
-
 }
 
-void ExprDLDisposeList (tExprDLList *L) {
+void exprDLDisposeList (tExprDLList *L) {
 
-    if (L->First == NULL)
+    if(L->First != NULL)
     {
-        ExprDLError();
-        return;
+        do
+        {
+            L->Act = L->Last->lptr;
+            free(L->Last);
+            L->Last = L->Act;
+        } while(L->Last != NULL);
+        L->First = NULL;
     }
-
-    tExprDLElemPtr *tempElem = L->Last;
-    while (L->Last != L->First)
-    {
-        L->Last->lptr = L->Last;
-        free(tempElem);
-    }
-    *tempElem = L->First;
-    L->First = NULL;
-    L->Act = NULL;
-    L->Last = NULL;
-    free(tempElem);
-    return;
 }
 
-void ExprDLInsertFirst (tExprDLList *L, tInstruction val) {
+void exprDLInsertFirst (tExprDLList *L, expr_token_t exprToken) {
 
     tExprDLElemPtr newElem = (tExprDLElemPtr) malloc (sizeof(tExprDLElemPtr));// tExprDLElemPtr je struktura definovaná jako pointer, jak tedy mallocovat
     if (newElem == NULL)    //Ověření zda alokace proběhla úspěšně
     {
-        ExprDLError();
+        exprDLError();
         exit(1);
     }
-    newElem->instr = val;    //Přiřazení dat do nového prvku
+    newElem->exprToken = exprToken;    //Přiřazení dat do nového prvku
+    newElem->exprToken.terminal = true;
+    newElem->exprToken.shifted = false;
     newElem->lptr = NULL;
     if(L->First != NULL)    //Pokud už seznam nějaké prvky má
     {
@@ -70,18 +65,19 @@ void ExprDLInsertFirst (tExprDLList *L, tInstruction val) {
     }
 
     L->First = newElem;
-    return;
 }
 
-void ExprDLInsertLast(tExprDLList *L, tInstruction val) {
+void exprDLInsertLast(tExprDLList *L, expr_token_t exprToken) {
 
-    tExprDLElemPtr newElem = (tExprDLElemPtr) malloc(sizeof(tExprDLElemPtr));
+    tExprDLElemPtr newElem = malloc(sizeof(struct tExprDLElem));
     if (newElem == NULL)
     {
-        ExprDLError();
+        exprDLError();
         exit(1);
     }
-    newElem->instr = val;
+    newElem->exprToken = exprToken;
+    newElem->exprToken.terminal = true;
+    newElem->exprToken.shifted = false;
     newElem->rptr = NULL;
     if(L->Last != NULL)
     {
@@ -95,63 +91,59 @@ void ExprDLInsertLast(tExprDLList *L, tInstruction val) {
     }
 
     L->Last = newElem;
-    return;
 }
 
-void ExprDLFirst (tExprDLList *L) {
+void exprDLFirst (tExprDLList *L) {
 
     L->Act = L->First;
-    return;
 }
 
-void ExprDLLast (tExprDLList *L) {
+void exprDLLast (tExprDLList *L) {
 
     L->Act = L->Last;
-    return;
 }
 
-void ExprDLCopyFirst (tExprDLList *L, tInstruction *val) {
+void exprDLCopyFirst (tExprDLList *L, expr_token_t *exprToken) {
 
     if(L->First == NULL)
     {
-        ExprDLError();
+        exprDLError();
         return;
     }
-    *val = L->First->instr;
-    return;
-
+    *exprToken = L->First->exprToken;
 }
 
-void ExprDLCopyLast (tExprDLList *L, tInstruction *val) {
+void exprDLCopyLast (tExprDLList *L, expr_token_t *exprToken) {
 
     if(L->Last == NULL)
     {
-        ExprDLError();
+        exprDLError();
         return;
     }
-    *val = L->Last->instr;
-    return;
+    *exprToken = L->Last->exprToken;
 }
 
-void ExprDLDeleteFirst (tExprDLList *L) {
-
-    if (L->First == NULL)
+void exprDLDeleteFirst (tExprDLList *L) {
+    if(L->First != NULL)
     {
-        return;
+        if(L->First == L->Act)
+            L->Act = NULL;
+        if(L->First == L->Last)
+        {
+            free(L->First);
+            L->First = NULL;
+            L->Last = NULL;
+        }
+        else
+        {
+            (L->First->rptr)->lptr = NULL;
+            L->First = L->First->rptr;
+            free((L->First)->lptr);
+        }
     }
-    else if (L->First == L->Act)
-    {
-        L->Act = NULL;
-    }
-    tExprDLElemPtr tempElem;
-    tempElem = L->First;
-    L->First = L->First->rptr;
-    L->First->lptr = NULL;
-    free(tempElem);
-    return;
 }
 
-void ExprDLDeleteLast (tExprDLList *L) {
+void exprDLDeleteLast (tExprDLList *L) {
 
     if (L->Last == NULL)
     {
@@ -166,10 +158,9 @@ void ExprDLDeleteLast (tExprDLList *L) {
     L->Last = L->Last->lptr;
     L->Last->rptr = NULL;
     free(tempElem);
-    return;
 }
 
-void ExprDLPostDelete (tExprDLList *L) {
+void exprDLPostDelete (tExprDLList *L) {
 
     if ((L->Act == L->Last) || (L->Act == NULL))
     {
@@ -189,10 +180,9 @@ void ExprDLPostDelete (tExprDLList *L) {
         L->Act->rptr->rptr->lptr = L->Act;
         free(tempElem);
     }
-    return;
 }
 
-void ExprDLPreDelete (tExprDLList *L) {
+void exprDLPreDelete (tExprDLList *L) {
 
     if ((L->Act == L->First) || (L->Act == NULL))
     {
@@ -212,10 +202,9 @@ void ExprDLPreDelete (tExprDLList *L) {
         L->Act->lptr->lptr->rptr = L->Act;
         free(tempElem);
     }
-    return;
 }
 
-void ExprDLPostInsert (tExprDLList *L, tInstruction val) {
+void exprDLPostInsert (tExprDLList *L, expr_token_t exprToken) {
 
     if(L->Act == NULL)
     {
@@ -225,10 +214,10 @@ void ExprDLPostInsert (tExprDLList *L, tInstruction val) {
     tExprDLElemPtr newElem = (tExprDLElemPtr) malloc(sizeof(tExprDLElemPtr));
     if (newElem == NULL)
     {
-        ExprDLError();
+        exprDLError();
         exit(1);
     }
-    newElem->instr= val;
+    newElem->exprToken= exprToken;
     newElem->lptr = L->Act;
     newElem->rptr = L->Act->rptr;
     L->Act->rptr = newElem;
@@ -240,10 +229,9 @@ void ExprDLPostInsert (tExprDLList *L, tInstruction val) {
     {
         newElem->rptr->lptr = newElem;
     }
-    return;
 }
 
-void ExprDLPreInsert (tExprDLList *L, tInstruction val) {
+void exprDLPreInsert (tExprDLList *L, expr_token_t exprToken) {
 
     if(L->Act == NULL)
     {
@@ -253,10 +241,10 @@ void ExprDLPreInsert (tExprDLList *L, tInstruction val) {
     tExprDLElemPtr newElem = (tExprDLElemPtr) malloc(sizeof(tExprDLElemPtr));
     if (newElem == NULL)
     {
-        ExprDLError();
+        exprDLError();
     }
 
-    newElem->instr = val;
+    newElem->exprToken = exprToken;
     newElem->rptr = L->Act;
     newElem->lptr = L->Act->lptr;
     L->Act->lptr = newElem;
@@ -268,31 +256,29 @@ void ExprDLPreInsert (tExprDLList *L, tInstruction val) {
     {
         newElem->lptr->rptr = newElem;
     }
-    return;
 }
 
-void ExprDLCopy (tExprDLList *L, tInstruction *val) {
+void exprDLCopy (tExprDLList *L, expr_token_t *exprToken) {
 
-    if(ExprDLActive(L) == 0)
+    if(exprDLActive(L) == 0)
     {
-        ExprDLError();
+        exprDLError();
         return;
     }
-    *val = L->Act->instr;
-    return;
+    *exprToken = L->Act->exprToken;
+
 }
 
-void ExprDLActualize (tExprDLList *L, tInstruction val) {
+void exprDLActualize (tExprDLList *L, expr_token_t exprToken) {
 
     if(L->Act == NULL)
     {
         return;
     }
-    L->Act->instr = val;
-    return;
+    L->Act->exprToken = exprToken;
 }
 
-void ExprDLSucc (tExprDLList *L) {
+void exprDLSucc (tExprDLList *L) {
 
     if(L->Act == NULL)
     {
@@ -306,12 +292,10 @@ void ExprDLSucc (tExprDLList *L) {
     {
         L->Act = L->Act->rptr;
     }
-    return;
-
 }
 
 
-void ExprDLPred (tExprDLList *L) {
+void exprDLPred (tExprDLList *L) {
 
     if(L->Act == NULL)
     {
@@ -325,10 +309,9 @@ void ExprDLPred (tExprDLList *L) {
     {
         L->Act = L->Act->lptr;
     }
-    return;
 }
 
-int ExprDLActive (tExprDLList *L) {
+int exprDLActive (tExprDLList *L) {
 
     if(L->Act != NULL)
     {
@@ -338,3 +321,5 @@ int ExprDLActive (tExprDLList *L) {
     {
         return 0;
     }
+
+}

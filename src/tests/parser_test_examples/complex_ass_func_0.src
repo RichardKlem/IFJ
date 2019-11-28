@@ -1,0 +1,35 @@
+#should be ok
+def print(a):
+    pass
+
+a = 1
+def main(a):
+    if a:
+        print('uvnitr if')
+    else:
+        print('uvnitr else')
+    print('uvnitr main')
+    print(a)
+
+
+
+
+
+
+    def foo(a, b):
+        print('uvnitr foo')
+        print(a)
+        print(b)
+
+
+
+
+        def foo2(c):
+            print('unvnitr foo2')
+            print(c)
+
+        foo2('\x32')
+    foo('a', 2)
+    return 1
+
+main(1)

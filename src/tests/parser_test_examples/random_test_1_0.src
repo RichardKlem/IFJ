@@ -1,0 +1,10 @@
+def very_long_function_name_that_is_unecessary_long(ahoj):
+    if 1 + 2 == 3:
+       pass
+       pass
+       return ahoj
+    else:
+            return 3-2
+
+
+very_long_function_name_that_is_unecessary_long(1)

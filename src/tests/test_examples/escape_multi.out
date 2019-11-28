@@ -1,3 +1,5 @@
+1 -  chyba v programu v ramci lexikalni analyzy.
+
 TOKEN(IDENTIFIKATOR)
 TOKEN(=)
 TOKEN(STRING, \A\z\z'\'\z""'\z'\\\zz\m\m)
@@ -16,4 +18,9 @@ TOKEN(()
 TOKEN(STRING, a\X)
 TOKEN())
 TOKEN(EOL)
-TOKEN(EOF)
+TOKEN(EOL)
+TOKEN(IDENTIFIKATOR)
+TOKEN(IDENTIFIKATOR)
+TOKEN(EOL)
+TOKEN(IDENTIFIKATOR)
+TOKEN(=)

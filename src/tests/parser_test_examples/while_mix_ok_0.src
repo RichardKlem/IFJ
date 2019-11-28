@@ -1,0 +1,21 @@
+#should be ok
+def print(a):
+   pass
+   
+def main(b):
+    c = 0
+    while b <= 3:
+        print(b)
+        b = b+1
+        c = c +1
+
+    while c == 3:
+        print(c)
+        c = c+1
+
+    while c <= 6:
+        print(c)
+        c = c+1
+
+a = 1
+main(a)

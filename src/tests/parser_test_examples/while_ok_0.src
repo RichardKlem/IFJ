@@ -1,0 +1,12 @@
+#should ok
+
+def print(a):
+    pass
+
+def main(a):
+    print('in main')
+    while a-1 > 2: #not sure if ok
+        print(a)
+
+a = 'str'
+main(a)

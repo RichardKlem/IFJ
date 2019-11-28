@@ -2,3 +2,4 @@
 src/*.src
 src/tests/a
 src/tests/scanner_test_app
+src/compiler

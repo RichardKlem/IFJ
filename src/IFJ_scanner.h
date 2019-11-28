@@ -54,7 +54,7 @@ typedef enum {
 } states;
 
 typedef enum {
-    TOKEN_EOL,
+    TOKEN_EOL, //=0
     TOKEN_MATH_PLUS,
     TOKEN_MATH_MINUS,
     TOKEN_MATH_MUL,
@@ -64,7 +64,7 @@ typedef enum {
     TOKEN_LESS_EQ,
     TOKEN_GREATER,
     TOKEN_GREATER_EQ,
-    TOKEN_LEFT_BRACKET,
+    TOKEN_LEFT_BRACKET, //=10
     TOKEN_RIGHT_BRACKET,
     TOKEN_COMMA,  //carka
     TOKEN_COLON,  //dvojtecka
@@ -74,11 +74,12 @@ typedef enum {
     TOKEN_ID,
     TOKEN_KEYWORD,
     TOKEN_EOF,
-    TOKEN_INDENT,
+    TOKEN_INDENT, //=20
     TOKEN_DEDENT,
     TOKEN_INT,
     TOKEN_DOUBLE,
-    TOKEN_STRING
+    TOKEN_STRING,
+    TOKEN_DOLAR //=25
 } token_type;
 
 typedef enum {
@@ -110,4 +111,4 @@ token_t get_token(FILE* src_file);
 
 #endif
 
- /* konec souboru IFJ_scanner.h */
+/* konec souboru IFJ_scanner.h */

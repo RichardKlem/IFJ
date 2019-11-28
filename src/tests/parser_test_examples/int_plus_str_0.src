@@ -1,0 +1,3 @@
+#asi ok
+a = 1
+b = a + 'str' #nevim kdy kontrolujeme

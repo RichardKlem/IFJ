@@ -11,14 +11,16 @@
 #include <stdio.h>
 #include "IFJ_scanner.h"
 #include "IFJ_error.h"
+#include "IFJ_parser.h"
 
 int main () {
+    /*
     FILE* src_file = fopen("test.src", "r");
     if (src_file == NULL)
         error_exit(ERROR_INTERNAL);
+    */
 
-    token_t token = get_token(src_file);
-    printf("%d\n", token.type);
+    prog();
 
 
     return 0;
