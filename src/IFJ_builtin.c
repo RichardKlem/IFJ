@@ -1,5 +1,6 @@
 //vestavene funkce
 #include "IFJ_builtin.h"
+#include "symtable.h"
 #include <stdio.h>
 /*
     a = inputi     READ a int
@@ -315,4 +316,71 @@ void call_chr(char* arg)
     printf("DEFVAR TF@%c1\n", '%');
     printf("MOVE TF@%c1 %s\n", '%', "arg");
     printf("CALL $chr\n");
+}
+
+void print_stack(tStack *sem_stack)
+{
+    while (!stackEmpty(&sem_stack)) {
+        act_token = stackPop(&sem_stack);
+        switch (act_token.type) {
+            case TOKEN_INT:
+                printf("PUSH int@%d\n", act_token.value.int_value);
+            case TOKEN_DOUBLE:
+                printf("PUSH float@%a\n", act_token.value.double_value);
+            case TOKEN_STRING:
+                printf("PUSH string@%s\n", act_token.value.string);
+            case TOKEN_ID:
+                int frame = getframe(act_token.value.string);
+                if (frame == 1) {
+                    printf("PUSH GF@%s\n", act_token.value.string);
+                } else {
+                    printf("PUSH LF@%s\n", act_token.value.string);
+                }
+
+            case TOKEN_KEYWORD:
+                if (act_token.value.keyword_value == NONE) {
+                    printf("PUSH nil@nil\n");
+                } else {
+                    error_exit(ERROR_SYNTAX); //dostanu jiný KEYWORD token než NONE
+                }
+
+            case TOKEN_MATH_PLUS:
+                printf("PUSH string@+\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_MATH_MINUS:
+                printf("PUSH string@-\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_MATH_MUL:
+                printf("PUSH string@*\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_MATH_DIV:
+                printf("PUSH string@/\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_MATH_INT_DIV:
+                printf("PUSH string@//\n");
+                printf("CALL $do_operation\n");
+
+            case TOKEN_LESS:
+                printf("PUSH string@<\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_LESS_EQ:
+                printf("PUSH string@<=\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_GREATER:
+                printf("PUSH string@>\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_GREATER_EQ:
+                printf("PUSH string@>=\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_EQ:
+                printf("PUSH string@==\n");
+                printf("CALL $do_operation\n");
+            case TOKEN_NOT_EQ:
+                printf("PUSH string@!=\n");
+                printf("CALL $do_operation\n");
+
+            default:
+                error_exit(ERROR_SYNTAX);
+        }
+    }
 }
