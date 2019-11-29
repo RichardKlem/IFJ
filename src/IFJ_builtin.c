@@ -380,6 +380,7 @@ void call_chr(char* arg)
     printf("CALL $chr\n");
 }
 
+/*
 void print_stack(tStack *sem_stack)
 {
     while (!stackEmpty(&sem_stack)) {
@@ -445,4 +446,4 @@ void print_stack(tStack *sem_stack)
                 error_exit(ERROR_SYNTAX);
         }
     }
-}
+} */

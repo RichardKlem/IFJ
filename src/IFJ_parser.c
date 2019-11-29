@@ -36,6 +36,9 @@ LL tabulka
 #include "IFJ_precedence_syntactic_analysis.h"
 #include "IFJ_builtin.h"
 
+#define debug_print(...)
+//printf(__VA_ARGS__)
+
 token_t next_token; //globalni token
 token_t first, second; //pomocne tokeny pro uchovani tokenu pri predavani ke zpracovani vyrazu
 Record id_param; //pomocna struktura pro ukladani informaci o promennych
@@ -46,9 +49,10 @@ int param_num, arg_num;
 bool in_function = false, in_block = false;
 char * fun_name = NULL;
 int unique_number = 0;
+token_t assign_to;
 
 void prog(){
-    printf("In main\n");
+    debug_print("In main\n");
     next_token = get_token(stdin);
 
     //inicializace tabulky symbolu
@@ -92,7 +96,7 @@ void prog(){
 }
 
 void st_list(){
-    printf("In st_list\n");
+    debug_print("In st_list\n");
     //pravidlo 4
     if (next_token.type == TOKEN_DEDENT ||
         //(next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) ||
@@ -119,7 +123,7 @@ void st_list(){
 }
 
 void stat(){
-    printf("In stat\n");
+    debug_print("In stat\n");
     //pravidlo 19*
     if (next_token.type == TOKEN_STRING || next_token.type == TOKEN_DOUBLE
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
@@ -137,6 +141,7 @@ void stat(){
     //pravidlo 5
     else if (next_token.type == TOKEN_ID){
         //uchovani identifikatoru
+        assign_to = next_token;
         first = next_token;
         next_token = get_token(stdin);
         expr_or_assign();
@@ -163,6 +168,12 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
+        printf("\nJUMP %s_END\n", fun_name);
+        printf("LABEL %s\n", fun_name);
+        printf("PUSHFRAME\n");
+        printf("DEFVAR LF@%%ret\n");
+        printf("MOVE LF@%%ret nil@nil\n");
+
         param_num = 0; //vynuluje pocet parametru
         param_list();
 
@@ -186,11 +197,17 @@ void stat(){
         in_function = true;
         in_block = true;
 
+        printf("\n#telo funkce\n\n");
+
         st_list();
 
         in_block = false;
         in_function = false;
         stack_sem_pop_until_block_start(&stack_semantic);
+
+        printf("POPFRAME\n");
+        printf("RETURN\n");
+        printf("LABEL %s_END\n", fun_name);
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -231,6 +248,7 @@ void stat(){
 
         printf("JUMP WHILE%d\n", while_unique_label);
         printf("LABEL WHILE_END%d\n", while_unique_label);
+        printf("CLEARS\n");
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -245,10 +263,21 @@ void stat(){
     }
     //pravidlo 16
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF){
+        int if_unique_label = unique_number;
+        unique_number++;
+
+        printf("\n#zpracovani vyrazu\n");
+
         next_token = get_token(stdin);
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
+
+        printf("PUSHS int@0\n");
+        printf("JUMPIFEQS ELSE%d\n", if_unique_label);
+        printf("\n#telo then\n\n");
+
+
 
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
@@ -261,9 +290,12 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
+
         in_block = true;
         st_list();
         in_block = false;
+
+        printf("JUMP IF_END%d\n", if_unique_label);
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -282,14 +314,14 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU ELSE
+        printf("LABEL ELSE%d\n", if_unique_label);
+        printf("\n#telo else\n\n");
+
         in_block = true;
-        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
-
         st_list();
-
-        stack_sem_pop_until_block_start(&stack_semantic);
         in_block = false;
+
+        printf("LABEL IF_END%d\n", if_unique_label);
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -300,7 +332,7 @@ void stat(){
 }
 
 void eol_opt(){
-    printf("In eol_opt\n");
+    debug_print("In eol_opt\n");
     //pravidlo 10
     if (next_token.type == TOKEN_STRING ||
         next_token.type == TOKEN_DOUBLE ||
@@ -327,7 +359,7 @@ void eol_opt(){
 }
 
 void ret(){
-    printf("In ret\n");
+    debug_print("In ret\n");
     //pravidlo 8
     if (next_token.type == TOKEN_DEDENT)
         /*DO NOTHING*/;
@@ -351,11 +383,15 @@ void ret(){
 }
 
 void param_list(){
-    printf("In param_list\n");
+    debug_print("In param_list\n");
     //pravidlo 12
     if (next_token.type == TOKEN_ID) {
         param_num++;
         stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
+
+        printf("DEFVAR LF@%s\n", next_token.value.string);
+        printf("MOVE LF@%s LF@%%%d\n", next_token.value.string, param_num);
+
         next_token = get_token(stdin);
         param_next();
     }
@@ -367,7 +403,7 @@ void param_list(){
 }
 
 void param_next(){
-    printf("In param_next\n");
+    debug_print("In param_next\n");
     //pravidlo 14
     if (next_token.type == TOKEN_RIGHT_BRACKET)
         /* DO NOTHING */;
@@ -377,6 +413,10 @@ void param_next(){
         if (next_token.type == TOKEN_ID){
             param_num++;
             stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
+
+            printf("DEFVAR LF@%s\n", next_token.value.string);
+            printf("MOVE LF@%s LF@%%%d\n", next_token.value.string, param_num);
+
             next_token = get_token(stdin);
             param_next();
         }
@@ -387,7 +427,7 @@ void param_next(){
 }
 
 void expr_or_assign() {
-    printf("In expr_or_assign\n");
+    debug_print("In expr_or_assign\n");
     //pravidlo 18*
     if (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
         next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
@@ -403,9 +443,13 @@ void expr_or_assign() {
     else if (next_token.type == TOKEN_LEFT_BRACKET){
         next_token = get_token(stdin);
 
+        printf("\nCREATEFRAME\n");
+
         arg_num = 0;
         arg_list();
         stack_sem_push(&stack_semantic, FUN_CALL, first.value.string);
+
+        printf("CALL %s\n", first.value.string);
 
         if (next_token.type == TOKEN_RIGHT_BRACKET) {
             next_token = get_token(stdin);
@@ -431,7 +475,7 @@ void expr_or_assign() {
 }
 
 void arg_list() {
-    printf("In arg_list\n");
+    debug_print("In arg_list\n");
     //pravidlo 25*
     if (next_token.type == TOKEN_STRING){
         arg_num++;
@@ -467,7 +511,7 @@ void arg_list() {
 }
 
 void arg_next() {
-    printf("In arg_next\n");
+    debug_print("In arg_next\n");
     //pravidlo 27
     if (next_token.type == TOKEN_RIGHT_BRACKET)
         /*DO NOTHING*/;
@@ -508,7 +552,7 @@ void arg_next() {
 }
 
 void fun_or_expr() {
-    printf("In fun_or_expr\n");
+    debug_print("In fun_or_expr\n");
     //pravidlo 22*
     if (next_token.type == TOKEN_STRING || next_token.type == TOKEN_DOUBLE
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
@@ -531,7 +575,7 @@ void fun_or_expr() {
 }
 
 void fun_or_expr_2() {
-    printf("In fun_or_expr2\n");
+    debug_print("In fun_or_expr2\n");
     //pravidlo 23*
     if (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
         next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
@@ -547,10 +591,19 @@ void fun_or_expr_2() {
     else if (next_token.type == TOKEN_LEFT_BRACKET) {
         next_token = get_token(stdin);
 
+        printf("\nCREATEFRAME\n");
+
         arg_num = 0;
         arg_list();
         stack_sem_push(&stack_semantic, FUN_CALL, first.value.string);
         arg_num = 0;
+
+        printf("CALL %s\n", first.value.string);
+
+        if (get_frame(assign_to.value.string))
+            printf("MOVE GF@%s TF@%%ret\n", assign_to.value.string);
+        else
+            printf("MOVE LF@%s TF@%%ret\n", assign_to.value.string);
 
         if (next_token.type == TOKEN_RIGHT_BRACKET)
             next_token = get_token(stdin);
