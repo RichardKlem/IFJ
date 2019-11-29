@@ -1,0 +1,15 @@
+def ahoj (a,b,c,f,g,h,j,k):
+   pass
+
+if (1):
+   a = 3
+   b = 0
+   ahoj('a', 2, 3, 4, 5, 1.0, a, b, 1000) #spatny pocet parametru
+else:
+   b = a
+
+
+
+
+
+

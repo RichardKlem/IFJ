@@ -1,0 +1,10 @@
+def foo (a,b):
+   fuu()
+   fu()	
+
+def fuu():
+   pass
+
+
+foo(1,2)
+
