@@ -1,6 +1,7 @@
 //vestavene funkce
 #include "IFJ_builtin.h"
 #include "symtable.h"
+#include "IFJ_scanner.h"
 #include <stdio.h>
 /*
     a = inputi     READ a int
@@ -495,40 +496,50 @@ void print_stack(tStack *sem_stack)
             case TOKEN_MATH_PLUS:
                 printf("PUSH string@+\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_MATH_MINUS:
                 printf("PUSH string@-\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_MATH_MUL:
                 printf("PUSH string@*\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_MATH_DIV:
                 printf("PUSH string@/\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_MATH_INT_DIV:
                 printf("PUSH string@//\n");
                 printf("CALL $do_operation\n");
-
+                break;
             case TOKEN_LESS:
                 printf("PUSH string@<\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_LESS_EQ:
                 printf("PUSH string@<=\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_GREATER:
                 printf("PUSH string@>\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_GREATER_EQ:
                 printf("PUSH string@>=\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_EQ:
                 printf("PUSH string@==\n");
                 printf("CALL $do_operation\n");
+                break;
             case TOKEN_NOT_EQ:
                 printf("PUSH string@!=\n");
                 printf("CALL $do_operation\n");
-
+                break;
             default:
                 error_exit(ERROR_SYNTAX);
+                break;
         }
     }
 }
