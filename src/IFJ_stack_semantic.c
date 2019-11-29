@@ -68,6 +68,16 @@ void check_for_fun_def(char *name){
 
 }
 
+bool is_builtin(char * name) {
+    if (!strcmp(name, "inputi") || !strcmp(name, "inputf") ||
+        !strcmp(name, "inputs") || !strcmp(name, "print") ||
+        !strcmp(name, "len") || !strcmp(name, "substr") ||
+        !strcmp(name, "ord") || !strcmp(name, "chr"))
+        return true;
+    else
+        return false;
+}
+
 void stack_sem_push (tStack_sem* s, taction action, char * name) {
 	if (s == NULL)
 		error_exit(ERROR_INTERNAL);
@@ -164,6 +174,8 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                     }
                 }
                 else { //neni promenna
+                    if (!strcmp(name, "print"))
+                        return;
                     if (tmp.param_num != arg_num)
                         error_exit(ERROR_SEM_CALL);
                 }
