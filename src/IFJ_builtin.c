@@ -225,6 +225,25 @@ void generate_builtin()
 
 
     printf("LABEL $operation_mul\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("VARDEF LF@tmp\n");
+    printf("JUMPIFNEQ $operation_mul_notsame LF@param2$type LF@param3@type\n");
+    printf("MUL LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_plus_notsame\n");
+    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2@type int\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("MUL LF@tmp LF@tmp LF@param2\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_plus_notsame_1int\n");
+    printf("INT2FLOAT LF@tmp LF@param2\n");
+    printf("MUL LF@tmp LF@tmp LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+
     printf("LABEL $operation_div\n");
     printf("LABEL $operation_intdiv\n");
 
@@ -308,7 +327,12 @@ void generate_builtin()
 
 
     printf("LABEL $operation_error\n");
-    printf("EXIT 1\n");
+    printf("DPRINT int@4\n");
+    printf("EXIT 4\n");
+
+    printf("LABEL $operation_error_divzero\n");
+    printf("DPRINT int@9\n");
+    printf("EXIT 9\n");
     //end_do_operation
     printf("LABEL $end_do_operation\n");
 
