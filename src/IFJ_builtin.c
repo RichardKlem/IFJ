@@ -220,9 +220,24 @@ void generate_builtin()
 
 
     printf("LABEL $operation_min\n");
-    //pokud nejsou stejný
+    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("VARDEF LF@tmp\n");
     printf("JUMPIFNEQ $operation_min_notsame LF@param2$type LF@param3@type\n");
-
+    printf("SUB LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_min_notsame\n");
+    printf("JUMPIFEQ $operation_min_notsame_1int LF@param2@type int\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("SUB LF@tmp LF@tmp LF@param2\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_min_notsame_1int\n");
+    printf("INT2FLOAT LF@tmp LF@param2\n");
+    printf("SUB LF@tmp LF@tmp LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_mul\n");
     printf("JUMPIFEQ $operation_error LF@param2$type string\n");
@@ -245,7 +260,27 @@ void generate_builtin()
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_div\n");
-    
+    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("VARDEF LF@tmp\n");
+    printf("JUMPIFNEQ $operation_div_notsame LF@param2$type LF@param3@type\n");
+    printf("DIV LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_div_notsame\n");
+    printf("JUMPIFEQ $operation_div_notsame_1int LF@param2@type int\n");
+    printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("DIV LF@tmp LF@tmp LF@param2\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_div_notsame_1int\n");
+    printf("INT2FLOAT LF@tmp LF@param2\n");
+    printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
+    printf("DIV LF@tmp LF@tmp LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+
     printf("LABEL $operation_intdiv\n");
     printf("JUMPIFEQ $operation_error LF@param2$type string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string\n");
