@@ -198,6 +198,7 @@ void generate_builtin()
     printf("LABEL $operation_div\n");
     printf("LABEL $operation_intdiv\n");
 
+    //<
     printf("LABEL $operation_<\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("LT LF@tmp_bool LF@param2 LF@param3\n");
@@ -210,16 +211,72 @@ void generate_builtin()
     printf("PUSH int@0\n");
     printf("JUMP $end_do_operation\n");
 
+    //>
     printf("LABEL $operation_>\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFEQ $operation_>_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_>_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //==
     printf("LABEL $operation_==\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFEQ $operation_==_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_==_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //!=
     printf("LABEL $operation_!=\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_!=_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_!=_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+    
+    //<=
     printf("LABEL $operation_<=\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_<=_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_<=_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //>=
     printf("LABEL $operation_>=\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_>=_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_>=_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //end_do_operation
     printf("LABEL $end_do_operation\n");
     printf("POPFRAME\n");
     printf("RETURN\n");
