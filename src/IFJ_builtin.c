@@ -191,8 +191,30 @@ void generate_builtin()
     printf("JUMPIFEQ $operation_!= LF@param1 string@!=\n");
     printf("JUMPIFEQ $operation_<= LF@param1 string@<=\n");
     printf("JUMPIFEQ $operation_>= LF@param1 string@>=\n");
+
     printf("LABEL $operation_plus\n");
-    printf("");
+    printf("VARDEF LF@tmp\n");
+    printf("JUMPIFNEQ $operation_plus_notsame LF@param2$type LF@param3@type\n");
+    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type int\n");
+    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type float\n");
+    printf("CONCAT LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_plus_same_int\n");
+    printf("ADD LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_plus_notsame\n");
+    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2$type int\n");
+    printf("LABEL $operation_plus_notsame_1int\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("ADD LF@tmp LF@param2 LF@tmp\n");
+    printf("LABEL $operation_plus_notsame_push\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+
+
     printf("LABEL $operation_min\n");
     printf("LABEL $operation_mul\n");
     printf("LABEL $operation_div\n");
@@ -249,7 +271,7 @@ void generate_builtin()
     //false
     printf("PUSH int@0\n");
     printf("JUMP $end_do_operation\n");
-    
+
     //<=
     printf("LABEL $operation_<=\n");
     printf("DEFVAR LF@tmp_bool\n");
@@ -278,6 +300,7 @@ void generate_builtin()
 
     //end_do_operation
     printf("LABEL $end_do_operation\n");
+
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_of_def$do_operation\n");
