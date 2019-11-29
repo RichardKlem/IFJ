@@ -190,3 +190,11 @@ void insert_builtin_to_symtable() {
         tmp.param_num = 1;
         symtable_insert(&symtable, name, tmp);
 }
+
+bool get_frame(char * name) {
+    Record tmp;
+    if (symtable_search(&symtable, name, &tmp) && tmp.local)
+        return false;
+    else
+        return true;
+}

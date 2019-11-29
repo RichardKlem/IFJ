@@ -321,7 +321,8 @@ void ret(){
         next_token = get_token(stdin);
         if (next_token.type != TOKEN_EOL && next_token.type != TOKEN_EOF) {
             /*****PSA*******/
-            next_token = expressionParse(stdin, &next_token, NULL, 1);
+            first = next_token;
+            next_token = expressionParse(stdin, &first, NULL, 1);
         }
         if (next_token.type == TOKEN_EOL) {
             next_token = get_token(stdin);

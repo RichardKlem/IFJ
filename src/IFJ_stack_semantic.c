@@ -203,6 +203,7 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                         return;
                 if (tmp.param_num == arg_num) {
                     //musime se jeste podivat, zda jsou definovane vsechny zavisle fce
+
                     check_for_fun_def(name);
                 }
                 else
