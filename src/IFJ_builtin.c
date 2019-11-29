@@ -163,7 +163,22 @@ void generate_builtin()
     printf("LABEL end_$chr\n");
     printf("\n");
 
-    
+    //Definovani funkce pro zpracovani vyrazu
+    printf("#def do_operation()\n");
+    printf("JUMP end_$do_operation\n");
+    printf("LABEL $do_operation\n");
+    printf("DEFVAR LF@param1\n");
+    printf("POP LF@param1\n");
+    printf("DEFVAR LF@param\n");
+    printf("POP LF@param1\n");
+    printf("DEFVAR LF@param1\n");
+    printf("POP LF@param1\n");
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+    printf("LABEL end_$do_operation\n");
+    printf("\n");
+
+
 }
 
 void call_inputi()
@@ -188,7 +203,7 @@ void call_write(char* arg)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 \s\n", '%', 'arg');
+    printf("MOVE TF@%c1 %s\n", '%', "arg");
     printf("CALL $print\n");
 }
 
@@ -196,7 +211,7 @@ void call_len(char* arg)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 \s\n", '%', 'arg');
+    printf("MOVE TF@%c1 %s\n", '%', "arg");
     printf("CALL $len\n");
 }
 
@@ -204,11 +219,11 @@ void call_substr(char* arg1, char* arg2, char* arg3)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 \s\n", '%', 'arg1');
+    printf("MOVE TF@%c1 %s\n", '%', "arg1");
     printf("DEFVAR TF@%c2\n", '%');
-    printf("MOVE TF@%c2 \s\n", '%', 'arg2');
+    printf("MOVE TF@%c2 %s\n", '%', "arg2");
     printf("DEFVAR TF@%c3\n", '%');
-    printf("MOVE TF@%c3 \s\n", '%', 'arg3');
+    printf("MOVE TF@%c3 %s\n", '%', "arg3");
     printf("CALL $substr\n");
 }
 
@@ -216,9 +231,9 @@ void call_ord(char* arg1, char* arg2)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 \s\n", '%', 'arg1');
+    printf("MOVE TF@%c1 %s\n", '%', "arg1");
     printf("DEFVAR TF@%c2\n", '%');
-    printf("MOVE TF@%c2 \s\n", '%', 'arg2');
+    printf("MOVE TF@%c2 %s\n", '%', "arg2");
     printf("CALL $ord\n");
 }
 
@@ -226,6 +241,6 @@ void call_chr(char* arg)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 \s\n", '%', 'arg1');
+    printf("MOVE TF@%c1 %s\n", '%', "arg");
     printf("CALL $chr\n");
 }
