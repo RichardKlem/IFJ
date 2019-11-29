@@ -298,6 +298,9 @@ void generate_builtin()
     printf("PUSH int@0\n");
     printf("JUMP $end_do_operation\n");
 
+
+    printf("LABEL $operation_error\n");
+    printf("EXIT 1\n");
     //end_do_operation
     printf("LABEL $end_do_operation\n");
 
