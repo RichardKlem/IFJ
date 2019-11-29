@@ -11,6 +11,8 @@
 #ifndef IFJ_STACK_SEMANTIC_H_INCLUDED
 #define IFJ_STACK_SEMANTIC_H_INCLUDED
 
+#include <stdbool.h>
+
 typedef enum {
     FUN_DEF,
     FUN_CALL,
@@ -37,6 +39,8 @@ extern tStack_sem stack_semantic;
 extern tStack_sem stack_semantic_params;
 extern int param_num;
 extern int arg_num;
+extern char * fun_name;
+extern bool in_function;
 
 void stack_sem_init (tStack_sem* s);
 int stack_sem_empty (tStack_sem* s);

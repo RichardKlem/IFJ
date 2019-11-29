@@ -43,6 +43,7 @@ tStack_sem stack_semantic; //zasobnik pro semantickou analyzu
 tStack_sem stack_semantic_params;
 int param_num, arg_num;
 bool in_function = false, in_block = false;
+char * fun_name = NULL;
 
 void prog(){
     printf("In main\n");
@@ -209,13 +210,8 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU WHILE
         in_block = true;
-        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
-
         st_list();
-
-        stack_sem_pop_until_block_start(&stack_semantic);
         in_block = false;
 
         if (next_token.type == TOKEN_DEDENT)
@@ -247,13 +243,8 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU THEN
         in_block = true;
-        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
-
         st_list();
-
-        stack_sem_pop_until_block_start(&stack_semantic);
         in_block = false;
 
         if (next_token.type == TOKEN_DEDENT)
