@@ -13,13 +13,13 @@
 #include <string.h>
 #include "IFJ_inst_gen.h"
 
-void setArg(tArgument *argument, tFrame frame, tDatTyp datTyp, char* value)
+/*void setArg(tArgument *argument, tFrame frame, tDatTyp datTyp, char* value)
 {
     argument->datTyp = datTyp;
     argument->frame = frame;
     argument->value = value;
     return;
-}
+}*/
 
 //Generuje a vloží instrukci do seznamu
 void generateInst(tDLElemPtr *List, enInstruction instType, char *arg1, char *arg2, char *arg3)
@@ -33,7 +33,7 @@ void generateInst(tDLElemPtr *List, enInstruction instType, char *arg1, char *ar
     DLInsertLast(List, instruction);
 }
 
-void sendToGenerator(char *str, char *arg1, char *arg2, char *arg3)
+/*void sendToGenerator(char *str, char *arg1, char *arg2, char *arg3)
 {
     if (strcmp(str, "+") == 0)
     {
@@ -99,9 +99,9 @@ void sendToGenerator(char *str, char *arg1, char *arg2, char *arg3)
     {
         if(arg3 == NULL)
     }
-}
+}*/
 
-void writeInstruction(tDLElemPtr *List, enInstruction instType, tArgument *arg1, tArgument *arg2, tArgument *arg3)
+/*void writeInstruction(tDLElemPtr *List, enInstruction instType, tArgument *arg1, tArgument *arg2, tArgument *arg3)
 {
     if(arg1 == NULL)    //Generujeme instrukci bez argumentu
     {
@@ -120,7 +120,7 @@ void writeInstruction(tDLElemPtr *List, enInstruction instType, tArgument *arg1,
         generateInst(List, instType, arg1->value, arg2->value, arg3->value);
     }
     return;
-}
+}*/
 
 void printInst(tDLList *List)
 {
@@ -340,13 +340,13 @@ void DLDisposeList (tDLList *L) {
         return;
     }
 
-    tDLElemPtr *tempElem = L->Last;
+    tDLElemPtr tempElem = L->Last;
     while (L->Last != L->First)
     {
         L->Last->lptr = L->Last;
         free(tempElem);
     }
-    *tempElem = L->First;
+    tempElem = L->First;
     L->First = NULL;
     L->Act = NULL;
     L->Last = NULL;
