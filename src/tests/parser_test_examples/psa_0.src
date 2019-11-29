@@ -1,0 +1,40 @@
+#testovani precencni analyzy
+
+a=1
+a = a+a-a*a/a//a
+b = 1+2-3*4/5//1
+
+if a:
+    pass
+else:
+    pass
+
+if a<1+2-3*4//5:
+    pass
+else:
+    pass
+
+if a+b-1*2/3//4<1+2-3*4//5:
+    pass
+else:
+    pass
+
+while a+b-1*2/3//4<1+2-3*4//5:
+    pass
+
+while a+b-1*2/3//4<=1+2-3*4//5:
+    pass
+
+while a+b-1*2/3//4>1+2-3*4//5:
+    pass
+
+while a+b-1*2/3//4==1+2-3*4//5:
+    pass
+
+while a+b-1*2/3//4!=1+2-3*4//5:
+    pass
+
+if a<None:
+    pass
+else:
+    pass
