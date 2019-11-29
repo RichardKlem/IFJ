@@ -34,6 +34,7 @@ LL tabulka
 #include "symtable.h"
 #include "IFJ_stack_semantic.h"
 #include "IFJ_precedence_syntactic_analysis.h"
+#include "IFJ_builtin.h"
 
 token_t next_token; //globalni token
 token_t first, second; //pomocne tokeny pro uchovani tokenu pri predavani ke zpracovani vyrazu
@@ -54,6 +55,10 @@ void prog(){
     //inicializace zasobniku na semantickou kontrolu
     stack_sem_init(&stack_semantic);
     stack_sem_init(&stack_semantic_params);
+
+    //vypsani hlavicky a vestavenych funkci
+    generate_builtin();
+    insert_builtin_to_symtable();
 
     //pravidlo 1
     if (next_token.type == TOKEN_STRING ||

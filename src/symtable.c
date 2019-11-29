@@ -1,6 +1,7 @@
 #include "symtable.h"
 #include <string.h>
 #include "IFJ_error.h"
+#include "IFJ_stack_semantic.h"
 
 void symtable_init(tBSTNodePtr *RootPtr) {
     if (RootPtr == NULL)
@@ -122,4 +123,55 @@ void symtable_dispose(tBSTNodePtr *RootPtr) {
         free(*RootPtr);
         symtable_init(RootPtr);
     }
+}
+
+void insert_builtin_to_symtable() {
+        char * name;
+        Record tmp;
+        tmp.forward_call = false;
+        tmp.global = true;
+        tmp.is_variable = false;
+        tmp.local = false;
+        tmp.read_from_global = false;
+        tmp.undefined_functions = NULL;
+
+        name = malloc(strlen("inputi") + 1);
+        strcpy(name, "inputi");
+        tmp.param_num = 0;
+        symtable_insert(&symtable, name, tmp);
+
+        name = malloc(strlen("inputf") + 1);
+        strcpy(name, "inputf");
+        tmp.param_num = 0;
+        symtable_insert(&symtable, name, tmp);
+
+        name = malloc(strlen("inputs") + 1);
+        strcpy(name, "inputs");
+        tmp.param_num = 0;
+        symtable_insert(&symtable, name, tmp);
+
+        name = malloc(strlen("print") + 1);
+        strcpy(name, "print");
+        tmp.param_num = -1; //u print muze byt libovolny pocet parametru
+        symtable_insert(&symtable, name, tmp);
+
+        name = malloc(strlen("len") + 1);
+        strcpy(name, "len");
+        tmp.param_num = 1;
+        symtable_insert(&symtable, name, tmp);
+
+        name = malloc(strlen("substr") + 1);
+        strcpy(name, "substr");
+        tmp.param_num = 3;
+        symtable_insert(&symtable, name, tmp);
+
+        name = malloc(strlen("ord") + 1);
+        strcpy(name, "ord");
+        tmp.param_num = 2;
+        symtable_insert(&symtable, name, tmp);
+
+        name = malloc(strlen("chr") + 1);
+        strcpy(name, "chr");
+        tmp.param_num = 1;
+        symtable_insert(&symtable, name, tmp);
 }
