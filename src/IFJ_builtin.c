@@ -209,7 +209,7 @@ void generate_builtin()
     printf("JUMPIFEQ $operation_error LF@param3$type string\n");
     printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2$type int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
-    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("ADD LF@tmp LF@param2 LF@tmp\n");
     printf("JUMP $operation_plus_notsame_push\n");
     printf("LABEL $operation_plus_notsame_1int\n");
     printf("INT2FLOAT LF@tmp LF@param2\n");
@@ -220,6 +220,10 @@ void generate_builtin()
 
 
     printf("LABEL $operation_min\n");
+    //pokud nejsou stejný
+    printf("JUMPIFNEQ $operation_min_notsame LF@param2$type LF@param3@type\n");
+
+
     printf("LABEL $operation_mul\n");
     printf("LABEL $operation_div\n");
     printf("LABEL $operation_intdiv\n");
