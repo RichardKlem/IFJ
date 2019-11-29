@@ -45,6 +45,7 @@ tStack_sem stack_semantic_params;
 int param_num, arg_num;
 bool in_function = false, in_block = false;
 char * fun_name = NULL;
+int unique_number = 0;
 
 void prog(){
     printf("In main\n");
@@ -197,10 +198,21 @@ void stat(){
     }
     //pravidlo 17
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == WHILE){
+        int while_unique_label = unique_number;
+        unique_number++;
+
+        printf("\nLABEL WHILE%d\n", while_unique_label);
+        printf("#zpracovani vyrazu\n");
+
         next_token = get_token(stdin);
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
+
+        printf("PUSHS int@0\n");
+        printf("JUMP JUMPIFEQS WHILE_END%d\n", while_unique_label);
+        printf("CLEARS\n");
+        printf("\n#telo while\n\n");
 
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
@@ -216,6 +228,9 @@ void stat(){
         in_block = true;
         st_list();
         in_block = false;
+
+        printf("JUMP WHILE%d\n", while_unique_label);
+        printf("LABEL WHILE_END%d\n", while_unique_label);
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
