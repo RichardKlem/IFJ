@@ -1,8 +1,8 @@
 //vestavene funkce
+#include <stdio.h>
 #include "IFJ_builtin.h"
 #include "symtable.h"
 #include "IFJ_scanner.h"
-#include <stdio.h>
 /*
     a = inputi     READ a int
     a = inputf      READ a float
@@ -466,7 +466,7 @@ void call_chr(char* arg)
     printf("MOVE TF@%c1 %s\n", '%', "arg");
     printf("CALL $chr\n");
 }
-
+/*
 void print_stack(tStack *sem_stack)
 {
     while (!stackEmpty(&sem_stack)) {
@@ -542,4 +542,4 @@ void print_stack(tStack *sem_stack)
                 break;
         }
     }
-}
+} */
