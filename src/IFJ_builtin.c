@@ -232,20 +232,39 @@ void generate_builtin()
     printf("MUL LF@tmp LF@param2 LF@param3\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_plus_notsame\n");
-    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2@type int\n");
+    printf("LABEL $operation_mul_notsame\n");
+    printf("JUMPIFEQ $operation_mul_notsame_1int LF@param2@type int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
     printf("MUL LF@tmp LF@tmp LF@param2\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_plus_notsame_1int\n");
+    printf("LABEL $operation_mul_notsame_1int\n");
     printf("INT2FLOAT LF@tmp LF@param2\n");
     printf("MUL LF@tmp LF@tmp LF@param3\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_div\n");
+    
     printf("LABEL $operation_intdiv\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("VARDEF LF@tmp\n");
+    printf("JUMPIFNEQ $operation_mul_notsame LF@param2$type LF@param3@type\n");
+    printf("MUL LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_mul_notsame\n");
+    printf("JUMPIFEQ $operation_mul_notsame_1int LF@param2@type int\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("MUL LF@tmp LF@tmp LF@param2\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_mul_notsame_1int\n");
+    printf("INT2FLOAT LF@tmp LF@param2\n");
+    printf("MUL LF@tmp LF@tmp LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
 
     //<
     printf("LABEL $operation_<\n");
