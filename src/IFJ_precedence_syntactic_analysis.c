@@ -25,6 +25,8 @@
 #include "IFJ_precedence_table.h"
 #include "IFJ_precedence_DLL.h"
 #include "IFJ_stack_semantic.h"
+#include "c202.h"
+#include "c204.h"
 #include "IFJ_precedence_syntactic_analysis.h"
 
 /**
@@ -79,6 +81,35 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
     end_token.shifted = false;
     exprDLInsertLast(expr_DLL, end_token);
     return act_token.token;
+}
+
+/**
+ * @brief funkce inf2post_stack_gen zpracuje infix na postix
+ * @param input_list DL list kde je jiz nacteny vstup
+ * @param infix_stack ukazatel na stack s tokeny v infix tvaru
+ * @param postfix_stack ukazatel na cilovy stack, kde bude input zpracovan do postfixu
+ */
+void inf2post_stack_gen(tExprDLList * input_list, tGenStack * infix_stack, tGenStack * postfix_stack)
+{
+    token_t end_token;
+    end_token.type = TOKEN_DOLAR;
+    end_token.value.string = "$";
+    genStackPush(infix_stack, end_token;)
+
+    expr_token_t act_expr_token;
+    token_t act_token;
+    exprDLLast(input_list);
+    exprDLCopy(input_list, act_expr_token);
+    act_token = act_expr_token.token;
+    while (act_token.type != TOKEN_DOLAR)
+    {
+        genStackPush(infix_stack, act_token);
+
+        exprDLPred(input_list);
+        exprDLCopy(infix_stack, act_expr_token);
+        act_token = act_expr_token.token;
+    }
+    *postfix_stack = infix2postfix(infix_stack);
 }
 
 /**

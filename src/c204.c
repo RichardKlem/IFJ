@@ -31,6 +31,8 @@
 **
 **/
 
+#include "IFJ_precedence_table.h"
+#include "IFJ_scanner.h"
 #include "c204.h"
 
 /*
@@ -39,22 +41,22 @@
 ** bude také odstraněna. Pokud je zásobník prázdný, provádění funkce se ukončí.
 **
 ** Operátory odstraňované ze zásobníku postupně vkládejte do výstupního pole
-** znaků postExpr. Délka převedeného výrazu a též ukazatel na první volné
+** znaků postfix_gen_stack. Délka převedeného výrazu a též ukazatel na první volné
 ** místo, na které se má zapisovat, představuje parametr postLen.
 **
 ** Aby se minimalizoval počet přístupů ke struktuře zásobníku, můžete zde
 ** nadeklarovat a používat pomocnou proměnnou typu char.
 */
-void untilLeftPar ( tStack* s, char* postExpr, unsigned* postLen )
+void untilLeftPar ( tGenStack * s, tGenStack * postfix_stack, unsigned * postLen)
 {
-    char tmp;
-    while(stackEmpty(s) == 0) //dokud JE to rovno nule, tak to znamena ze stack NENI prazdny
+    token_t tmp;
+    while(genStackEmpty(s) == 0) //dokud JE to rovno nule, tak to znamena ze stack NENI prazdny
     {
-        stackTop(s, &tmp);
-        stackPop(s);
+        genStackTop(s, &tmp);
+        genStackPop(s);
         if(tmp == '(')
             break;  // kdyz dojde na levou zavorku, tak konci, zavorka je jiz z predchoziho kroku popnuta
-        postExpr[(*postLen)++] = tmp;
+        postfix_stack[(*postLen)++] = tmp;
     }
 }
 
@@ -66,35 +68,35 @@ void untilLeftPar ( tStack* s, char* postExpr, unsigned* postLen )
 ** Dle priority předaného operátoru a případně priority operátoru na
 ** vrcholu zásobníku rozhodneme o dalším postupu. Délka převedeného
 ** výrazu a taktéž ukazatel na první volné místo, do kterého se má zapisovat,
-** představuje parametr postLen, výstupním polem znaků je opět postExpr.
+** představuje parametr postLen, výstupním polem znaků je opět postfix_gen_stack.
 */
-void doOperation ( tStack* s, char c, char* postExpr, unsigned* postLen )
+void doOperation (tGenStack* s, token_t operator_token, tGenStack * postfix_stack, unsigned * postLen)
 {
-    if (stackEmpty(s) != 0) // nerovna se nule znamena je prazdny
+    if (genStackEmpty(s) != 0) // nerovna se nule znamena je prazdny
     {
-        stackPush(s, c);
+        stackPush(s, operator_token);
         return;
     }
 
-    char tmp;
+    token_t tmp;
     stackTop(s, &tmp);  //prvni znak
 
     if ((tmp) == '(')
     {
-        stackPush(s, c);
+        genStackPush(s, operator_token);
         return;
     }
 
-    if ((c == '*' || c == '/') && (tmp == '+' || tmp == '-'))
+    if ((operator_token == TOKEN_MATH_MUL || operator_token == TOKEN_MATH_DIV || operator_token == TOKEN_MATH_INT_DIV) && (tmp == TOKEN_MATH_PLUS || tmp == TOKEN_MATH_MINUS))
     {
-        stackPush(s, c);
+        genStackPush(s, operator_token);
         return;
     }
 
-    postExpr[(*postLen)++] = tmp;
-    stackPop(s);
+    postfix_stack[(*postLen)++] = tmp;
+    genStackPop(s);
 
-    doOperation(s, c, postExpr, postLen);  //rekurze dokud se nepodari splnit podminka
+    doOperation(s, operator_token, postfix_stack, postLen);  //rekurze dokud se nepodari splnit podminka
 }
 
 /*
@@ -148,51 +150,55 @@ tGenStack infix2postfix (tGenStack * input_infix_stack, int max_len)
         return NULL;
 
     tGenStack * postfix_gen_stack = (tGenStack *) malloc(max_len * sizeof(tGenStack));
-    if(postExpr == NULL)
+    if(postfix_gen_stack == NULL)
     {
         free(stack);
         return NULL;
     }
 
-    stackInit(stack);
+    genStackInit(stack);
 
     unsigned infIndex = 0;
     unsigned postIndex = 0;  //postIndex je vlastne postLen
-    char inputChar = input_infix_stack[infIndex];  //prvni znak
+    token_t input_token = input_infix_stack[infIndex];  //prvni znak
 
-    while(inputChar != '\0')
+    while(input_token != '\0')
     {
-        if(('a' <= inputChar && inputChar <= 'z') || ('A' <= inputChar && inputChar <= 'Z') || ('0' <= inputChar && inputChar <= '9'))
-            postExpr[postIndex++] = inputChar;
+        token_type tt = input_token.type;
+        if(tt == TOKEN_ID || tt == TOKEN_STRING || tt == TOKEN_INT || tt == TOKEN_DOUBLE || tt == TOKEN_KEYWORD)
+            postfix_gen_stack[postIndex++] = input_token;
 
-        else if(inputChar == '(')
-            stackPush(stack, inputChar);
+        else if(tt == TOKEN_LEFT_BRACKET)
+            stackPush(stack, input_token);
 
-        else if(inputChar == '+' || inputChar == '-' || inputChar == '*' || inputChar == '/') {
-            doOperation(stack, inputChar, postExpr, (&postIndex));
+        else if(tt == TOKEN_MATH_PLUS || tt == TOKEN_MATH_MINUS || tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV) {
+            doOperation(stack, input_token, postfix_gen_stack, (&postIndex));
         }
 
-        else if(inputChar == ')')
-            untilLeftPar(stack, postExpr, (&postIndex));
+        else if(tt == TOKEN_RIGHT_BRACKET)
+            untilLeftPar(stack, postfix_gen_stack, (&postIndex));
 
-        else if(inputChar == '=')
+        else if(tt == TOKEN_DOLAR)
         {
-            char tmp;
+            token_t tmp;
             while(stackEmpty(stack) == 0)  //dokud JE rovno 0 znamena ze NENI prazdny
             {
                 stackTop(stack, &tmp);
-                postExpr[postIndex++] = tmp;
+                postfix_gen_stack[postIndex++] = tmp;
                 stackPop(stack);
             }
-            postExpr[postIndex++] = '=';
+            token_t end_token;
+            end_token.type = TOKEN_DOLAR;
+            end_token.value.string = "$";
+            postfix_gen_stack[postIndex++] = end_token;
             break;
         }
-        inputChar = input_infix_stack[++infIndex];
+        input_token = input_infix_stack[++infIndex];
     }
-    postExpr[postIndex] = '\0';
+    //postfix_gen_stack[postIndex] = '\0';
 
-    free(stack);  //postExpr neuvolnuji, protoze bych si smazal svuj vysledek
-    return postExpr;
+    free(stack);  //postfix_gen_stack neuvolnuji, protoze bych si smazal svuj vysledek
+    return postfix_gen_stack;
 }
 
 /* Konec c204.c */
