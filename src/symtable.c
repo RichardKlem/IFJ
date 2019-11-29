@@ -193,7 +193,7 @@ void insert_builtin_to_symtable() {
 
 bool get_frame(char * name) {
     Record tmp;
-    if (symtable_search(&symtable, name, &tmp) && tmp.local)
+    if (symtable_search(symtable, name, &tmp) && tmp.local)
         return false;
     else
         return true;
