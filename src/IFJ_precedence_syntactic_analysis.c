@@ -58,7 +58,7 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
     act_token.token = get_token(src_file); //nacteni tokenu ze vstupu
 
     //dokud nenactu keyword krome None, EOL nebo EOF
-        while (act_token.token.type != TOKEN_KEYWORD && act_token.token.type != TOKEN_EOL && act_token.token.type != TOKEN_EOF && act_token.token.type != TOKEN_COLON)
+        while ((act_token.token.type != TOKEN_KEYWORD || act_token.token.value.keyword_value == NONE) && act_token.token.type != TOKEN_EOL && act_token.token.type != TOKEN_EOF && act_token.token.type != TOKEN_COLON)
     {
         /*printf("Cyklim????\n");
         if(act_token.token.type == TOKEN_INT)
