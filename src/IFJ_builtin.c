@@ -19,7 +19,7 @@
                                             DEFVAR GF@tmp3
                                             ADD GF@tmp3 zacatek pocet
                                             LABEL while
-                                            GT GF@tmp GF@tmp2 GF@tmp3
+                                            LT GF@tmp GF@tmp2 GF@tmp3
                                             JUMPIFEQ end_while GF@tmp bool@false
                                             GETCHAR tmp retezec GF@tmp2
                                             CONCAT a GF@tmp
@@ -77,12 +77,13 @@ void generate_builtin()
     printf("JUMP end_$print\n");
     printf("LABEL $print\n");
     printf("PUSHFRAME\n");
-    printf("DEFVAR LF@param\n",);
+    printf("DEFVAR LF@param\n");
     printf("MOVE LF@param LF@\c1\n", '%');
     printf("WRITE LF@param\n", '%');
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$print\n");
+    printf("\n");
 
     //Definovani vestavene funkce len
     printf("#def len()\n");
@@ -97,6 +98,7 @@ void generate_builtin()
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$len\n");
+    printf("\n");
 
     //Definovani vestavene funkce substr
     printf("#def substr()\n");
@@ -112,10 +114,10 @@ void generate_builtin()
     printf("DEFVAR LF@param3\n", '%');
     printf("MOVE LF@param3 LF@\c3\n", '%');
     printf("ADD LF@param3 LF@param3 LF@param2\n");
-    printf("DEFVAR L$tmp\n");
+    printf("DEFVAR LF$tmp\n");
     printf("LABEL $while_substr\n");
-    printf("GT LF@tmp LF@param2 LF@param3\n");
-    printf("JUMPIFEQ $end_while_substr LF@tmp bool@false\n");
+    printf("LT LF@tmp LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $end_while_substr LF@tmp bool@true\n");
     printf("GETCHAR LF@tmp LF@param1 LF@param2\n");
     printf("CONCAT LF@\cret LF@tmp\n", '%');
     printf("ADD LF@param2 LF@param2 int@1\n");
@@ -124,6 +126,7 @@ void generate_builtin()
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$substr\n");
+    printf("\n");
 
     //Definice vestavene funkce ord
     printf("#def ord()\n");
@@ -140,6 +143,7 @@ void generate_builtin()
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$ord\n");
+    printf("\n");
 
     //Definice vestavene funkce chr
     printf("#def chr()\n");
@@ -154,4 +158,5 @@ void generate_builtin()
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$chr\n");
+    printf("\n");
 }
