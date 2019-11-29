@@ -14,11 +14,17 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdarg.h>
+#include<stdbool.h>
+#include "IFJ_stack_string.h"
 
 typedef struct record {
-    int defined;
-    int is_variable;
+    bool is_variable;
     int param_num;
+    tStack_string* undefined_functions; //zde se ukladaji funkce, ktere jeste nemely definici, ale byly pouzity v ji difinici
+    bool global;
+    bool local;
+    bool read_from_global;
+    bool forward_call;
 } Record;
 
 typedef struct tBSTNode {

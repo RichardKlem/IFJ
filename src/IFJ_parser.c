@@ -14,7 +14,7 @@ LL tabulka
                 |+  |-  |/  |*  |// |<  |<= |>  |>= |str|dbl|int|!= |== |key-None|id |(  |)  |eol|,  |:  |indent|dedent|=  |key-def|key-else|key-while|key-pass|key-return|key-if|eof|
 <prog>			|   |   |   |   |   |   |   |   |   |1  |1  |1  |   |   |1       |1  |1  |   |1  |   |   |      |      |   |1      |        |1        |1       |          |1     |1  |
 <st-list>		|   |   |   |   |   |   |   |   |   |2  |2  |2  |   |   |2       |2  |2  |   |   |   |   |      |4     |   |2      |        |2        |2       |4         |2     |4  |
-<stat>			|   |   |   |   |   |   |   |   |   |19*|19*|19*|   |   |19*     |5  |19*|   |   |   |   |      |      |   |11     |        |17       |3       |          |16    |   |
+<stat>			|   |   |   |   |   |   |   |   |   |19*|19*|19*|   |   |19*     |5  |19*|   |   |   |   |      |      |   |11*    |        |17       |3       |          |16    |   |
 <eol-opt>		|   |   |   |   |   |   |   |   |   |10 |10 |10 |   |   |10      |10 |10 |   |9  |   |   |10    |10    |   |10     |        |10       |10      |10        |10    |10 |
 <return>		|   |   |   |   |   |   |   |   |   |   |   |   |   |   |        |   |   |   |   |   |   |      |8     |   |       |        |         |        |7         |      |   |
 <param-list>	|   |   |   |   |   |   |   |   |   |   |   |   |   |   |        |12 |   |13 |   |   |   |      |      |   |       |        |         |        |          |      |   |
@@ -41,7 +41,9 @@ Record id_param; //pomocna struktura pro ukladani informaci o promennych
 tBSTNodePtr symtable; //tabulka symbolu
 tStack_sem stack_semantic; //zasobnik pro semantickou analyzu
 tStack_sem stack_semantic_params;
-int param_num, arg_num, fun_def_nesting = 0;
+int param_num, arg_num;
+bool in_function = false, in_block = false;
+char * fun_name = NULL;
 
 void prog(){
     printf("In main\n");
@@ -101,7 +103,7 @@ void st_list(){
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == WHILE) ||
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == PASS) ||
             (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF) ||
-            ((fun_def_nesting > 0) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN))){
+            ((in_function) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN))){
                 stat();
                 eol_opt();
                 st_list();
@@ -116,32 +118,11 @@ void stat(){
     if (next_token.type == TOKEN_STRING || next_token.type == TOKEN_DOUBLE
         || next_token.type == TOKEN_INT || (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE)
         || next_token.type == TOKEN_LEFT_BRACKET){
-            first = next_token;
-            /*****PSA*******/
-            next_token = expressionParse(stdin, &first, NULL, 1);
-/*******************************************************************************************
-        SIMULACE RESENI VYRAZU first
-            //TODO <expr1>
 
-        if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
-        next_token = get_token(stdin);
+        first = next_token;
+        /*****PSA*******/
+        next_token = expressionParse(stdin, &first, NULL, 1);
 
-        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
-        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
-        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
-        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
-        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
-        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
-        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
-        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
-        next_token.type == TOKEN_ID) {
-            if (next_token.type == TOKEN_ID)
-                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
-            next_token = get_token(stdin);
-        }
-
-/*********************************************************************************************/
         if (next_token.type == TOKEN_EOL)
             next_token = get_token(stdin);
         else
@@ -159,13 +140,11 @@ void stat(){
             error_exit(ERROR_SYNTAX);
     }
     //pravidlo 7*/8 sloucene a pouze za podminky, ze jsme ve funkci
-    else if ((fun_def_nesting > 0) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN)){
+    else if ((in_function) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN)){
         ret(); //pouze presmerujeme do puvodniho pravidla 7/8
     }
     //pravidlo 11 - definice funkce
-    else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == DEF){
-        char * fun_name; //pomocna promenna pro uchovani jmena funkce
-
+    else if ((!in_block) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == DEF)){
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_ID) {
             fun_name = next_token.value.string;
@@ -178,12 +157,8 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        fun_def_nesting++; //zacina blok prikazu fce, muze nastat return
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
         param_num = 0; //vynuluje pocet parametru
         param_list();
-        //stack_sem_push se interne diva na globalni promennou param_num a zaroven vlozi funkci na symtable
-        stack_sem_push(&stack_semantic, FUN_DEF, fun_name);
 
         if (next_token.type == TOKEN_RIGHT_BRACKET)
             next_token = get_token(stdin);
@@ -199,16 +174,20 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
+        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
+        //stack_sem_push se interne diva na globalni promennou param_num a zaroven vlozi funkci na symtable
+        stack_sem_push(&stack_semantic, FUN_DEF, fun_name);
+        in_function = true;
+        in_block = true;
+
         st_list();
-       // ret();
-        fun_def_nesting--; //konci blok fce, pokud je fun_def_nesting > 0, znamena to, ze jsme stale v definici funkce
 
-        if (next_token.type == TOKEN_DEDENT) {
-            //konec definice funkce, uvolnime semanticky zasobnik
-            stack_sem_pop_until_block_start(&stack_semantic);
+        in_block = false;
+        in_function = false;
+        stack_sem_pop_until_block_start(&stack_semantic);
 
+        if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
-        }
         else error_exit(ERROR_SYNTAX);
     }
     //pravidlo 17
@@ -217,29 +196,7 @@ void stat(){
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
-/********************************************************************************************
-        SIMULACE RESENI VYRAZU first
-            //TODO <expr1>
 
-        if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
-        next_token = get_token(stdin);
-
-        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
-        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
-        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
-        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
-        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
-        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
-        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
-        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
-        next_token.type == TOKEN_ID) {
-            if (next_token.type == TOKEN_ID)
-                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
-            next_token = get_token(stdin);
-        }
-
-/*********************************************************************************************/
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -251,10 +208,9 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
-        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
+        in_block = true;
         st_list();
-        stack_sem_pop_until_block_start(&stack_semantic);
+        in_block = false;
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -273,29 +229,7 @@ void stat(){
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
-/********************************************************************************************
-        SIMULACE RESENI VYRAZU first
-            //TODO <expr1>
 
-        if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
-        next_token = get_token(stdin);
-
-        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
-        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
-        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
-        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
-        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
-        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
-        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
-        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
-        next_token.type == TOKEN_ID) {
-            if (next_token.type == TOKEN_ID)
-                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
-            next_token = get_token(stdin);
-        }
-
-/*********************************************************************************************/
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -307,10 +241,9 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
-        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
+        in_block = true;
         st_list();
-        stack_sem_pop_until_block_start(&stack_semantic);
+        in_block = false;
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -329,10 +262,14 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
+        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU ELSE
+        in_block = true;
         stack_sem_push(&stack_semantic, BLOCK_START, NULL);
+
         st_list();
+
         stack_sem_pop_until_block_start(&stack_semantic);
+        in_block = false;
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -381,27 +318,6 @@ void ret(){
             /*****PSA*******/
             next_token = expressionParse(stdin, &next_token, NULL, 1);
         }
-
-
-/********************************************************************************************
-        SIMULACE RESENI VYRAZU
-            //TODO <expr0>
-
-        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
-        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
-        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
-        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
-        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
-        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
-        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
-        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
-        next_token.type == TOKEN_ID) {
-            if (next_token.type == TOKEN_ID)
-                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
-            next_token = get_token(stdin);
-        }
-
-/*********************************************************************************************/
         if (next_token.type == TOKEN_EOL) {
             next_token = get_token(stdin);
             eol_opt();
@@ -418,7 +334,7 @@ void param_list(){
     //pravidlo 12
     if (next_token.type == TOKEN_ID) {
         param_num++;
-        stack_sem_push(&stack_semantic_params, VAR_DEF, next_token.value.string);
+        stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
         next_token = get_token(stdin);
         param_next();
     }
@@ -439,7 +355,7 @@ void param_next(){
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_ID){
             param_num++;
-            stack_sem_push(&stack_semantic_params, VAR_DEF, next_token.value.string);
+            stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
             next_token = get_token(stdin);
             param_next();
         }
@@ -461,33 +377,6 @@ void expr_or_assign() {
         second = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, &second, 2);
-/********************************************************************************************
-        SIMULACE RESENI VYRAZU first,second
-            //TODO <expr2> */
-/*
-        if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
-
-        if (second.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, second.value.string);
-        next_token = get_token(stdin);
-
-        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
-        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
-        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
-        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
-        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
-        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
-        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
-        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
-        next_token.type == TOKEN_ID) {
-            if (next_token.type == TOKEN_ID)
-                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
-            next_token = get_token(stdin);
-        }
-*/
-/*********************************************************************************************/
-            ;
     }
     //pravidlo 24
     else if (next_token.type == TOKEN_LEFT_BRACKET){
@@ -606,29 +495,6 @@ void fun_or_expr() {
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
-/********************************************************************************************
-        SIMULACE RESENI VYRAZU first
-            //TODO <expr> */
-/*
-        if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
-        next_token = get_token(stdin);
-
-        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
-        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
-        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
-        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
-        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
-        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
-        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
-        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
-        next_token.type == TOKEN_ID) {
-            if (next_token.type == TOKEN_ID)
-                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
-            next_token = get_token(stdin);
-        }
-
-/*********************************************************************************************/
     }
     //pravidlo 20
     else if (next_token.type == TOKEN_ID){
@@ -655,32 +521,6 @@ void fun_or_expr_2() {
             second = next_token;
             /*****PSA*******/
             next_token = expressionParse(stdin, &first, &second, 2);
-/********************************************************************************************
-        SIMULACE RESENI VYRAZU first,second
-            //TODO <expr2>
-
-        if (first.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, first.value.string);
-
-        if (second.type == TOKEN_ID)
-            stack_sem_push(&stack_semantic, VAR_USE, second.value.string);
-        next_token = get_token(stdin);
-
-        while (next_token.type == TOKEN_MATH_PLUS || next_token.type == TOKEN_MATH_MINUS ||
-        next_token.type == TOKEN_MATH_DIV || next_token.type == TOKEN_MATH_MUL ||
-        next_token.type == TOKEN_MATH_INT_DIV || next_token.type == TOKEN_LESS ||
-        next_token.type == TOKEN_LESS_EQ || next_token.type == TOKEN_GREATER ||
-        next_token.type == TOKEN_GREATER_EQ || next_token.type == TOKEN_NOT_EQ ||
-        next_token.type == TOKEN_EQ || next_token.type == TOKEN_LEFT_BRACKET ||
-        next_token.type == TOKEN_RIGHT_BRACKET || next_token.type == TOKEN_STRING ||
-        next_token.type == TOKEN_INT || next_token.type == TOKEN_DOUBLE ||
-        next_token.type == TOKEN_ID) {
-            if (next_token.type == TOKEN_ID)
-                stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
-            next_token = get_token(stdin);
-        }
-
-/*********************************************************************************************/
     }
     //pravidlo 21
     else if (next_token.type == TOKEN_LEFT_BRACKET) {
