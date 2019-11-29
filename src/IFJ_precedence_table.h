@@ -54,6 +54,5 @@ int genStackEmpty (tGenStack * s);
 token_t genStackTop (tGenStack * s);
 void genStackPop (tGenStack * s);
 void genStackPush (tGenStack * s, token_t item);
-token_t * find_top_terminal(tGenStack * s);
 
 #endif //IFJ_PRECEDENCE_TABLE_H
