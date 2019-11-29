@@ -191,13 +191,40 @@ void generate_builtin()
     printf("JUMPIFEQ $operation_!= LF@param1 string@!=\n");
     printf("JUMPIFEQ $operation_<= LF@param1 string@<=\n");
     printf("JUMPIFEQ $operation_>= LF@param1 string@>=\n");
+
     printf("LABEL $operation_plus\n");
-    printf("");
+    printf("VARDEF LF@tmp\n");
+    printf("JUMPIFNEQ $operation_plus_notsame LF@param2$type LF@param3@type\n");
+    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type int\n");
+    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type float\n");
+    printf("CONCAT LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_plus_same_int\n");
+    printf("ADD LF@tmp LF@param2 LF@param3\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_plus_notsame\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2$type int\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("JUMP $operation_plus_notsame_push\n");
+    printf("LABEL $operation_plus_notsame_1int\n");
+    printf("INT2FLOAT LF@tmp LF@param2\n");
+    printf("ADD LF@tmp LF@param3 LF@tmp\n");
+    printf("LABEL $operation_plus_notsame_push\n");
+    printf("PUSH LF@tmp\n");
+    printf("JUMP $end_do_operation\n");
+
+
     printf("LABEL $operation_min\n");
     printf("LABEL $operation_mul\n");
     printf("LABEL $operation_div\n");
     printf("LABEL $operation_intdiv\n");
 
+    //<
     printf("LABEL $operation_<\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("LT LF@tmp_bool LF@param2 LF@param3\n");
@@ -210,17 +237,77 @@ void generate_builtin()
     printf("PUSH int@0\n");
     printf("JUMP $end_do_operation\n");
 
+    //>
     printf("LABEL $operation_>\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFEQ $operation_>_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_>_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //==
     printf("LABEL $operation_==\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFEQ $operation_==_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_==_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //!=
     printf("LABEL $operation_!=\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_!=_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_!=_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //<=
     printf("LABEL $operation_<=\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_<=_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_<=_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+    //>=
     printf("LABEL $operation_>=\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_>=_false LF@tmp_bool bool@false\n");
+    //true
+    printf("PUSH int@1\n");
+    printf("JUMP $end_do_operation\n");
+    printf("LABEL $operation_>=_false\n");
+    //false
+    printf("PUSH int@0\n");
+    printf("JUMP $end_do_operation\n");
+
+
+    printf("LABEL $operation_error\n");
+    printf("EXIT 1\n");
+    //end_do_operation
     printf("LABEL $end_do_operation\n");
+
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_of_def$do_operation\n");
