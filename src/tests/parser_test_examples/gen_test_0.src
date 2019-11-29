@@ -1,8 +1,5 @@
 a = 1
 
-def print(x):
-    pass
-
 while a:
     print(a)
 

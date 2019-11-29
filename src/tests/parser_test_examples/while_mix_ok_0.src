@@ -1,7 +1,5 @@
 #should be ok
-def print(a):
-   pass
-   
+
 def main(b):
     c = 0
     while b <= 3:
