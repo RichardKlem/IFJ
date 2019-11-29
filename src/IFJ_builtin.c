@@ -205,11 +205,15 @@ void generate_builtin()
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_plus_notsame\n");
-    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2$type int\n");
-    printf("LABEL $operation_plus_notsame_1int\n");
     printf("JUMPIFEQ $operation_error LF@param2$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2$type int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
-    printf("ADD LF@tmp LF@param2 LF@tmp\n");
+    printf("INT2FLOAT LF@tmp LF@param3\n");
+    printf("JUMP $operation_plus_notsame_push\n");
+    printf("LABEL $operation_plus_notsame_1int\n");
+    printf("INT2FLOAT LF@tmp LF@param2\n");
+    printf("ADD LF@tmp LF@param3 LF@tmp\n");
     printf("LABEL $operation_plus_notsame_push\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
