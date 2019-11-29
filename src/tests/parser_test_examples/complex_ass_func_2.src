@@ -1,4 +1,4 @@
-#should be ok
+#fail na definici funkce ve funkci
 def print(a):
     pass
 
