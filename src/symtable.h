@@ -46,6 +46,7 @@ void symtable_insert(tBSTNodePtr *, char*, Record);
 void symtable_delete(tBSTNodePtr *, char*);
 void symtable_dispose(tBSTNodePtr *);
 void insert_builtin_to_symtable();
+bool get_frame(char * name);
 
 #endif // SYMTABLE_H_INCLUDED
 

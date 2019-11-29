@@ -1,0 +1,7 @@
+if 1:
+     ahoj = 1
+     pass
+else:
+   pass
+
+

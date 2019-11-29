@@ -133,45 +133,68 @@ void insert_builtin_to_symtable() {
         tmp.is_variable = false;
         tmp.local = false;
         tmp.read_from_global = false;
-        tmp.undefined_functions = NULL;
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("inputi") + 1);
         strcpy(name, "inputi");
         tmp.param_num = 0;
         symtable_insert(&symtable, name, tmp);
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("inputf") + 1);
         strcpy(name, "inputf");
         tmp.param_num = 0;
         symtable_insert(&symtable, name, tmp);
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("inputs") + 1);
         strcpy(name, "inputs");
         tmp.param_num = 0;
         symtable_insert(&symtable, name, tmp);
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("print") + 1);
         strcpy(name, "print");
         tmp.param_num = -1; //u print muze byt libovolny pocet parametru
         symtable_insert(&symtable, name, tmp);
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("len") + 1);
         strcpy(name, "len");
         tmp.param_num = 1;
         symtable_insert(&symtable, name, tmp);
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("substr") + 1);
         strcpy(name, "substr");
         tmp.param_num = 3;
         symtable_insert(&symtable, name, tmp);
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("ord") + 1);
         strcpy(name, "ord");
         tmp.param_num = 2;
         symtable_insert(&symtable, name, tmp);
 
+        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
+        stack_init_string(tmp.undefined_functions);
         name = malloc(strlen("chr") + 1);
         strcpy(name, "chr");
         tmp.param_num = 1;
         symtable_insert(&symtable, name, tmp);
+}
+
+bool get_frame(char * name) {
+    Record tmp;
+    if (symtable_search(symtable, name, &tmp) && tmp.local)
+        return false;
+    else
+        return true;
 }

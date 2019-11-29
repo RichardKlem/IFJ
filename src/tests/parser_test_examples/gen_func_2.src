@@ -1,0 +1,13 @@
+def main():
+    def foo():
+        pass
+    def shit():
+        pass
+    foo()
+    pass
+
+def main2():
+    def foo():
+        pass
+    foo()
+    pass
