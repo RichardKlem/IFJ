@@ -12,8 +12,8 @@ typedef struct {
 
 void stack_init_string (tStack_string* s);
 int stack_empty_string (tStack_string* s);
-int stack_top_string (tStack_string* s);
+char * stack_top_string (tStack_string* s);
 void stack_pop_string (tStack_string* s);
-void stack_push_string (tStack_string* s, int data);
+void stack_push_string (tStack_string* s, char * data);
 
 #endif // IFJ_STACK_STRING_H_INCLUDED

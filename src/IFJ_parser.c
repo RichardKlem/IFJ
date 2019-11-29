@@ -145,8 +145,6 @@ void stat(){
     }
     //pravidlo 11 - definice funkce
     else if ((!in_block) && (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == DEF)){
-        char * fun_name; //pomocna promenna pro uchovani jmena funkce
-
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_ID) {
             fun_name = next_token.value.string;
@@ -336,7 +334,7 @@ void param_list(){
     //pravidlo 12
     if (next_token.type == TOKEN_ID) {
         param_num++;
-        stack_sem_push(&stack_semantic_params, VAR_DEF, next_token.value.string);
+        stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
         next_token = get_token(stdin);
         param_next();
     }
@@ -357,7 +355,7 @@ void param_next(){
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_ID){
             param_num++;
-            stack_sem_push(&stack_semantic_params, VAR_DEF, next_token.value.string);
+            stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
             next_token = get_token(stdin);
             param_next();
         }

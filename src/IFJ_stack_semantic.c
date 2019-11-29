@@ -47,7 +47,23 @@ void stack_sem_pop (tStack_sem* s) {
 }
 
 void check_for_fun_def(char *name){
+    Record tmp;
 
+    symtable_search(symtable, name, &tmp);
+
+    //nezavisi na zadnych funkcich
+    if (stack_empty_string(tmp.undefined_functions))
+        return;
+
+    //prochazime vsechny funkce, na kterych je aktualni funkce zavisla a kontrolujeem zda jsou definovane a jejich zavislosti taky
+    while (!stack_empty_string(tmp.undefined_functions)) {
+        name = stack_top_string(tmp.undefined_functions);
+        if (symtable_search(symtable, name, &tmp) && !tmp.is_variable && tmp.global && !tmp.forward_call)
+            check_for_fun_def(name);
+        else
+            error_exit(ERROR_SEM_UNDEF);
+        stack_pop_string(tmp.undefined_functions);
+    }
 
 
 }
@@ -81,6 +97,7 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                     tmp.param_num = param_num; //globalni prommena do ktere zapisuje parser
                     tmp.local = false;
                     tmp.forward_call = false;
+                    tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
                     stack_init_string(tmp.undefined_functions);
                     symtable_insert(&symtable, name, tmp); //prepiseme hodnoty v symtable
                     stack_sem_push(&stack_semantic, BLOCK_START, NULL); //vlozeni zacatku bloku
@@ -91,10 +108,11 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                     error_exit(ERROR_SEM_UNDEF);
                 else { //byla jenom volana
                     if (tmp.param_num != param_num) //neshoduje se pocet arguemntu predchoziho volani a pocet parametru teto definice
-                        error_exit(ERROR_SEM_UNDEF);
+                        error_exit(ERROR_SEM_CALL);
                     else {
                         tmp.forward_call = false;
                         symtable_insert(&symtable, name, tmp);
+                        stack_sem_push(&stack_semantic, BLOCK_START, NULL);
                     }
                 }
             }
@@ -105,12 +123,16 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
             tmp.param_num = param_num; //globalni prommena do ktere zapisuje parser
             tmp.local = false;
             tmp.forward_call = false;
+            tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
             stack_init_string(tmp.undefined_functions);
             symtable_insert(&symtable, name, tmp); //prepiseme hodnoty v symtable
             stack_sem_push(&stack_semantic, BLOCK_START, NULL); //vlozeni zacatku bloku
         }
         //nutne vlozit parametry, ktere jsou nacteny v stack_semantic_params, budou tam v opacnem poradi
         tdata data;
+
+        //pro nacteni parametru uz bereme, ze jsme ve funkci
+        in_function = true;
 
         while (!stack_sem_empty(&stack_semantic_params)){
             data = stack_sem_top(&stack_semantic_params);
@@ -130,6 +152,7 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                         tmp.global = true;
                         tmp.local = false;
                         tmp.param_num = arg_num;
+                        tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
                         stack_init_string(tmp.undefined_functions);
                         tmp.read_from_global = false;
                         tmp.forward_call = true;
@@ -150,6 +173,7 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                 tmp.global = true;
                 tmp.local = false;
                 tmp.param_num = arg_num;
+                tmp.undefined_functions = malloc(sizeof(*tmp.undefined_functions));
                 stack_init_string(tmp.undefined_functions);
                 tmp.read_from_global = false;
                 tmp.forward_call = true;
@@ -193,7 +217,10 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                     symtable_insert(&symtable, name, tmp);
                 }
                 else { //pokud jsme na globalni urovni, nedelame nic
-                    /*DO NOTHING*/;
+                    tmp.global = true;
+                    tmp.read_from_global = false;
+                    tmp.local = false;
+                    symtable_insert(&symtable, name, tmp);
                 }
             }
         }
@@ -209,7 +236,7 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                 tmp.global = true;
                 tmp.is_variable = true;
                 tmp.local = false;
-                tmp.read_from_global;
+                tmp.read_from_global = false;
                 symtable_insert(&symtable, name, tmp);
             }
         }

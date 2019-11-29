@@ -18,7 +18,8 @@ typedef enum {
     FUN_CALL,
     VAR_DEF,
     VAR_USE,
-    BLOCK_START
+    BLOCK_START,
+    DO_NOTHING
 } taction;
 
 typedef struct tdata {

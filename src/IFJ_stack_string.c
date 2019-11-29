@@ -16,7 +16,7 @@ int stack_empty_string(tStack_string* s) {
         return s->top == NULL;
 }
 
-int stack_top_string(tStack_string* s) {
+char * stack_top_string(tStack_string* s) {
 	if (stack_empty_string(s) || stack_empty_string(s))
 		error_exit(ERROR_INTERNAL);
 	else
