@@ -6,7 +6,7 @@
     a = inputf      READ a float
     a = inputs      READ a string
 
-    print(a)        WRITE a 
+    print(a)        WRITE a
     print(a, b)     WRITE a
                     WRITE b
 
@@ -27,7 +27,7 @@
                                             ADD GF@tmp2 GF@tmp2 int@1
                                             JUMP wjile
                                             LABEL end_while
-    
+
     a = ord(řetězec. pozice)    STRI2INT a řetězec pozice
 
     a = chr(ASCII_kod)      INT2CHAR a ASCII_kod
@@ -112,9 +112,9 @@ void generate_builtin()
     printf("MOVE LF@%cret string@\n", '%');
     printf("DEFVAR LF@param1\n");
     printf("MOVE LF@param1 LF@%c1\n", '%');
-    printf("DEFVAR LF@param2\n", '%');
+    printf("DEFVAR LF@param2\n");
     printf("MOVE LF@param2 LF@%c2\n", '%');
-    printf("DEFVAR LF@param3\n", '%');
+    printf("DEFVAR LF@param3\n");
     printf("MOVE LF@param3 LF@%c3\n", '%');
     printf("ADD LF@param3 LF@param3 LF@param2\n");
     printf("DEFVAR LF$tmp\n");

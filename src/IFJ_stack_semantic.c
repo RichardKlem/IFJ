@@ -14,6 +14,7 @@
 #include "symtable.h"
 #include "stdbool.h"
 #include "IFJ_stack_string.h"
+#include "string.h"
 
 void stack_sem_init (tStack_sem* s) {
 	if (s == NULL)
