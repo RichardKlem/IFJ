@@ -52,6 +52,7 @@ char * fun_name = NULL; //pomocna promenna, pro uchovani jmena funkce ve ktere j
 int unique_number = 0; //unikatni pocitadlo pro geenrovani labelu
 token_t assign_to; //pomocna promenna pro uchovani jmena promenne, do ktere se prirazuje
 int print_pop = 0;
+int print_assign_one_var = 0;
 
 void prog(){
     debug_print("In main\n");
@@ -477,6 +478,7 @@ void expr_or_assign() {
                 printf("POPS GF@%s\n", tmp);
             else
                 printf("POPS LF@%s\n", tmp);
+            print_pop = 0;
         }
     }
     else
@@ -683,6 +685,19 @@ void fun_or_expr() {
         first = next_token;
         next_token = get_token(stdin);
         fun_or_expr_2();
+
+        if (print_assign_one_var) {
+            if (get_frame(assign_to.value.string))
+                printf("\nMOVE GF@%s ", assign_to.value.string);
+            else
+                printf("\nMOVE LF@%s ", assign_to.value.string);
+
+            if (get_frame(first.value.string))
+                printf("GF@%s\n", first.value.string);
+            else
+                printf("LF@%s\n", first.value.string);
+            print_assign_one_var = 0;
+        }
     }
     //pravidlo 29
     //else if (next_token.type == TOKEN_EOL)
@@ -740,15 +755,7 @@ void fun_or_expr_2() {
     else if (next_token.type == TOKEN_EOL) {
         stack_sem_push(&stack_semantic, VAR_USE, first.value.string); //pouze kontrola samotneho identifikatoru
 
-        if (get_frame(assign_to.value.string))
-            printf("\nMOVE GF@%s ", assign_to.value.string);
-        else
-            printf("\nMOVE LF@%s ", assign_to.value.string);
-
-        if (get_frame(first.value.string))
-            printf("GF@%s\n", assign_to.value.string);
-        else
-            printf("LF@%s\n", assign_to.value.string);
+        print_assign_one_var = 1;
     }
     else
         error_exit(ERROR_SYNTAX);
