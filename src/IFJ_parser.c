@@ -35,6 +35,7 @@ LL tabulka
 #include "IFJ_stack_semantic.h"
 #include "IFJ_precedence_syntactic_analysis.h"
 #include "IFJ_builtin.h"
+#include <string.h>
 
 #define debug_print(...)
 //printf(__VA_ARGS__)
