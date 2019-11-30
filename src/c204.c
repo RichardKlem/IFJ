@@ -89,12 +89,17 @@ void doOperation (tGenStack* s, token_t operator_token, token_t * postfix_stack,
     }
 
     token_type tt = operator_token.type;
-    if ((tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV) && (tmp.type == TOKEN_MATH_PLUS || tmp.type == TOKEN_MATH_MINUS))
+    if ((tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV) &&
+    (tmp.type == TOKEN_MATH_PLUS || tmp.type == TOKEN_MATH_MINUS || tmp.type == TOKEN_EQ || tmp.type == TOKEN_NOT_EQ || tmp.type == TOKEN_LESS || tmp.type== TOKEN_GREATER || tmp.type== TOKEN_LESS_EQ || tmp.type== TOKEN_GREATER ))
     {
         genStackPush(s, operator_token);
         return;
     }
-
+    if((tt == TOKEN_MATH_PLUS || tt == TOKEN_MATH_MINUS) && (tmp.type == TOKEN_EQ || tmp.type == TOKEN_NOT_EQ || tmp.type == TOKEN_LESS || tmp.type== TOKEN_GREATER || tmp.type== TOKEN_LESS_EQ || tmp.type== TOKEN_GREATER ))
+    {
+        genStackPush(s, operator_token);
+        return;
+    }
     postfix_stack[(*postLen)++] = tmp;
     genStackPop(s);
 

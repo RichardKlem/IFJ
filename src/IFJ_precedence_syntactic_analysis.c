@@ -387,7 +387,7 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
     /*for(int i =0; i < max_len; ++i)
     {
-        //printf("%d\n", (postfix_array[i]).type);
+        printf("%d\n", (postfix_array[i]).type);
     }*/
     tExprStack psa_stack;
     exprStackInit(&psa_stack);
