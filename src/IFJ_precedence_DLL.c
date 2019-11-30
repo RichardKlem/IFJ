@@ -17,7 +17,7 @@
 
 void exprDLError() {
 
-    fprintf (stderr,"*ERROR* PSA expression DLL\n");
+    //fprintf (stderr,"*ERROR* PSA expression DLL\n");
 }
 
 void exprDLInitList (tExprDLList *L) {
