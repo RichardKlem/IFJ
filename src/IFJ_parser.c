@@ -543,7 +543,7 @@ void arg_next() {
             arg_num++;
 
             printf("DEFVAR TF@%%%d\n", arg_num);
-            printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
+            printf("MOVE TF@%%%d string@%a\n", arg_num, next_token.value.double_value);
 
             next_token = get_token(stdin);
             arg_next();
