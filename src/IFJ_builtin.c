@@ -42,7 +42,7 @@ void generate_builtin()
     //Definovani vestavene funkce inputi
     printf("#def inputi()\n");
     printf("JUMP end_$inputi\n");
-    printf("LABEL $inputi\n");
+    printf("LABEL inputi\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
@@ -55,7 +55,7 @@ void generate_builtin()
     //Definovani vestavene funkce inputf
     printf("#def inputf()\n");
     printf("JUMP end_$inputf\n");
-    printf("LABEL $inputf\n");
+    printf("LABEL inputf\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
@@ -68,7 +68,7 @@ void generate_builtin()
     //Definovani vestavene funkce inputs
     printf("#def inputs()\n");
     printf("JUMP end_$inputs\n");
-    printf("LABEL $inputs\n");
+    printf("LABEL inputs\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
@@ -81,7 +81,7 @@ void generate_builtin()
     //Definovani vestavene funkce write
     printf("#def print()\n");
     printf("JUMP end_$print\n");
-    printf("LABEL $print\n");
+    printf("LABEL print\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
@@ -96,7 +96,7 @@ void generate_builtin()
     //Definovani vestavene funkce len
     printf("#def len()\n");
     printf("JUMP end_$len\n");
-    printf("LABEL $len\n");
+    printf("LABEL len\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
@@ -111,7 +111,7 @@ void generate_builtin()
     //Definovani vestavene funkce substr
     printf("#def substr()\n");
     printf("JUMP end_$substr\n");
-    printf("LABEL $substr\n");
+    printf("LABEL substr\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret string@\n", '%');
@@ -139,7 +139,7 @@ void generate_builtin()
     //Definice vestavene funkce ord
     printf("#def ord()\n");
     printf("JUMP end_$ord\n");
-    printf("LABEL $ord\n");
+    printf("LABEL ord\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
@@ -156,7 +156,7 @@ void generate_builtin()
     //Definice vestavene funkce chr
     printf("#def chr()\n");
     printf("JUMP end_$chr\n");
-    printf("LABEL $chr\n");
+    printf("LABEL chr\n");
     printf("PUSHFRAME\n");
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
@@ -429,7 +429,7 @@ void call_write(char* arg)
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
     printf("MOVE TF@%c1 %s\n", '%', arg);
-    printf("CALL $print\n");
+    printf("CALL print\n");
 }
 
 void call_len(char* arg)
