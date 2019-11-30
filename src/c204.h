@@ -20,7 +20,7 @@
 
 
 /* Konverzní funkce */
-token_t * infix2postfix (token_t * input_infix_stack, int max_len);
+void infix2postfix (token_t * input_infix_stack, token_t * postfix_array, int max_len);
 
 #endif
 
