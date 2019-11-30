@@ -122,12 +122,12 @@ void generate_builtin()
     printf("DEFVAR LF@param3\n");
     printf("MOVE LF@param3 LF@%c3\n", '%');
     printf("ADD LF@param3 LF@param3 LF@param2\n");
-    printf("DEFVAR LF$tmp\n");
+    printf("DEFVAR LF@$tmp\n");
     printf("LABEL $while_substr\n");
     printf("LT LF@tmp LF@param2 LF@param3\n");
     printf("JUMPIFNEQ $end_while_substr LF@tmp bool@true\n");
     printf("GETCHAR LF@tmp LF@param1 LF@param2\n");
-    printf("CONCAT LF@%cret LF@tmp\n", '%');
+    printf("CONCAT LF@%cret LF@%cret LF@tmp\n", '%', '%');
     printf("ADD LF@param2 LF@param2 int@1\n");
     printf("JUMP $while_substr\n");
     printf("LABEL $end_while_substr\n");
@@ -172,12 +172,13 @@ void generate_builtin()
     printf("#def do_operation()\n");
     printf("JUMP end_of_def$do_operation\n");
     printf("LABEL $do_operation\n");
+    printf("PUSHFRAME\n");
     printf("DEFVAR LF@param1\n");
-    printf("POP LF@param1\n");
+    printf("POPS LF@param1\n");
     printf("DEFVAR LF@param2\n");
-    printf("POP LF@param2\n");
+    printf("POPS LF@param2\n");
     printf("DEFVAR LF@param3\n");
-    printf("POP LF@param3\n");
+    printf("POPS LF@param3\n");
     printf("DEFVAR LF@param2$type\n");
     printf("TYPE LF@param2$type LF@param2\n");
     printf("DEFVAR LF@param3$type\n");
@@ -187,30 +188,30 @@ void generate_builtin()
     printf("JUMPIFEQ $operation_mul LF@param1 string@*\n");
     printf("JUMPIFEQ $operation_div LF@param1 string@/\n");
     printf("JUMPIFEQ $operation_intdiv LF@param1 string@//\n");
-    printf("JUMPIFEQ $operation_< LF@param1 string@<\n");
-    printf("JUMPIFEQ $operation_> LF@param1 string@>\n");
-    printf("JUMPIFEQ $operation_== LF@param1 string@==\n");
-    printf("JUMPIFEQ $operation_!= LF@param1 string@!=\n");
-    printf("JUMPIFEQ $operation_<= LF@param1 string@<=\n");
-    printf("JUMPIFEQ $operation_>= LF@param1 string@>=\n");
+    printf("JUMPIFEQ $operation_less LF@param1 string@<\n");
+    printf("JUMPIFEQ $operation_greater LF@param1 string@>\n");
+    printf("JUMPIFEQ $operation_eq LF@param1 string@==\n");
+    printf("JUMPIFEQ $operation_not_eq LF@param1 string@!=\n");
+    printf("JUMPIFEQ $operation_less_eq LF@param1 string@<=\n");
+    printf("JUMPIFEQ $operation_greater_eq LF@param1 string@>=\n");
 
 
     printf("LABEL $operation_plus\n");
-    printf("VARDEF LF@tmp\n");
-    printf("JUMPIFNEQ $operation_plus_notsame LF@param2$type LF@param3@type\n");
-    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type int\n");
-    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type float\n");
+    printf("DEFVAR LF@tmp\n");
+    printf("JUMPIFNEQ $operation_plus_notsame LF@param2$type LF@param3$type\n");
+    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type string@int\n");
+    printf("JUMPIFEQ $operation_plus_same_int LF@param2$type string@float\n");
     printf("CONCAT LF@tmp LF@param2 LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_plus_same_int\n");
     printf("ADD LF@tmp LF@param2 LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_plus_notsame\n");
-    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
-    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
-    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2$type int\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+    printf("JUMPIFEQ $operation_plus_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
     printf("ADD LF@tmp LF@param2 LF@tmp\n");
     printf("JUMP $operation_plus_notsame_push\n");
@@ -218,172 +219,172 @@ void generate_builtin()
     printf("INT2FLOAT LF@tmp LF@param2\n");
     printf("ADD LF@tmp LF@param3 LF@tmp\n");
     printf("LABEL $operation_plus_notsame_push\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
 
 
     printf("LABEL $operation_min\n");
-    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
-    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
-    printf("VARDEF LF@tmp\n");
-    printf("JUMPIFNEQ $operation_min_notsame LF@param2$type LF@param3@type\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+    printf("DEFVAR LF@tmp\n");
+    printf("JUMPIFNEQ $operation_min_notsame LF@param2$type LF@param3$type\n");
     printf("SUB LF@tmp LF@param2 LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_min_notsame\n");
-    printf("JUMPIFEQ $operation_min_notsame_1int LF@param2@type int\n");
+    printf("JUMPIFEQ $operation_min_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
     printf("SUB LF@tmp LF@param2 LF@tmp\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_min_notsame_1int\n");
     printf("INT2FLOAT LF@tmp LF@param2\n");
     printf("SUB LF@tmp LF@tmp LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_mul\n");
-    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
-    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
-    printf("VARDEF LF@tmp\n");
-    printf("JUMPIFNEQ $operation_mul_notsame LF@param2$type LF@param3@type\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+    printf("DEFVAR LF@tmp\n");
+    printf("JUMPIFNEQ $operation_mul_notsame LF@param2$type LF@param3$type\n");
     printf("MUL LF@tmp LF@param2 LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_mul_notsame\n");
-    printf("JUMPIFEQ $operation_mul_notsame_1int LF@param2@type int\n");
+    printf("JUMPIFEQ $operation_mul_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
     printf("MUL LF@tmp LF@tmp LF@param2\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_mul_notsame_1int\n");
     printf("INT2FLOAT LF@tmp LF@param2\n");
     printf("MUL LF@tmp LF@tmp LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_div\n");
-    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
-    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
     printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
-    printf("VARDEF LF@tmp\n");
-    printf("JUMPIFNEQ $operation_div_notsame LF@param2$type LF@param3@type\n");
+    printf("DEFVAR LF@tmp\n");
+    printf("JUMPIFNEQ $operation_div_notsame LF@param2$type LF@param3$type\n");
     printf("DIV LF@tmp LF@param2 LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_div_notsame\n");
-    printf("JUMPIFEQ $operation_div_notsame_1int LF@param2@type int\n");
+    printf("JUMPIFEQ $operation_div_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
     printf("DIV LF@tmp LF@param2 LF@tmp\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_div_notsame_1int\n");
     printf("INT2FLOAT LF@tmp LF@param2\n");
     printf("DIV LF@tmp LF@tmp LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_intdiv\n");
-    printf("JUMPIFEQ $operation_error LF@param2$type string\n");
-    printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
     printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
-    printf("VARDEF LF@tmp\n");
-    printf("JUMPIFNEQ $operation_idiv_notsame LF@param2$type LF@param3@type\n");
-    printf("JUMPIFEQ $operation_idiv_notsame_int LF@param2$type int\n");
+    printf("DEFVAR LF@tmp\n");
+    printf("JUMPIFNEQ $operation_idiv_notsame LF@param2$type LF@param3$type\n");
+    printf("JUMPIFEQ $operation_idiv_notsame_int LF@param2$type string@int\n");
     printf("FLOAT2INT LF@param2 LF@param2\n");
     printf("FLOAT2INT LF@param3 LF@param3\n");
     printf("LABEL $operation_idiv_notsame_int\n");
     printf("IDIV LF@tmp LF@param2 LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_idiv_notsame\n");
-    printf("JUMPIFEQ $operation_idiv_notsame_1int LF@param2@type float\n");
+    printf("JUMPIFEQ $operation_idiv_notsame_1int LF@param2$type string@float\n");
     printf("FLOAT2INT LF@tmp LF@param3\n");
     printf("IDIV LF@tmp LF@param2 LF@tmp\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_idiv_notsame_1int\n");
     printf("FLOAT2INT LF@tmp LF@param2\n");
     printf("IDIV LF@tmp LF@tmp LF@param3\n");
-    printf("PUSH LF@tmp\n");
+    printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
 
     //<
-    printf("LABEL $operation_<\n");
+    printf("LABEL $operation_less\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("LT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFEQ $operation_<_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFEQ $operation_less_false LF@tmp_bool bool@false\n");
     //true
-    printf("PUSH int@1\n");
+    printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_<_false\n");
+    printf("LABEL $operation_less_false\n");
     //false
-    printf("PUSH int@0\n");
+    printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //>
-    printf("LABEL $operation_>\n");
+    printf("LABEL $operation_greater\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("GT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFEQ $operation_>_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFEQ $operation_greater_false LF@tmp_bool bool@false\n");
     //true
-    printf("PUSH int@1\n");
+    printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_>_false\n");
+    printf("LABEL $operation_greater_false\n");
     //false
-    printf("PUSH int@0\n");
+    printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //==
-    printf("LABEL $operation_==\n");
+    printf("LABEL $operation_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFEQ $operation_==_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFEQ $operation_eq_false LF@tmp_bool bool@false\n");
     //true
-    printf("PUSH int@1\n");
+    printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_==_false\n");
+    printf("LABEL $operation_eq_false\n");
     //false
-    printf("PUSH int@0\n");
+    printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //!=
-    printf("LABEL $operation_!=\n");
+    printf("LABEL $operation_not_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_!=_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_not_eq_false LF@tmp_bool bool@false\n");
     //true
-    printf("PUSH int@1\n");
+    printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_!=_false\n");
+    printf("LABEL $operation_not_eq_false\n");
     //false
-    printf("PUSH int@0\n");
+    printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //<=
-    printf("LABEL $operation_<=\n");
+    printf("LABEL $operation_less_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("GT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_<=_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_less_eq_false LF@tmp_bool bool@false\n");
     //true
-    printf("PUSH int@1\n");
+    printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_<=_false\n");
+    printf("LABEL $operation_less_eq_false\n");
     //false
-    printf("PUSH int@0\n");
+    printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //>=
-    printf("LABEL $operation_>=\n");
+    printf("LABEL $operation_greater_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
     printf("LT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_>=_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_greater_eq_false LF@tmp_bool bool@false\n");
     //true
-    printf("PUSH int@1\n");
+    printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_>=_false\n");
+    printf("LABEL $operation_greater_eq_false\n");
     //false
-    printf("PUSH int@0\n");
+    printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
 
@@ -474,73 +475,84 @@ void print_stack(token_t *sem_array)
     for (; sem_array->type != TOKEN_DOLAR; sem_array++) {
         switch (sem_array->type) {
             case TOKEN_INT:
-                printf("PUSH int@%d\n", sem_array->value.int_value);
+                printf("PUSHS int@%d\n", sem_array->value.int_value);
                 break;
             case TOKEN_DOUBLE:
-                printf("PUSH float@%a\n", sem_array->value.double_value);
+                printf("PUSHS float@%a\n", sem_array->value.double_value);
                 break;
             case TOKEN_STRING:
-                printf("PUSH string@%s\n", sem_array->value.string);
+                printf("PUSHS string@%s\n", sem_array->value.string);
                 break;
             case TOKEN_ID:
                 ;
                 int frame = get_frame(sem_array->value.string);
                 if (frame == 1) {
-                    printf("PUSH GF@%s\n", sem_array->value.string);
+                    printf("PUSHS GF@%s\n", sem_array->value.string);
                 } else {
-                    printf("PUSH LF@%s\n", sem_array->value.string);
+                    printf("PUSHS LF@%s\n", sem_array->value.string);
                 }
                 break;
 
             case TOKEN_KEYWORD:
                 if (sem_array->value.keyword_value == NONE) {
-                    printf("PUSH nil@nil\n");
+                    printf("PUSHS nil@nil\n");
                 } else {
                     error_exit(ERROR_SYNTAX); //dostanu jiný KEYWORD token než NONE
                 }
 
             case TOKEN_MATH_PLUS:
-                printf("PUSH string@+\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@+\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_MATH_MINUS:
-                printf("PUSH string@-\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@-\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_MATH_MUL:
-                printf("PUSH string@*\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@*\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_MATH_DIV:
-                printf("PUSH string@/\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@/\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_MATH_INT_DIV:
-                printf("PUSH string@//\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@//\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_LESS:
-                printf("PUSH string@<\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@<\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_LESS_EQ:
-                printf("PUSH string@<=\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@<=\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_GREATER:
-                printf("PUSH string@>\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@>\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_GREATER_EQ:
-                printf("PUSH string@>=\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@>=\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_EQ:
-                printf("PUSH string@==\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@==\n");
                 printf("CALL $do_operation\n");
                 break;
             case TOKEN_NOT_EQ:
-                printf("PUSH string@!=\n");
+                printf("CREATEFRAME\n");
+                printf("PUSHS string@!=\n");
                 printf("CALL $do_operation\n");
                 break;
             default:
