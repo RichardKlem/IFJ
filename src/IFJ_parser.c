@@ -227,7 +227,7 @@ void stat(){
         next_token = expressionParse(stdin, &first, NULL, 1);
 
         printf("PUSHS int@0\n");
-        printf("JUMP JUMPIFEQS WHILE_END%d\n", while_unique_label);
+        printf("JUMPIFEQS WHILE_END%d\n", while_unique_label);
         printf("CLEARS\n");
         printf("\n#telo while\n\n");
 
