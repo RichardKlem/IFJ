@@ -51,6 +51,7 @@ bool in_function = false, in_block = false;
 char * fun_name = NULL; //pomocna promenna, pro uchovani jmena funkce ve ktere jsme zanoreni
 int unique_number = 0; //unikatni pocitadlo pro geenrovani labelu
 token_t assign_to; //pomocna promenna pro uchovani jmena promenne, do ktere se prirazuje
+int print_pop = 0;
 
 void prog(){
     debug_print("In main\n");
@@ -470,6 +471,13 @@ void expr_or_assign() {
 
         //bylo prirazeno do promenne, je nutna vlozit ji do stack_semantic
         stack_sem_push(&stack_semantic, VAR_DEF, tmp);
+
+        if (print_pop) {
+            if (get_frame(tmp))
+                printf("POPS GF@%s\n", tmp);
+            else
+                printf("POPS LF@%s\n", tmp);
+        }
     }
     else
         error_exit(ERROR_SYNTAX);
@@ -668,12 +676,8 @@ void fun_or_expr() {
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
 
-        stack_sem_push(&stack_semantic, VAR_DEF, assign_to.value.string);
-        if (get_frame(assign_to.value.string))
-            printf("POPS GF@%s\n", first.value.string);
-        else
-            printf("POPS LF@%s\n", first.value.string);
-    }
+        print_pop = 1;
+        }
     //pravidlo 20
     else if (next_token.type == TOKEN_ID){
         first = next_token;
