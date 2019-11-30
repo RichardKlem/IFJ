@@ -50,13 +50,13 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
 
     *max_len = 0;
     if(first_token != NULL){
-        //printf("VKLADAM do DL listu PRVNI token\n");
+        ////printf("VKLADAM do DL listu PRVNI token\n");
         exprDLInsertLast(expr_DLL, *first_token);
-        //printf("VLOZIL JSEM do DL listu PRVNI token\n");
+        ////printf("VLOZIL JSEM do DL listu PRVNI token\n");
         *max_len = 1;
         }
     if(second_token != NULL){
-        //printf("Vkladam do DL listu DRUHY token\n");
+        ////printf("Vkladam do DL listu DRUHY token\n");
         exprDLInsertLast(expr_DLL, *second_token);
         *max_len = 2;
         }
@@ -67,19 +67,19 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
     //dokud nenactu keyword krome None, EOL nebo EOF
         while ((act_token.token.type != TOKEN_KEYWORD || act_token.token.value.keyword_value == NONE) && act_token.token.type != TOKEN_EOL && act_token.token.type != TOKEN_EOF && act_token.token.type != TOKEN_COLON)
     {
-        /*printf("Cyklim????\n");
+        /*//printf("Cyklim????\n");
         if(act_token.token.type == TOKEN_INT)
-            printf("%d\n", act_token.token.value.int_value);
+            //printf("%d\n", act_token.token.value.int_value);
         if(act_token.token.type == TOKEN_KEYWORD)
-            printf("%d\n", act_token.token.value.keyword_value);*/
+            //printf("%d\n", act_token.token.value.keyword_value);*/
         act_token.terminal = true;
         act_token.shifted = false;
         exprDLInsertLast(expr_DLL, act_token);
         act_token.token = get_token(src_file);
         (*max_len)++;
-        //printf("Cyklim za\n");
+        ////printf("Cyklim za\n");
     }
-    //printf("PRED returnem\n");
+    ////printf("PRED returnem\n");
     expr_token_t end_token;
     end_token.token.type = TOKEN_DOLAR;
     end_token.token.value.string = "$";
@@ -165,7 +165,7 @@ int get_prec_value(token_t token)
                 index = 6;
             else
             {
-                printf("Chci zjistit precedenci tokenu KEYWORD, ktery nnei NONE\n");
+                //printf("Chci zjistit precedenci tokenu KEYWORD, ktery nnei NONE\n");
                 error_exit(ERROR_SYNTAX);
             }
             break;
@@ -173,7 +173,7 @@ int get_prec_value(token_t token)
             index = 7;
             break;
         default:
-            printf("dostal jsem neocekavany token\n");
+            //printf("dostal jsem neocekavany token\n");
             error_exit(ERROR_SYNTAX);
             break;
     }
@@ -221,7 +221,7 @@ int get_members_count(tExprStack * s)
         }
         else
         {
-            printf("get_members_count funkce nema zadny terminal\n");
+            //printf("get_members_count funkce nema zadny terminal\n");
             error_exit(ERROR_SYNTAX); //neni zadny terminal, to je chyba
         }
     }
@@ -235,7 +235,7 @@ void reduce_var_val(tExprStack * stack)
 {
     if (stack == NULL)
     {
-        printf("neni stack ve funkci reduce_var_val\n");
+        //printf("neni stack ve funkci reduce_var_val\n");
         error_exit(ERROR_INTERNAL);
     }
 
@@ -254,7 +254,7 @@ void reduce_brackets(tExprStack * stack)
 {
     if (stack == NULL)
     {
-        printf("neni stack ve funkci reduce_brackets\n");
+        //printf("neni stack ve funkci reduce_brackets\n");
         error_exit(ERROR_INTERNAL);
     }
     exprStackPop(stack);
@@ -270,7 +270,7 @@ void reduce_bin_op(tExprStack * stack)
 {
     if (stack == NULL)
     {
-        printf("neni stack ve funkci reduce_bin_op\n");
+        //printf("neni stack ve funkci reduce_bin_op\n");
         error_exit(ERROR_INTERNAL);
     }
     //TODO kontolovat operator
@@ -335,7 +335,7 @@ int reduce_by_rules(tExprStack * stack, int members_count)
  */
 token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int num_of_tokens)
 {
-    //printf("\nfirst-%d",first->type);
+    ////printf("\nfirst-%d",first->type);
     expr_token_t prvni_expr_token;
     expr_token_t druhy_expr_token;
     expr_token_t* first_expr_token = &prvni_expr_token;
@@ -385,10 +385,10 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
     inf2post_stack_gen(&psa_exprDLL, infix_array, postfix_array, &max_len);
 
-    for(int i =0; i < max_len; ++i)
+    /*for(int i =0; i < max_len; ++i)
     {
-        printf("%d\n", (postfix_array[i]).type);
-    }
+        //printf("%d\n", (postfix_array[i]).type);
+    }*/
     tExprStack psa_stack;
     exprStackInit(&psa_stack);
 
@@ -412,7 +412,7 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     {
         //zjisteni precedecniho pravidla
         precedence_rule precedence = get_precedence(*top_terminal, *input);
-        //printf("\n%d \ntt-%d \ninput-%d \n\n", precedence, top_terminal->token.type, input->token.type);
+        ////printf("\n%d \ntt-%d \ninput-%d \n\n", precedence, top_terminal->token.type, input->token.type);
         // < :zaměň a za a< na zásobníku & push(b) & přečti další symbol b ze vstupu
         if(precedence == SHIFT){
             top_terminal->shifted = true; //zamen a za a<
@@ -443,22 +443,22 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
             //zjistim pocet operandu na PSA stacku, ktere budu redukovat , nejvrchnejsi shifted terminal je touto funkci prenastavem na shifted == false
             int members_count = get_members_count(&psa_stack);
-            //printf("%d\n", members_count);
+            ////printf("%d\n", members_count);
             //reduce_by_rules vraci 1 kdyz je vse ok, jinak 0
             if(! reduce_by_rules(&psa_stack, members_count)){
-                printf("PO redukci\n");
+                //printf("PO redukci\n");
                 error_exit(ERROR_SYNTAX); // kdyz vrati 0, tak nastala chyba => ERROR_SYNTAX
             }
         top_terminal = find_top_terminal(&psa_stack);
         }
         else if(precedence == ERROR)
         {
-            printf("Precedence vratila ERROR\n");
+            //printf("Precedence vratila ERROR\n");
             error_exit(ERROR_SYNTAX);
         }
 
     } while (top_terminal->token.type != TOKEN_DOLAR || input->token.type != TOKEN_DOLAR);
-    //printf("\nJDU VEN\n");
+    ////printf("\nJDU VEN\n");
     print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
