@@ -228,11 +228,15 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                 if (in_function) { //pokud se nachazime v lokalni tabulce symbolu
                     if (tmp.read_from_global) //pokud jsme z ni cetli a byla globalni tak error pri lokalni definici
                         error_exit(ERROR_SEM_UNDEF);
+                    if (!tmp.local)
+                        printf("DEFVAR LF@%s\n", name);
                     tmp.is_variable = true;
                     tmp.local = true;
                     symtable_insert(&symtable, name, tmp);
                 }
                 else { //pokud jsme na globalni urovni, nedelame nic
+                    if (!tmp.global)
+                        printf("DEFVAR GF@%s\n", name);
                     tmp.global = true;
                     tmp.read_from_global = false;
                     tmp.local = false;
@@ -242,6 +246,7 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
         }
         else { //pokud neni v tabulce, musime rucne nastavit parametry
             if (in_function){ //pokud je lokalni
+                printf("DEFVAR LF@%s\n", name);
                 tmp.global = false;
                 tmp.is_variable = true;
                 tmp.local = true;
@@ -249,6 +254,7 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                 symtable_insert(&symtable, name, tmp);
             }
             else{ //pokud je globalni
+                printf("DEFVAR GF@%s\n", name);
                 tmp.global = true;
                 tmp.is_variable = true;
                 tmp.local = false;
