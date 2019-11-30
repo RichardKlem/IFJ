@@ -4,6 +4,9 @@
 #include "symtable.h"
 #include "IFJ_error.h"
 #include "IFJ_scanner.h"
+#include "stdlib.h"
+#include <string.h>
+
 /*
     a = inputi     READ a int
     a = inputf      READ a float
@@ -488,6 +491,66 @@ void call_chr(char* arg)
     printf("DEFVAR TF@%c1\n", '%');
     printf("MOVE TF@%c1 %s\n", '%', arg);
     printf("CALL $chr\n");
+}
+
+char * convert_str_to_ifjcode_str(char * input){
+    int size = 0;
+    char * input_cp = input;
+    char * tmp;
+    int size_alloc = 20;
+    char * output = malloc(20); //akolokujeme po blocích o velikosti 20
+
+
+    while (*input) {
+        if (size > (size_alloc - 5)){ //jakmile se priblizime k naplneni reallocujeme
+            tmp = malloc(size_alloc + 20);
+            if (tmp == NULL)
+                error_exit(ERROR_INTERNAL);
+            strcpy(tmp, output);
+            free(output);
+            output = tmp;
+            size_alloc += 20;
+        }
+
+        if (*input == ' '){ //nahrazeni mezery \032
+         output[size] = '\\';
+         size++;
+         output[size] = '0';
+         size++;
+         output[size] = '3';
+         size++;
+         output[size] = '2';
+         size++;
+        }
+        else if (*input == '\n'){ //nahrazeni mezery \032
+         output[size] = '\\';
+         size++;
+         output[size] = '0';
+         size++;
+         output[size] = '1';
+         size++;
+         output[size] = '0';
+         size++;
+        }
+        else if (*input == '\t'){ //nahrazeni mezery \032
+         output[size] = '\\';
+         size++;
+         output[size] = '0';
+         size++;
+         output[size] = '0';
+         size++;
+         output[size] = '9';
+         size++;
+        }
+        else
+        {
+            output[size] = *input;
+            size++;
+        }
+        input++;
+    }
+    output[size] = '\0';
+    //free(input_cp);
 }
 
 void print_stack(token_t *sem_array)

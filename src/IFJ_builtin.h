@@ -15,5 +15,6 @@ void call_substr(char* arg1, char* arg2, char* arg3);
 void call_ord(char* arg1, char* arg2);
 void call_chr(char* arg);
 void print_stack(token_t *sem_array);
+char * convert_str_to_ifjcode_str(char * input);
 
 #endif //IFJ_BUILTIN_H

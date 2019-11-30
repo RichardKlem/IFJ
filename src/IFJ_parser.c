@@ -523,7 +523,7 @@ void arg_list() {
             printf("CREATEFRAME\n");
 
         printf("DEFVAR TF@%%%d\n", arg_num);
-        printf("MOVE TF@%%%d string@%s\n", arg_num, next_token.value.string);
+        printf("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
 
         if (!strcmp(first.value.string, "print"))
             printf("CALL print\n");
@@ -617,7 +617,7 @@ void arg_next() {
                 printf("CREATEFRAME\n");
 
             printf("DEFVAR TF@%%%d\n", arg_num);
-            printf("MOVE TF@%%%d string@%a\n", arg_num, next_token.value.double_value);
+            printf("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
 
             if (!strcmp(first.value.string, "print"))
                 printf("CALL print\n");
