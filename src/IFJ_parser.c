@@ -480,6 +480,19 @@ void expr_or_assign() {
                 printf("POPS LF@%s\n", tmp);
             print_pop = 0;
         }
+
+        if (print_assign_one_var) {
+            if (get_frame(assign_to.value.string))
+                printf("\nMOVE GF@%s ", assign_to.value.string);
+            else
+                printf("\nMOVE LF@%s ", assign_to.value.string);
+
+            if (get_frame(first.value.string))
+                printf("GF@%s\n", first.value.string);
+            else
+                printf("LF@%s\n", first.value.string);
+            print_assign_one_var = 0;
+        }
     }
     else
         error_exit(ERROR_SYNTAX);
@@ -685,19 +698,6 @@ void fun_or_expr() {
         first = next_token;
         next_token = get_token(stdin);
         fun_or_expr_2();
-
-        if (print_assign_one_var) {
-            if (get_frame(assign_to.value.string))
-                printf("\nMOVE GF@%s ", assign_to.value.string);
-            else
-                printf("\nMOVE LF@%s ", assign_to.value.string);
-
-            if (get_frame(first.value.string))
-                printf("GF@%s\n", first.value.string);
-            else
-                printf("LF@%s\n", first.value.string);
-            print_assign_one_var = 0;
-        }
     }
     //pravidlo 29
     //else if (next_token.type == TOKEN_EOL)
