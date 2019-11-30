@@ -467,28 +467,27 @@ void call_chr(char* arg)
     printf("MOVE TF@%c1 %s\n", '%', arg);
     printf("CALL $chr\n");
 }
-/*
+
 void print_stack(token_t *sem_array)
 {
-    while (!stackEmpty(&sem_stack)) {
-        act_token = stackPop(&sem_stack);
-        switch (act_token.type) {
+    for (; sem_array.type != TOKEN_DOLAR; sem_array++) {
+        switch (sem_array.type) {
             case TOKEN_INT:
-                printf("PUSH int@%d\n", act_token.value.int_value);
+                printf("PUSH int@%d\n", sem_array[i].value.int_value);
             case TOKEN_DOUBLE:
-                printf("PUSH float@%a\n", act_token.value.double_value);
+                printf("PUSH float@%a\n", sem_array[i].value.double_value);
             case TOKEN_STRING:
-                printf("PUSH string@%s\n", act_token.value.string);
+                printf("PUSH string@%s\n", sem_array[i].value.string);
             case TOKEN_ID:
-                int frame = getframe(act_token.value.string);
+                int frame = getframe(sem_array[i].value.string);
                 if (frame == 1) {
-                    printf("PUSH GF@%s\n", act_token.value.string);
+                    printf("PUSH GF@%s\n", sem_array[i].value.string);
                 } else {
-                    printf("PUSH LF@%s\n", act_token.value.string);
+                    printf("PUSH LF@%s\n", sem_array[i].value.string);
                 }
 
             case TOKEN_KEYWORD:
-                if (act_token.value.keyword_value == NONE) {
+                if (sem_array[i].value.keyword_value == NONE) {
                     printf("PUSH nil@nil\n");
                 } else {
                     error_exit(ERROR_SYNTAX); //dostanu jiný KEYWORD token než NONE
@@ -544,4 +543,3 @@ void print_stack(token_t *sem_array)
         }
     }
 }
-*/
