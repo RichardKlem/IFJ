@@ -149,7 +149,7 @@ void infix2postfix (token_t * input_infix_stack, token_t * postfix_array, int ma
 {
     tGenStack * stack = (tGenStack *) malloc(sizeof(tGenStack));
     if(stack == NULL)
-        return NULL;
+        return;
 
     /*token_t * postfix_gen_stack = (token_t *) malloc(max_len * sizeof(token_t));
     if(postfix_gen_stack == NULL)
@@ -173,7 +173,8 @@ void infix2postfix (token_t * input_infix_stack, token_t * postfix_array, int ma
         else if(tt == TOKEN_LEFT_BRACKET)
             genStackPush(stack, input_token);
 
-        else if(tt == TOKEN_MATH_PLUS || tt == TOKEN_MATH_MINUS || tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV) {
+        else if(tt == TOKEN_MATH_PLUS || tt == TOKEN_MATH_MINUS || tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV ||
+                tt == TOKEN_EQ || tt == TOKEN_NOT_EQ || tt == TOKEN_LESS || tt == TOKEN_GREATER || tt == TOKEN_LESS_EQ || tt == TOKEN_GREATER) {
             doOperation(stack, input_token, postfix_array, (&postIndex));
         }
 
