@@ -14,12 +14,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "c202.h"                          /* využívá příklad c202 - zásobník */
+#include "IFJ_scanner.h"
+#include "IFJ_precedence_table.h"
+//#include "c202.h"                          /* využívá příklad c202 - zásobník */
 
 
 /* Konverzní funkce */
-tGenStack infix2postfix (tGenStack * input_infix_stack);
+token_t * infix2postfix (token_t * input_infix_stack, int max_len);
 
 #endif
 

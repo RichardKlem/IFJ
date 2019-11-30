@@ -25,7 +25,7 @@
 #include "IFJ_precedence_table.h"
 #include "IFJ_precedence_DLL.h"
 #include "IFJ_stack_semantic.h"
-#include "c202.h"
+//#include "c202.h"
 #include "c204.h"
 #include "IFJ_precedence_syntactic_analysis.h"
 
@@ -86,30 +86,32 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
 /**
  * @brief funkce inf2post_stack_gen zpracuje infix na postix
  * @param input_list DL list kde je jiz nacteny vstup
- * @param infix_stack ukazatel na stack s tokeny v infix tvaru
- * @param postfix_stack ukazatel na cilovy stack, kde bude input zpracovan do postfixu
+ * @param infix_array ukazatel na stack s tokeny v infix tvaru
+ * @param postfix_array ukazatel na cilovy stack, kde bude input zpracovan do postfixu
  */
-void inf2post_stack_gen(tExprDLList * input_list, tGenStack * infix_stack, tGenStack * postfix_stack)
+void inf2post_stack_gen(tExprDLList * input_list, token_t * infix_array, token_t * postfix_array)
 {
-    token_t end_token;
-    end_token.type = TOKEN_DOLAR;
-    end_token.value.string = "$";
-    genStackPush(infix_stack, end_token;)
+    int max_len = 0;
 
     expr_token_t act_expr_token;
     token_t act_token;
     exprDLLast(input_list);
-    exprDLCopy(input_list, act_expr_token);
+    exprDLCopy(input_list, &act_expr_token);
     act_token = act_expr_token.token;
+
     while (act_token.type != TOKEN_DOLAR)
     {
-        genStackPush(infix_stack, act_token);
+        infix_array[max_len++] = act_token;
 
         exprDLPred(input_list);
-        exprDLCopy(infix_stack, act_expr_token);
+        exprDLCopy(input_list, &act_expr_token);
         act_token = act_expr_token.token;
     }
-    *postfix_stack = infix2postfix(infix_stack);
+    token_t end_token;
+    end_token.type = TOKEN_DOLAR;
+    end_token.value.string = "$";
+    infix_array[max_len++] = end_token;
+    postfix_array = infix2postfix(infix_array, max_len);
 }
 
 /**
@@ -369,6 +371,11 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     token_t last_token; //token ktery vratim do RS
     last_token = loadExpr(src_file, &psa_exprDLL, first_expr_token, second_expr_token);
 
+    token_t * infix_array;
+    token_t * postfix_array;
+
+    inf2post_stack_gen(&psa_exprDLL, infix_array, postfix_array);
+
     tExprStack psa_stack;
     exprStackInit(&psa_stack);
 
@@ -439,5 +446,6 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
     } while (top_terminal->token.type != TOKEN_DOLAR || input->token.type != TOKEN_DOLAR);
     //printf("\nJDU VEN\n");
+    print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }

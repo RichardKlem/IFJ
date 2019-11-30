@@ -31,8 +31,9 @@
 **
 **/
 
-#include "IFJ_precedence_table.h"
+
 #include "IFJ_scanner.h"
+#include "IFJ_precedence_table.h"
 #include "c204.h"
 
 /*
@@ -47,14 +48,14 @@
 ** Aby se minimalizoval počet přístupů ke struktuře zásobníku, můžete zde
 ** nadeklarovat a používat pomocnou proměnnou typu char.
 */
-void untilLeftPar ( tGenStack * s, tGenStack * postfix_stack, unsigned * postLen)
+void untilLeftPar ( tGenStack * s, token_t * postfix_stack, unsigned * postLen)
 {
     token_t tmp;
     while(genStackEmpty(s) == 0) //dokud JE to rovno nule, tak to znamena ze stack NENI prazdny
     {
-        genStackTop(s, &tmp);
+        tmp = genStackTop(s);
         genStackPop(s);
-        if(tmp == '(')
+        if(tmp.type == TOKEN_LEFT_BRACKET)
             break;  // kdyz dojde na levou zavorku, tak konci, zavorka je jiz z predchoziho kroku popnuta
         postfix_stack[(*postLen)++] = tmp;
     }
@@ -70,24 +71,25 @@ void untilLeftPar ( tGenStack * s, tGenStack * postfix_stack, unsigned * postLen
 ** výrazu a taktéž ukazatel na první volné místo, do kterého se má zapisovat,
 ** představuje parametr postLen, výstupním polem znaků je opět postfix_gen_stack.
 */
-void doOperation (tGenStack* s, token_t operator_token, tGenStack * postfix_stack, unsigned * postLen)
+void doOperation (tGenStack* s, token_t operator_token, token_t * postfix_stack, unsigned * postLen)
 {
     if (genStackEmpty(s) != 0) // nerovna se nule znamena je prazdny
-    {
-        stackPush(s, operator_token);
-        return;
-    }
-
-    token_t tmp;
-    stackTop(s, &tmp);  //prvni znak
-
-    if ((tmp) == '(')
     {
         genStackPush(s, operator_token);
         return;
     }
 
-    if ((operator_token == TOKEN_MATH_MUL || operator_token == TOKEN_MATH_DIV || operator_token == TOKEN_MATH_INT_DIV) && (tmp == TOKEN_MATH_PLUS || tmp == TOKEN_MATH_MINUS))
+    token_t tmp;
+    tmp = genStackTop(s);  //prvni znak
+
+    if (tmp.type == TOKEN_LEFT_BRACKET)
+    {
+        genStackPush(s, operator_token);
+        return;
+    }
+
+    token_type tt = operator_token.type;
+    if ((tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV) && (tmp.type == TOKEN_MATH_PLUS || tmp.type == TOKEN_MATH_MINUS))
     {
         genStackPush(s, operator_token);
         return;
@@ -143,13 +145,13 @@ void doOperation (tGenStack* s, token_t operator_token, tGenStack * postfix_stac
 ** ověřte, že se alokace skutečně zdrařila. V případě chyby alokace vraťte namísto
 ** řetězce konstantu NULL.
 */
-tGenStack infix2postfix (tGenStack * input_infix_stack, int max_len)
+token_t * infix2postfix (token_t * input_infix_stack, int max_len)
 {
     tGenStack * stack = (tGenStack *) malloc(sizeof(tGenStack));
     if(stack == NULL)
         return NULL;
 
-    tGenStack * postfix_gen_stack = (tGenStack *) malloc(max_len * sizeof(tGenStack));
+    token_t * postfix_gen_stack = (token_t *) malloc(max_len * sizeof(token_t));
     if(postfix_gen_stack == NULL)
     {
         free(stack);
@@ -162,14 +164,14 @@ tGenStack infix2postfix (tGenStack * input_infix_stack, int max_len)
     unsigned postIndex = 0;  //postIndex je vlastne postLen
     token_t input_token = input_infix_stack[infIndex];  //prvni znak
 
-    while(input_token != '\0')
+    while(input_token.type != TOKEN_DOLAR)
     {
         token_type tt = input_token.type;
         if(tt == TOKEN_ID || tt == TOKEN_STRING || tt == TOKEN_INT || tt == TOKEN_DOUBLE || tt == TOKEN_KEYWORD)
             postfix_gen_stack[postIndex++] = input_token;
 
         else if(tt == TOKEN_LEFT_BRACKET)
-            stackPush(stack, input_token);
+            genStackPush(stack, input_token);
 
         else if(tt == TOKEN_MATH_PLUS || tt == TOKEN_MATH_MINUS || tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV) {
             doOperation(stack, input_token, postfix_gen_stack, (&postIndex));
@@ -181,11 +183,11 @@ tGenStack infix2postfix (tGenStack * input_infix_stack, int max_len)
         else if(tt == TOKEN_DOLAR)
         {
             token_t tmp;
-            while(stackEmpty(stack) == 0)  //dokud JE rovno 0 znamena ze NENI prazdny
+            while(genStackEmpty(stack) == 0)  //dokud JE rovno 0 znamena ze NENI prazdny
             {
-                stackTop(stack, &tmp);
+                tmp = genStackTop(stack);
                 postfix_gen_stack[postIndex++] = tmp;
-                stackPop(stack);
+                genStackPop(stack);
             }
             token_t end_token;
             end_token.type = TOKEN_DOLAR;
