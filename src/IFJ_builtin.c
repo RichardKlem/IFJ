@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "IFJ_builtin.h"
 #include "symtable.h"
+#include "IFJ_error.h"
 #include "IFJ_scanner.h"
 /*
     a = inputi     READ a int
@@ -479,7 +480,8 @@ void print_stack(token_t *sem_array)
             case TOKEN_STRING:
                 printf("PUSH string@%s\n", sem_array->value.string);
             case TOKEN_ID:
-                int frame = getframe(sem_array->value.string);
+                ;
+                int frame = get_frame(sem_array->value.string);
                 if (frame == 1) {
                     printf("PUSH GF@%s\n", sem_array->value.string);
                 } else {

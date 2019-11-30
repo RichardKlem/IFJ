@@ -26,6 +26,7 @@
 #include "IFJ_precedence_DLL.h"
 #include "IFJ_stack_semantic.h"
 //#include "c202.h"
+#include "IFJ_builtin.h"
 #include "c204.h"
 #include "IFJ_precedence_syntactic_analysis.h"
 
@@ -457,6 +458,6 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
     } while (top_terminal->token.type != TOKEN_DOLAR || input->token.type != TOKEN_DOLAR);
     //printf("\nJDU VEN\n");
-    //print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
+    print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
