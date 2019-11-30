@@ -44,12 +44,12 @@ token_t first, second; //pomocne tokeny pro uchovani tokenu pri predavani ke zpr
 Record id_param; //pomocna struktura pro ukladani informaci o promennych
 tBSTNodePtr symtable; //tabulka symbolu
 tStack_sem stack_semantic; //zasobnik pro semantickou analyzu
-tStack_sem stack_semantic_params;
-int param_num, arg_num;
+tStack_sem stack_semantic_params; //pomocny zasobnik pro zpracovani parametru
+int param_num, arg_num; //pocitadla argumentu (u volani fce) a parametru (u definice fce)
 bool in_function = false, in_block = false;
-char * fun_name = NULL;
-int unique_number = 0;
-token_t assign_to;
+char * fun_name = NULL; //pomocna promenna, pro uchovani jmena funkce ve ktere jsme zanoreni
+int unique_number = 0; //unikatni pocitadlo pro geenrovani labelu
+token_t assign_to; //pomocna promenna pro uchovani jmena promenne, do ktere se prirazuje
 
 void prog(){
     debug_print("In main\n");
@@ -277,8 +277,6 @@ void stat(){
         printf("JUMPIFEQS ELSE%d\n", if_unique_label);
         printf("\n#telo then\n\n");
 
-
-
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -289,7 +287,6 @@ void stat(){
         if (next_token.type == TOKEN_INDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
-
 
         in_block = true;
         st_list();
@@ -322,6 +319,7 @@ void stat(){
         in_block = false;
 
         printf("LABEL IF_END%d\n", if_unique_label);
+        printf("CLEARS\n");
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -479,27 +477,50 @@ void arg_list() {
     //pravidlo 25*
     if (next_token.type == TOKEN_STRING){
         arg_num++;
+
+        printf("DEFVAR TF@%%%d\n", arg_num);
+        printf("MOVE TF@%%%d string@%s\n", arg_num, next_token.value.string);
+
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_DOUBLE){
         arg_num++;
+
+        printf("DEFVAR TF@%%%d\n", arg_num);
+        printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
+
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_INT){
         arg_num++;
+
+        printf("DEFVAR TF@%%%d\n", arg_num);
+        printf("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
+
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE){
         arg_num++;
+
+        printf("DEFVAR TF@%%%d\n", arg_num);
+        printf("MOVE TF@%%%d nil@nil\n", arg_num);
+
         next_token = get_token(stdin);
         arg_next();
     }
     else if (next_token.type == TOKEN_ID){
         arg_num++;
         stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+
+        printf("DEFVAR TF@%%%d\n", arg_num);
+        if (get_frame(assign_to.value.string))
+            printf("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
+        else
+            printf("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);
+
         next_token = get_token(stdin);
         arg_next();
     }
@@ -520,27 +541,50 @@ void arg_next() {
         next_token = get_token(stdin);
         if (next_token.type == TOKEN_STRING) {
             arg_num++;
+
+            printf("DEFVAR TF@%%%d\n", arg_num);
+            printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
+
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_DOUBLE) {
             arg_num++;
+
+            printf("DEFVAR TF@%%%d\n", arg_num);
+            printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
+
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_INT) {
             arg_num++;
+
+            printf("DEFVAR TF@%%%d\n", arg_num);
+            printf("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
+
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE) {
             arg_num++;
+
+            printf("DEFVAR TF@%%%d\n", arg_num);
+            printf("MOVE TF@%%%d nil@nil\n", arg_num);
+
             next_token = get_token(stdin);
             arg_next();
         }
         else if (next_token.type == TOKEN_ID) {
             arg_num++;
             stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
+
+            printf("DEFVAR TF@%%%d\n", arg_num);
+            if (get_frame(assign_to.value.string))
+                printf("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
+            else
+                printf("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);
+
             next_token = get_token(stdin);
             arg_next();
         }
@@ -586,6 +630,13 @@ void fun_or_expr_2() {
             second = next_token;
             /*****PSA*******/
             next_token = expressionParse(stdin, &first, &second, 2);
+
+            if (get_frame(assign_to.value.string))
+                printf("\nPOPS GF@%s\n", assign_to.value.string);
+            else
+                printf("\nPOPS LF@%s\n", assign_to.value.string);
+            printf("CLEARS\n");
+
     }
     //pravidlo 21
     else if (next_token.type == TOKEN_LEFT_BRACKET) {
@@ -611,8 +662,19 @@ void fun_or_expr_2() {
             error_exit(ERROR_SYNTAX);
     }
     //pravidlo 30
-    else if (next_token.type == TOKEN_EOL)
+    else if (next_token.type == TOKEN_EOL) {
         stack_sem_push(&stack_semantic, VAR_USE, first.value.string); //pouze kontrola samotneho identifikatoru
+
+        if (get_frame(assign_to.value.string))
+            printf("\nMOVE GF@%s ", assign_to.value.string);
+        else
+            printf("\nMOVE LF@%s ", assign_to.value.string);
+
+        if (get_frame(first.value.string))
+            printf("GF@%s\n", assign_to.value.string);
+        else
+            printf("LF@%s\n", assign_to.value.string);
+    }
     else
         error_exit(ERROR_SYNTAX);
 }
