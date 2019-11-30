@@ -466,9 +466,8 @@ void call_chr(char* arg)
     printf("MOVE TF@%c1 %s\n", '%', "arg");
     printf("CALL $chr\n");
 }
-
 /*
-void print_stack(tStack *sem_stack)
+void print_stack(token_t *sem_array)
 {
     while (!stackEmpty(&sem_stack)) {
         act_token = stackPop(&sem_stack);
@@ -543,4 +542,5 @@ void print_stack(tStack *sem_stack)
                 break;
         }
     }
-} */
+}
+*/
