@@ -21,7 +21,53 @@
 #include "IFJ_error.h"
 #include "IFJ_stack.h"
 #include "IFJ_precedence_table.h"
+//______Gen stack functions_________
+void genStackInit (tGenStack* s) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else
+        s->top = NULL;
+}
 
+int genStackEmpty (tGenStack* s) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else
+        return s->top == NULL;
+}
+
+token_t genStackTop (tGenStack* s) {
+    if (genStackEmpty(s))
+        error_exit(ERROR_INTERNAL);
+    else
+        return s->top->genToken;
+}
+
+void genStackPop (tGenStack* s) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else if (!genStackEmpty(s)) {
+        tGenElem* del = s->top;
+        s->top = s->top->next;
+        free (del);
+    }
+}
+
+void genStackPush (tGenStack* s, token_t item) {
+    if (s == NULL)
+        error_exit(ERROR_INTERNAL);
+    else {
+        tGenElem* insert = (tGenElem *)malloc(sizeof(tGenElem));
+        if (insert == NULL)
+            error_exit(ERROR_INTERNAL);
+
+        insert->genToken= item;
+        insert->next = s->top;
+        s->top = insert;
+    }
+}
+
+//________Expression stack functions___________
 void exprStackInit (tExprStack* s) {
     if (s == NULL)
         error_exit(ERROR_INTERNAL);
