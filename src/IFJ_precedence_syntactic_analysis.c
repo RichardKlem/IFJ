@@ -109,8 +109,9 @@ void inf2post_stack_gen(tExprDLList * input_list, token_t * infix_array, token_t
         infix_array[max_len_loc++] = act_token;
 
         exprDLSucc(input_list);
-        exprDLCopy(input_list, &act_expr_token);
-        act_token = act_expr_token.token;
+        if(input_list->Act != NULL)
+            {exprDLCopy(input_list, &act_expr_token);
+            act_token = act_expr_token.token;}
     }
     token_t end_token;
     end_token.type = TOKEN_DOLAR;
