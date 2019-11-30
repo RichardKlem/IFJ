@@ -470,24 +470,24 @@ void call_chr(char* arg)
 
 void print_stack(token_t *sem_array)
 {
-    for (; sem_array.type != TOKEN_DOLAR; sem_array++) {
-        switch (sem_array.type) {
+    for (; sem_array->type != TOKEN_DOLAR; sem_array++) {
+        switch (sem_array->type) {
             case TOKEN_INT:
-                printf("PUSH int@%d\n", sem_array[i].value.int_value);
+                printf("PUSH int@%d\n", sem_array->value.int_value);
             case TOKEN_DOUBLE:
-                printf("PUSH float@%a\n", sem_array[i].value.double_value);
+                printf("PUSH float@%a\n", sem_array->value.double_value);
             case TOKEN_STRING:
-                printf("PUSH string@%s\n", sem_array[i].value.string);
+                printf("PUSH string@%s\n", sem_array->value.string);
             case TOKEN_ID:
-                int frame = getframe(sem_array[i].value.string);
+                int frame = getframe(sem_array->value.string);
                 if (frame == 1) {
-                    printf("PUSH GF@%s\n", sem_array[i].value.string);
+                    printf("PUSH GF@%s\n", sem_array->value.string);
                 } else {
-                    printf("PUSH LF@%s\n", sem_array[i].value.string);
+                    printf("PUSH LF@%s\n", sem_array->value.string);
                 }
 
             case TOKEN_KEYWORD:
-                if (sem_array[i].value.keyword_value == NONE) {
+                if (sem_array->value.keyword_value == NONE) {
                     printf("PUSH nil@nil\n");
                 } else {
                     error_exit(ERROR_SYNTAX); //dostanu jiný KEYWORD token než NONE
