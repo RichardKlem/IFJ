@@ -363,8 +363,10 @@ void eol_opt(){
 void ret(){
     debug_print("In ret\n");
     //pravidlo 8
-    if (next_token.type == TOKEN_DEDENT)
+    if (next_token.type == TOKEN_DEDENT) {
+        printf("POPFRAME\n");
         printf("RETURN\n");
+    }
     //pravidlo 7
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) {
         next_token = get_token(stdin);
@@ -374,6 +376,7 @@ void ret(){
             next_token = expressionParse(stdin, &first, NULL, 1);
 
             printf("POPS LF@%%ret\n");
+            printf("POPFRAME\n");
             printf("RETURN\n");
         }
         if (next_token.type == TOKEN_EOL) {
