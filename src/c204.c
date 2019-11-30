@@ -145,40 +145,40 @@ void doOperation (tGenStack* s, token_t operator_token, token_t * postfix_stack,
 ** ověřte, že se alokace skutečně zdrařila. V případě chyby alokace vraťte namísto
 ** řetězce konstantu NULL.
 */
-token_t * infix2postfix (token_t * input_infix_stack, int max_len)
+void infix2postfix (token_t * input_infix_stack, token_t * postfix_array, int max_len)
 {
     tGenStack * stack = (tGenStack *) malloc(sizeof(tGenStack));
     if(stack == NULL)
         return NULL;
 
-    token_t * postfix_gen_stack = (token_t *) malloc(max_len * sizeof(token_t));
+    /*token_t * postfix_gen_stack = (token_t *) malloc(max_len * sizeof(token_t));
     if(postfix_gen_stack == NULL)
     {
         free(stack);
         return NULL;
-    }
+    }*/
 
     genStackInit(stack);
 
     unsigned infIndex = 0;
     unsigned postIndex = 0;  //postIndex je vlastne postLen
     token_t input_token = input_infix_stack[infIndex];  //prvni znak
-
-    while(input_token.type != TOKEN_DOLAR)
+    int max_len_loc = 0;
+    while(max_len_loc < max_len)
     {
         token_type tt = input_token.type;
         if(tt == TOKEN_ID || tt == TOKEN_STRING || tt == TOKEN_INT || tt == TOKEN_DOUBLE || tt == TOKEN_KEYWORD)
-            postfix_gen_stack[postIndex++] = input_token;
+            postfix_array[postIndex++] = input_token;
 
         else if(tt == TOKEN_LEFT_BRACKET)
             genStackPush(stack, input_token);
 
         else if(tt == TOKEN_MATH_PLUS || tt == TOKEN_MATH_MINUS || tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV) {
-            doOperation(stack, input_token, postfix_gen_stack, (&postIndex));
+            doOperation(stack, input_token, postfix_array, (&postIndex));
         }
 
         else if(tt == TOKEN_RIGHT_BRACKET)
-            untilLeftPar(stack, postfix_gen_stack, (&postIndex));
+            untilLeftPar(stack, postfix_array, (&postIndex));
 
         else if(tt == TOKEN_DOLAR)
         {
@@ -186,21 +186,22 @@ token_t * infix2postfix (token_t * input_infix_stack, int max_len)
             while(genStackEmpty(stack) == 0)  //dokud JE rovno 0 znamena ze NENI prazdny
             {
                 tmp = genStackTop(stack);
-                postfix_gen_stack[postIndex++] = tmp;
+                postfix_array[postIndex++] = tmp;
                 genStackPop(stack);
             }
             token_t end_token;
             end_token.type = TOKEN_DOLAR;
             end_token.value.string = "$";
-            postfix_gen_stack[postIndex++] = end_token;
+            postfix_array[postIndex++] = end_token;
             break;
         }
         input_token = input_infix_stack[++infIndex];
+        max_len_loc++;
     }
     //postfix_gen_stack[postIndex] = '\0';
 
     free(stack);  //postfix_gen_stack neuvolnuji, protoze bych si smazal svuj vysledek
-    return postfix_gen_stack;
+    //postfix_array = postfix_gen_stack;
 }
 
 /* Konec c204.c */

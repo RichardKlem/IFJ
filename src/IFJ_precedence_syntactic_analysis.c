@@ -42,18 +42,22 @@
  * @param second druhy token od RS
  * @return vraci posledni token typu KEYWORD nebo EOL
  */
-token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_token, expr_token_t * second_token)
+token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_token, expr_token_t * second_token, int * max_len)
 {
     if(expr_DLL == NULL)
         error_exit(ERROR_INTERNAL);
+
+    *max_len = 0;
     if(first_token != NULL){
         //printf("VKLADAM do DL listu PRVNI token\n");
         exprDLInsertLast(expr_DLL, *first_token);
         //printf("VLOZIL JSEM do DL listu PRVNI token\n");
+        *max_len = 1;
         }
     if(second_token != NULL){
         //printf("Vkladam do DL listu DRUHY token\n");
         exprDLInsertLast(expr_DLL, *second_token);
+        *max_len = 2;
         }
 
     expr_token_t act_token;
@@ -71,6 +75,7 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
         act_token.shifted = false;
         exprDLInsertLast(expr_DLL, act_token);
         act_token.token = get_token(src_file);
+        (*max_len)++;
         //printf("Cyklim za\n");
     }
     //printf("PRED returnem\n");
@@ -89,29 +94,28 @@ token_t loadExpr(FILE * src_file, tExprDLList * expr_DLL, expr_token_t * first_t
  * @param infix_array ukazatel na stack s tokeny v infix tvaru
  * @param postfix_array ukazatel na cilovy stack, kde bude input zpracovan do postfixu
  */
-void inf2post_stack_gen(tExprDLList * input_list, token_t * infix_array, token_t * postfix_array)
+void inf2post_stack_gen(tExprDLList * input_list, token_t * infix_array, token_t * postfix_array, int * max_len)
 {
-    int max_len = 0;
 
     expr_token_t act_expr_token;
     token_t act_token;
-    exprDLLast(input_list);
+    exprDLFirst(input_list);
     exprDLCopy(input_list, &act_expr_token);
     act_token = act_expr_token.token;
-
-    while (act_token.type != TOKEN_DOLAR)
+    int max_len_loc = 0;
+    while (max_len_loc < *max_len)
     {
-        infix_array[max_len++] = act_token;
+        infix_array[max_len_loc++] = act_token;
 
-        exprDLPred(input_list);
+        exprDLSucc(input_list);
         exprDLCopy(input_list, &act_expr_token);
         act_token = act_expr_token.token;
     }
     token_t end_token;
     end_token.type = TOKEN_DOLAR;
     end_token.value.string = "$";
-    infix_array[max_len++] = end_token;
-    postfix_array = infix2postfix(infix_array, max_len);
+    infix_array[max_len_loc] = end_token;
+    infix2postfix(infix_array, postfix_array, *max_len + 1);
 }
 
 /**
@@ -369,13 +373,20 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     tExprDLList psa_exprDLL; //dvojsmerne vazany list v kterem bude cely vstup v tokenech
     exprDLInitList(&psa_exprDLL); //inicializace DL listu
     token_t last_token; //token ktery vratim do RS
-    last_token = loadExpr(src_file, &psa_exprDLL, first_expr_token, second_expr_token);
+    int max_len;
+    last_token = loadExpr(src_file, &psa_exprDLL, first_expr_token, second_expr_token, &max_len);
 
-    token_t * infix_array;
-    token_t * postfix_array;
+    max_len++;
+    token_t * infix_array = (token_t *) malloc(max_len * sizeof(token_t));
+    token_t * postfix_array = (token_t *) malloc(max_len * sizeof(token_t));
 
-    inf2post_stack_gen(&psa_exprDLL, infix_array, postfix_array);
 
+    inf2post_stack_gen(&psa_exprDLL, infix_array, postfix_array, &max_len);
+
+    for(int i =0; i < max_len; ++i)
+    {
+        printf("%d\n", (postfix_array[i]).type);
+    }
     tExprStack psa_stack;
     exprStackInit(&psa_stack);
 
@@ -446,6 +457,6 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
 
     } while (top_terminal->token.type != TOKEN_DOLAR || input->token.type != TOKEN_DOLAR);
     //printf("\nJDU VEN\n");
-    print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
+    //print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
