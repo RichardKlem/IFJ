@@ -579,7 +579,7 @@ void arg_next() {
                 printf("CREATEFRAME\n");
 
             printf("DEFVAR TF@%%%d\n", arg_num);
-            printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
+            printf("MOVE TF@%%%d string@%a\n", arg_num, next_token.value.double_value);
 
             if (!strcmp(first.value.string, "print"))
                 printf("CALL print\n");
