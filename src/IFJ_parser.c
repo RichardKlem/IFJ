@@ -667,6 +667,12 @@ void fun_or_expr() {
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
+
+        stack_sem_push(&stack_semantic, VAR_DEF, assign_to.value.string);
+        if (get_frame(assign_to.value.string))
+            printf("POPS GF@%s\n", first.value.string);
+        else
+            printf("POPS LF@%s\n", first.value.string);
     }
     //pravidlo 20
     else if (next_token.type == TOKEN_ID){
