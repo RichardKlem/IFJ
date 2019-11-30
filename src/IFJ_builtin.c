@@ -193,6 +193,7 @@ void generate_builtin()
     printf("JUMPIFEQ $operation_<= LF@param1 string@<=\n");
     printf("JUMPIFEQ $operation_>= LF@param1 string@>=\n");
 
+
     printf("LABEL $operation_plus\n");
     printf("VARDEF LF@tmp\n");
     printf("JUMPIFNEQ $operation_plus_notsame LF@param2$type LF@param3@type\n");
@@ -231,7 +232,7 @@ void generate_builtin()
     printf("LABEL $operation_min_notsame\n");
     printf("JUMPIFEQ $operation_min_notsame_1int LF@param2@type int\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
-    printf("SUB LF@tmp LF@tmp LF@param2\n");
+    printf("SUB LF@tmp LF@param2 LF@tmp\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_min_notsame_1int\n");
@@ -263,6 +264,7 @@ void generate_builtin()
     printf("LABEL $operation_div\n");
     printf("JUMPIFEQ $operation_error LF@param2$type string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
     printf("VARDEF LF@tmp\n");
     printf("JUMPIFNEQ $operation_div_notsame LF@param2$type LF@param3@type\n");
     printf("DIV LF@tmp LF@param2 LF@param3\n");
@@ -270,14 +272,12 @@ void generate_builtin()
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_div_notsame\n");
     printf("JUMPIFEQ $operation_div_notsame_1int LF@param2@type int\n");
-    printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
     printf("INT2FLOAT LF@tmp LF@param3\n");
-    printf("DIV LF@tmp LF@tmp LF@param2\n");
+    printf("DIV LF@tmp LF@param2 LF@tmp\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_div_notsame_1int\n");
     printf("INT2FLOAT LF@tmp LF@param2\n");
-    printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
     printf("DIV LF@tmp LF@tmp LF@param3\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
@@ -285,6 +285,7 @@ void generate_builtin()
     printf("LABEL $operation_intdiv\n");
     printf("JUMPIFEQ $operation_error LF@param2$type string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string\n");
+    printf("JUMPIFEQ $operation_error_divzero LF@param3 int@0\n");
     printf("VARDEF LF@tmp\n");
     printf("JUMPIFNEQ $operation_idiv_notsame LF@param2$type LF@param3@type\n");
     printf("JUMPIFEQ $operation_idiv_notsame_int LF@param2$type int\n");
@@ -297,12 +298,12 @@ void generate_builtin()
     printf("LABEL $operation_idiv_notsame\n");
     printf("JUMPIFEQ $operation_idiv_notsame_1int LF@param2@type float\n");
     printf("FLOAT2INT LF@tmp LF@param3\n");
-    printf("MUL LF@tmp LF@tmp LF@param2\n");
+    printf("IDIV LF@tmp LF@param2 LF@tmp\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
     printf("LABEL $operation_idiv_notsame_1int\n");
     printf("FLOAT2INT LF@tmp LF@param2\n");
-    printf("MUL LF@tmp LF@tmp LF@param3\n");
+    printf("IDIV LF@tmp LF@tmp LF@param3\n");
     printf("PUSH LF@tmp\n");
     printf("JUMP $end_do_operation\n");
 
@@ -387,11 +388,11 @@ void generate_builtin()
 
     printf("LABEL $operation_error\n");
     printf("DPRINT int@4\n");
-    printf("EXIT 4\n");
+    printf("EXIT int@4\n"); //error_exit(4)
 
     printf("LABEL $operation_error_divzero\n");
     printf("DPRINT int@9\n");
-    printf("EXIT 9\n");
+    printf("EXIT int@9\n"); //snad ok
     //end_do_operation
     printf("LABEL $end_do_operation\n");
 
@@ -425,7 +426,7 @@ void call_write(char* arg)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 %s\n", '%', "arg");
+    printf("MOVE TF@%c1 %s\n", '%', arg);
     printf("CALL $print\n");
 }
 
@@ -433,7 +434,7 @@ void call_len(char* arg)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 %s\n", '%', "arg");
+    printf("MOVE TF@%c1 %s\n", '%', arg);
     printf("CALL $len\n");
 }
 
@@ -441,11 +442,11 @@ void call_substr(char* arg1, char* arg2, char* arg3)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 %s\n", '%', "arg1");
+    printf("MOVE TF@%c1 %s\n", '%', arg1);
     printf("DEFVAR TF@%c2\n", '%');
-    printf("MOVE TF@%c2 %s\n", '%', "arg2");
+    printf("MOVE TF@%c2 %s\n", '%', arg2);
     printf("DEFVAR TF@%c3\n", '%');
-    printf("MOVE TF@%c3 %s\n", '%', "arg3");
+    printf("MOVE TF@%c3 %s\n", '%', arg3);
     printf("CALL $substr\n");
 }
 
@@ -453,9 +454,9 @@ void call_ord(char* arg1, char* arg2)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 %s\n", '%', "arg1");
+    printf("MOVE TF@%c1 %s\n", '%', arg1);
     printf("DEFVAR TF@%c2\n", '%');
-    printf("MOVE TF@%c2 %s\n", '%', "arg2");
+    printf("MOVE TF@%c2 %s\n", '%', arg2);
     printf("CALL $ord\n");
 }
 
@@ -463,7 +464,7 @@ void call_chr(char* arg)
 {
     printf("CREATEFRAME\n");
     printf("DEFVAR TF@%c1\n", '%');
-    printf("MOVE TF@%c1 %s\n", '%', "arg");
+    printf("MOVE TF@%c1 %s\n", '%', arg);
     printf("CALL $chr\n");
 }
 
