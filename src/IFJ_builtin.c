@@ -475,10 +475,13 @@ void print_stack(token_t *sem_array)
         switch (sem_array->type) {
             case TOKEN_INT:
                 printf("PUSH int@%d\n", sem_array->value.int_value);
+                break;
             case TOKEN_DOUBLE:
                 printf("PUSH float@%a\n", sem_array->value.double_value);
+                break;
             case TOKEN_STRING:
                 printf("PUSH string@%s\n", sem_array->value.string);
+                break;
             case TOKEN_ID:
                 ;
                 int frame = get_frame(sem_array->value.string);
@@ -487,6 +490,7 @@ void print_stack(token_t *sem_array)
                 } else {
                     printf("PUSH LF@%s\n", sem_array->value.string);
                 }
+                break;
 
             case TOKEN_KEYWORD:
                 if (sem_array->value.keyword_value == NONE) {
