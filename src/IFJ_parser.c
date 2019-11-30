@@ -53,6 +53,7 @@ int unique_number = 0; //unikatni pocitadlo pro geenrovani labelu
 token_t assign_to; //pomocna promenna pro uchovani jmena promenne, do ktere se prirazuje
 int print_pop = 0;
 int print_assign_one_var = 0;
+int print_assign_fun = 0;
 
 void prog(){
     debug_print("In main\n");
@@ -473,6 +474,14 @@ void expr_or_assign() {
         //bylo prirazeno do promenne, je nutna vlozit ji do stack_semantic
         stack_sem_push(&stack_semantic, VAR_DEF, tmp);
 
+        if (print_assign_fun) {
+            if (get_frame(assign_to.value.string))
+                printf("MOVE GF@%s TF@%%ret\n", assign_to.value.string);
+            else
+                printf("MOVE LF@%s TF@%%ret\n", assign_to.value.string);
+            print_assign_fun = 0;
+        }
+
         if (print_pop) {
             if (get_frame(tmp))
                 printf("POPS GF@%s\n", tmp);
@@ -741,10 +750,7 @@ void fun_or_expr_2() {
         if (strcmp(first.value.string, "print"))
             printf("CALL %s\n", first.value.string);
 
-        if (get_frame(assign_to.value.string))
-            printf("MOVE GF@%s TF@%%ret\n", assign_to.value.string);
-        else
-            printf("MOVE LF@%s TF@%%ret\n", assign_to.value.string);
+        print_assign_fun = 1;
 
         if (next_token.type == TOKEN_RIGHT_BRACKET)
             next_token = get_token(stdin);
