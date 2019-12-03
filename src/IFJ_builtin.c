@@ -272,12 +272,12 @@ void generate_builtin()
     printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
     printf("JUMPIFNEQ $operation_div_notsame LF@param2$type LF@param3$type\n");
-    printf("JUMPIFEQ both_int LF@param2$type string@int\n" );
-    printf("JUMPIFEQ $operation_error_divzero LF@tmp float@0x0p+0\n");
+    printf("JUMPIFEQ $both_int LF@param2$type string@int\n" );
+    printf("JUMPIFEQ $operation_error_divzero LF@param2 float@0x0p+0\n");
     printf("DIV LF@tmp LF@param3 LF@param2\n");
     printf("PUSHS LF@tmp\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL both_int\n");
+    printf("LABEL $both_int\n");
     printf("INT2FLOAT LF@tmp LF@param2\n");
     printf("INT2FLOAT LF@tmp2 LF@param3\n");
     printf("JUMPIFEQ $operation_error_divzero LF@tmp2 float@0x0p+0\n");
@@ -334,79 +334,200 @@ void generate_builtin()
 
     //<
     printf("LABEL $operation_less\n");
+
     printf("DEFVAR LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_notsame LF@param2$type LF@param3$type\n");
     printf("LT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFEQ $operation_less_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_less_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_less_notsame\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+
+    printf("JUMPIFEQ $operation_less_notsame_1int LF@param2$type string@int\n");
+    printf("INT2FLOAT LF@param3 LF@param3\n");
+    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_less_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_less_notsame_1int\n");
+    printf("INT2FLOAT LF@param2 LF@param2\n");
+    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_less_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_false bool@false LF@tmp_bool\n");
+
     //true
+    printf("LABEL $operation_less_true\n");
     printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_less_false\n");
     //false
+    printf("LABEL $operation_less_false\n");
     printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //>
     printf("LABEL $operation_greater\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_notsame LF@param2$type LF@param3$type\n");
     printf("GT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFEQ $operation_greater_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_greater_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_greater_notsame\n");
+    printf("JUMPIFNEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFNEQ $operation_error LF@param3$type string@string\n");
+
+    printf("JUMPIFEQ $operation_greater_notsame_1int LF@param2$type string@int\n");
+    printf("INT2FLOAT LF@param3 LF@param3\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_greater_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_greater_notsame_1int\n");
+    printf("INT2FLOAT LF@param2 LF@param2\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_greater_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_false bool@false LF@tmp_bool\n");
+
     //true
+    printf("LABEL $operation_greater_true\n");
     printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_greater_false\n");
     //false
+    printf("LABEL $operation_greater_false\n");
     printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //==
     printf("LABEL $operation_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_eq_notsame LF@param2$type LF@param3$type\n");
     printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFEQ $operation_eq_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFEQ $operation_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_eq_notsame\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+
+    printf("JUMPIFEQ $operation_eq_notsame_1int LF@param2$type string@int\n");
+    printf("INT2FLOAT LF@param3 LF@param3\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFEQ $operation_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_eq_notsame_1int\n");
+    printf("INT2FLOAT LF@param2 LF@param2\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFEQ $operation_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_eq_false bool@false LF@tmp_bool\n");
+
     //true
+    printf("LABEL $operation_eq_true\n");
     printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_eq_false\n");
     //false
+    printf("LABEL $operation_eq_false\n");
     printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //!=
     printf("LABEL $operation_not_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_not_eq_notsame LF@param2$type LF@param3$type\n");
     printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_not_eq_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_not_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_not_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_not_eq_notsame\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+
+    printf("JUMPIFEQ $operation_not_eq_notsame_1int LF@param2$type string@int\n");
+    printf("INT2FLOAT LF@param3 LF@param3\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_not_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_not_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_not_eq_notsame_1int\n");
+    printf("INT2FLOAT LF@param2 LF@param2\n");
+    printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_not_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_not_eq_false bool@false LF@tmp_bool\n");
+
     //true
+    printf("LABEL $operation_not_eq_true\n");
     printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_not_eq_false\n");
     //false
+    printf("LABEL $operation_not_eq_false\n");
     printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //<=
     printf("LABEL $operation_less_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_eq_notsame LF@param2$type LF@param3$type\n");
     printf("GT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_less_eq_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_less_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_less_eq_notsame\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+
+    printf("JUMPIFEQ $operation_less_eq_notsame_1int LF@param2$type string@int\n");
+    printf("INT2FLOAT LF@param3 LF@param3\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_less_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_less_eq_notsame_1int\n");
+    printf("INT2FLOAT LF@param2 LF@param2\n");
+    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_less_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_less_eq_false bool@false LF@tmp_bool\n");
+
     //true
+    printf("LABEL $operation_less_eq_true\n");
     printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_less_eq_false\n");
     //false
+    printf("LABEL $operation_less_eq_false\n");
     printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
     //>=
     printf("LABEL $operation_greater_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_eq_notsame LF@param2$type LF@param3$type\n");
     printf("LT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_greater_eq_false LF@tmp_bool bool@false\n");
+    printf("JUMPIFNEQ $operation_greater_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_greater_eq_notsame\n");
+    printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
+
+    printf("JUMPIFEQ $operation_greater_eq_notsame_1int LF@param2$type string@int\n");
+    printf("INT2FLOAT LF@param3 LF@param3\n");
+    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_greater_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_eq_false bool@false LF@tmp_bool\n");
+
+    printf("LABEL $operation_greater_eq_notsame_1int\n");
+    printf("INT2FLOAT LF@param2 LF@param2\n");
+    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("JUMPIFNEQ $operation_greater_eq_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFNEQ $operation_greater_eq_false bool@false LF@tmp_bool\n");
+
     //true
+    printf("LABEL $operation_greater_eq_true\n");
     printf("PUSHS int@1\n");
     printf("JUMP $end_do_operation\n");
-    printf("LABEL $operation_greater_eq_false\n");
     //false
+    printf("LABEL $operation_greater_eq_false\n");
     printf("PUSHS int@0\n");
     printf("JUMP $end_do_operation\n");
 
@@ -551,6 +672,7 @@ char * convert_str_to_ifjcode_str(char * input){
     }
     output[size] = '\0';
     //free(input_cp);
+    return output;
 }
 
 void print_stack(token_t *sem_array)

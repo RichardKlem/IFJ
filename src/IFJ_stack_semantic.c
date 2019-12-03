@@ -144,12 +144,13 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
 
         //pro nacteni parametru uz bereme, ze jsme ve funkci
         in_function = true;
-
+		is_param = true;
         while (!stack_sem_empty(&stack_semantic_params)){
             data = stack_sem_top(&stack_semantic_params);
             stack_sem_pop(&stack_semantic_params);
             stack_sem_push(&stack_semantic, VAR_DEF, data.name);
         }
+		is_param = false;
         break;
 
     case FUN_CALL:
@@ -229,7 +230,8 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
                     if (tmp.read_from_global) //pokud jsme z ni cetli a byla globalni tak error pri lokalni definici
                         error_exit(ERROR_SEM_UNDEF);
                     if (!tmp.local)
-                        printf("DEFVAR LF@%s\n", name);
+						if (!is_param)
+                        	printf("DEFVAR LF@%s\n", name);
                     tmp.is_variable = true;
                     tmp.local = true;
                     symtable_insert(&symtable, name, tmp);
@@ -246,7 +248,8 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
         }
         else { //pokud neni v tabulce, musime rucne nastavit parametry
             if (in_function){ //pokud je lokalni
-                printf("DEFVAR LF@%s\n", name);
+				if (!is_param)
+                	printf("DEFVAR LF@%s\n", name);
                 tmp.global = false;
                 tmp.is_variable = true;
                 tmp.local = true;

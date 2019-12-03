@@ -54,6 +54,7 @@ token_t assign_to; //pomocna promenna pro uchovani jmena promenne, do ktere se p
 int print_pop = 0;
 int print_assign_one_var = 0;
 int print_assign_fun = 0;
+bool is_param = false;
 
 void prog(){
     debug_print("In main\n");
@@ -519,8 +520,10 @@ void arg_list() {
     if (next_token.type == TOKEN_STRING){
         arg_num++;
 
-        if (!strcmp(first.value.string, "print"))
+        if (!strcmp(first.value.string, "print")) {
             printf("CREATEFRAME\n");
+            arg_num = 1;
+        }
 
         printf("DEFVAR TF@%%%d\n", arg_num);
         printf("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
@@ -534,8 +537,10 @@ void arg_list() {
     else if (next_token.type == TOKEN_DOUBLE){
         arg_num++;
 
-        if (!strcmp(first.value.string, "print"))
+        if (!strcmp(first.value.string, "print")) {
             printf("CREATEFRAME\n");
+            arg_num = 1;
+        }
 
         printf("DEFVAR TF@%%%d\n", arg_num);
         printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
@@ -549,8 +554,10 @@ void arg_list() {
     else if (next_token.type == TOKEN_INT){
         arg_num++;
 
-        if (!strcmp(first.value.string, "print"))
+        if (!strcmp(first.value.string, "print")) {
             printf("CREATEFRAME\n");
+            arg_num = 1;
+        }
 
         printf("DEFVAR TF@%%%d\n", arg_num);
         printf("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
@@ -564,8 +571,10 @@ void arg_list() {
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE){
         arg_num++;
 
-        if (!strcmp(first.value.string, "print"))
+        if (!strcmp(first.value.string, "print")) {
             printf("CREATEFRAME\n");
+            arg_num = 1;
+        }
 
         printf("DEFVAR TF@%%%d\n", arg_num);
         printf("MOVE TF@%%%d nil@nil\n", arg_num);
@@ -580,11 +589,13 @@ void arg_list() {
         arg_num++;
         stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
 
-        if (!strcmp(first.value.string, "print"))
+        if (!strcmp(first.value.string, "print")) {
             printf("CREATEFRAME\n");
+            arg_num = 1;
+        }
 
         printf("DEFVAR TF@%%%d\n", arg_num);
-        if (get_frame(assign_to.value.string))
+        if (get_frame(next_token.value.string))
             printf("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
         else
             printf("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);
@@ -613,8 +624,10 @@ void arg_next() {
         if (next_token.type == TOKEN_STRING) {
             arg_num++;
 
-            if (!strcmp(first.value.string, "print"))
+            if (!strcmp(first.value.string, "print")) {
                 printf("CREATEFRAME\n");
+                arg_num = 1;
+            }
 
             printf("DEFVAR TF@%%%d\n", arg_num);
             printf("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
@@ -628,8 +641,10 @@ void arg_next() {
         else if (next_token.type == TOKEN_DOUBLE) {
             arg_num++;
 
-            if (!strcmp(first.value.string, "print"))
+            if (!strcmp(first.value.string, "print")) {
                 printf("CREATEFRAME\n");
+                arg_num = 1;
+            }
 
             printf("DEFVAR TF@%%%d\n", arg_num);
             printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
@@ -643,8 +658,10 @@ void arg_next() {
         else if (next_token.type == TOKEN_INT) {
             arg_num++;
 
-            if (!strcmp(first.value.string, "print"))
+            if (!strcmp(first.value.string, "print")) {
                 printf("CREATEFRAME\n");
+                arg_num = 1;
+            }
 
             printf("DEFVAR TF@%%%d\n", arg_num);
             printf("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
@@ -658,8 +675,10 @@ void arg_next() {
         else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == NONE) {
             arg_num++;
 
-            if (!strcmp(first.value.string, "print"))
+            if (!strcmp(first.value.string, "print")) {
                 printf("CREATEFRAME\n");
+                arg_num = 1;
+            }
 
             printf("DEFVAR TF@%%%d\n", arg_num);
             printf("MOVE TF@%%%d nil@nil\n", arg_num);
@@ -674,11 +693,13 @@ void arg_next() {
             arg_num++;
             stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
 
-            if (!strcmp(first.value.string, "print"))
+            if (!strcmp(first.value.string, "print")) {
                 printf("CREATEFRAME\n");
+                arg_num = 1;
+            }
 
             printf("DEFVAR TF@%%%d\n", arg_num);
-            if (get_frame(assign_to.value.string))
+            if (get_frame(next_token.value.string))
                 printf("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
             else
                 printf("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);

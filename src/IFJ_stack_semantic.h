@@ -42,6 +42,7 @@ extern int param_num;
 extern int arg_num;
 extern char * fun_name;
 extern bool in_function;
+extern bool is_param;
 
 void stack_sem_init (tStack_sem* s);
 int stack_sem_empty (tStack_sem* s);
