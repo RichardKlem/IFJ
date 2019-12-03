@@ -42,6 +42,8 @@ void generate_builtin()
 {
     //Hlavicka
     printf(".IFJcode19\n");
+    //Promenná pro kontrolu deklarací
+    printf("DEFVAR GF@$tmp_def\n");
     //Definovani vestavene funkce inputi
     printf("#def inputi()\n");
     printf("JUMP end_$inputi\n");
@@ -50,6 +52,11 @@ void generate_builtin()
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
     printf("READ LF@%cret int\n", '%');
+    printf("DEFVAR LF@tmp\n");
+    printf("TYPE LF@tmp LF@%%ret\n");
+    printf("JUMPIFEQ $is_int LF@tmp string@int\n");
+    printf("MOVE LF@%%ret nil@nil\n");
+    printf("LABEL $is_int\n");
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$inputi\n");
@@ -63,6 +70,11 @@ void generate_builtin()
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
     printf("READ LF@%cret float\n", '%');
+    printf("DEFVAR LF@tmp\n");
+    printf("TYPE LF@tmp LF@%%ret\n");
+    printf("JUMPIFEQ $is_float LF@tmp string@float\n");
+    printf("MOVE LF@%%ret nil@nil\n");
+    printf("LABEL $is_float\n" );
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$inputf\n");
@@ -76,6 +88,11 @@ void generate_builtin()
     printf("DEFVAR LF@%cret\n", '%');
     printf("MOVE LF@%cret nil@nil\n", '%');
     printf("READ LF@%cret string\n", '%');
+    printf("DEFVAR LF@tmp\n");
+    printf("TYPE LF@tmp LF@%%ret\n");
+    printf("JUMPIFEQ $is_string LF@tmp string@string\n");
+    printf("MOVE LF@%%ret nil@nil\n");
+    printf("LABEL $is_string\n");
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL end_$inputs\n");
@@ -200,6 +217,10 @@ void generate_builtin()
 
 
     printf("LABEL $operation_plus\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("DEFVAR LF@tmp\n");
     printf("JUMPIFNEQ $operation_plus_notsame LF@param2$type LF@param3$type\n");
     printf("JUMPIFEQ $operation_plus_same_int LF@param2$type string@int\n");
@@ -227,6 +248,10 @@ void generate_builtin()
 
 
     printf("LABEL $operation_min\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
     printf("DEFVAR LF@tmp\n");
@@ -247,6 +272,10 @@ void generate_builtin()
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_mul\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
     printf("DEFVAR LF@tmp\n");
@@ -267,6 +296,10 @@ void generate_builtin()
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_div\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("DEFVAR LF@tmp\n");
     printf("DEFVAR LF@tmp2\n");
     printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
@@ -299,6 +332,10 @@ void generate_builtin()
     printf("JUMP $end_do_operation\n");
 
     printf("LABEL $operation_intdiv\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("DEFVAR LF@tmp\n");
     printf("MOVE LF@tmp nil@nil\n");
     printf("DEFVAR LF@tmp2\n");
@@ -334,12 +371,15 @@ void generate_builtin()
 
     //<
     printf("LABEL $operation_less\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
 
     printf("DEFVAR LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_less_notsame LF@param2$type LF@param3$type\n");
-    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_less_true bool@true LF@tmp_bool\n");
-    printf("JUMPIFNEQ $operation_less_false bool@false LF@tmp_bool\n");
+    printf("LT LF@tmp_bool LF@param3 LF@param2\n");
+    printf("JUMPIFEQ $operation_less_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_less_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_less_notsame\n");
     printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
@@ -347,15 +387,15 @@ void generate_builtin()
 
     printf("JUMPIFEQ $operation_less_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@param3 LF@param3\n");
-    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_less_true bool@true LF@tmp_bool\n");
-    printf("JUMPIFNEQ $operation_less_false bool@false LF@tmp_bool\n");
+    printf("LT LF@tmp_bool LF@param3 LF@param2\n");
+    printf("JUMPIFEQ $operation_less_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_less_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_less_notsame_1int\n");
     printf("INT2FLOAT LF@param2 LF@param2\n");
-    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_less_true bool@true LF@tmp_bool\n");
-    printf("JUMPIFNEQ $operation_less_false bool@false LF@tmp_bool\n");
+    printf("LT LF@tmp_bool LF@param3 LF@param2\n");
+    printf("JUMPIFEQ $operation_less_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_less_false bool@false LF@tmp_bool\n");
 
     //true
     printf("LABEL $operation_less_true\n");
@@ -368,11 +408,15 @@ void generate_builtin()
 
     //>
     printf("LABEL $operation_greater\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("DEFVAR LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_greater_notsame LF@param2$type LF@param3$type\n");
-    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_greater_true bool@true LF@tmp_bool\n");
-    printf("JUMPIFNEQ $operation_greater_false bool@false LF@tmp_bool\n");
+    printf("GT LF@tmp_bool LF@param3 LF@param2\n");
+    printf("JUMPIFEQ $operation_greater_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_greater_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_greater_notsame\n");
     printf("JUMPIFNEQ $operation_error LF@param2$type string@string\n");
@@ -380,15 +424,15 @@ void generate_builtin()
 
     printf("JUMPIFEQ $operation_greater_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@param3 LF@param3\n");
-    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_greater_true bool@true LF@tmp_bool\n");
-    printf("JUMPIFNEQ $operation_greater_false bool@false LF@tmp_bool\n");
+    printf("GT LF@tmp_bool LF@param3 LF@param2\n");
+    printf("JUMPIFEQ $operation_greater_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_greater_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_greater_notsame_1int\n");
     printf("INT2FLOAT LF@param2 LF@param2\n");
-    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
-    printf("JUMPIFNEQ $operation_greater_true bool@true LF@tmp_bool\n");
-    printf("JUMPIFNEQ $operation_greater_false bool@false LF@tmp_bool\n");
+    printf("GT LF@tmp_bool LF@param3 LF@param2\n");
+    printf("JUMPIFEQ $operation_greater_true bool@true LF@tmp_bool\n");
+    printf("JUMPIFEQ $operation_greater_false bool@false LF@tmp_bool\n");
 
     //true
     printf("LABEL $operation_greater_true\n");
@@ -402,12 +446,18 @@ void generate_builtin()
     //==
     printf("LABEL $operation_eq\n");
     printf("DEFVAR LF@tmp_bool\n");
+
     printf("JUMPIFNEQ $operation_eq_notsame LF@param2$type LF@param3$type\n");
+
     printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
     printf("JUMPIFEQ $operation_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFEQ $operation_eq_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_eq_notsame\n");
+    //None
+    printf("JUMPIFEQ $operation_eq_false LF@param2$type string@nil\n" );
+    printf("JUMPIFEQ $operation_eq_false LF@param3$type string@nil\n" );
+
     printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
 
@@ -422,6 +472,7 @@ void generate_builtin()
     printf("EQ LF@tmp_bool LF@param2 LF@param3\n");
     printf("JUMPIFEQ $operation_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFEQ $operation_eq_false bool@false LF@tmp_bool\n");
+
 
     //true
     printf("LABEL $operation_eq_true\n");
@@ -441,6 +492,10 @@ void generate_builtin()
     printf("JUMPIFNEQ $operation_not_eq_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_not_eq_notsame\n");
+    //None
+    printf("JUMPIFEQ $operation_eq_true LF@param2$type string@nil\n" );
+    printf("JUMPIFEQ $operation_eq_true LF@param2$type string@nil\n" );
+
     printf("JUMPIFEQ $operation_error LF@param2$type string@string\n");
     printf("JUMPIFEQ $operation_error LF@param3$type string@string\n");
 
@@ -467,9 +522,13 @@ void generate_builtin()
 
     //<=
     printf("LABEL $operation_less_eq\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("DEFVAR LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_less_eq_notsame LF@param2$type LF@param3$type\n");
-    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("GT LF@tmp_bool LF@param3 LF@param2\n");
     printf("JUMPIFNEQ $operation_less_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_less_eq_false bool@false LF@tmp_bool\n");
 
@@ -479,13 +538,13 @@ void generate_builtin()
 
     printf("JUMPIFEQ $operation_less_eq_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@param3 LF@param3\n");
-    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("GT LF@tmp_bool LF@param3 LF@param2\n");
     printf("JUMPIFNEQ $operation_less_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_less_eq_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_less_eq_notsame_1int\n");
     printf("INT2FLOAT LF@param2 LF@param2\n");
-    printf("GT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("GT LF@tmp_bool LF@param3 LF@param2\n");
     printf("JUMPIFNEQ $operation_less_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_less_eq_false bool@false LF@tmp_bool\n");
 
@@ -500,9 +559,13 @@ void generate_builtin()
 
     //>=
     printf("LABEL $operation_greater_eq\n");
+    //None
+    printf("JUMPIFEQ $operation_error LF@param2$type string@nil\n");
+    printf("JUMPIFEQ $operation_error LF@param3$type string@nil\n");
+
     printf("DEFVAR LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_greater_eq_notsame LF@param2$type LF@param3$type\n");
-    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("LT LF@tmp_bool LF@param3 LF@param2\n");
     printf("JUMPIFNEQ $operation_greater_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_greater_eq_false bool@false LF@tmp_bool\n");
 
@@ -512,13 +575,13 @@ void generate_builtin()
 
     printf("JUMPIFEQ $operation_greater_eq_notsame_1int LF@param2$type string@int\n");
     printf("INT2FLOAT LF@param3 LF@param3\n");
-    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("LT LF@tmp_bool LF@param3 LF@param2\n");
     printf("JUMPIFNEQ $operation_greater_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_greater_eq_false bool@false LF@tmp_bool\n");
 
     printf("LABEL $operation_greater_eq_notsame_1int\n");
     printf("INT2FLOAT LF@param2 LF@param2\n");
-    printf("LT LF@tmp_bool LF@param2 LF@param3\n");
+    printf("LT LF@tmp_bool LF@param3 LF@param2\n");
     printf("JUMPIFNEQ $operation_greater_eq_true bool@true LF@tmp_bool\n");
     printf("JUMPIFNEQ $operation_greater_eq_false bool@false LF@tmp_bool\n");
 
@@ -704,6 +767,7 @@ void print_stack(token_t *sem_array)
                 } else {
                     error_exit(ERROR_SYNTAX); //dostanu jiný KEYWORD token než NONE
                 }
+                break;
 
             case TOKEN_MATH_PLUS:
                 printf("CREATEFRAME\n");
