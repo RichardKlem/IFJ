@@ -179,7 +179,7 @@ void infix2postfix (token_t * input_infix_stack, token_t * postfix_array, int ma
             genStackPush(stack, input_token);
 
         else if(tt == TOKEN_MATH_PLUS || tt == TOKEN_MATH_MINUS || tt == TOKEN_MATH_MUL || tt == TOKEN_MATH_DIV || tt == TOKEN_MATH_INT_DIV ||
-                tt == TOKEN_EQ || tt == TOKEN_NOT_EQ || tt == TOKEN_LESS || tt == TOKEN_GREATER || tt == TOKEN_LESS_EQ || tt == TOKEN_GREATER) {
+                tt == TOKEN_EQ || tt == TOKEN_NOT_EQ || tt == TOKEN_LESS || tt == TOKEN_GREATER || tt == TOKEN_LESS_EQ || tt == TOKEN_GREATER_EQ) {
             doOperation(stack, input_token, postfix_array, (&postIndex));
         }
 
