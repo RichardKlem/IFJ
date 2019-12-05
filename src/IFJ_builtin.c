@@ -707,7 +707,7 @@ char * convert_str_to_ifjcode_str(char * input){
          output[size] = '2';
          size++;
         }
-        else if (*input == '\n'){ //nahrazeni mezery \032
+        else if (*input == '\n'){ //nahrazeni EOL \032
          output[size] = '\\';
          size++;
          output[size] = '0';
@@ -717,7 +717,7 @@ char * convert_str_to_ifjcode_str(char * input){
          output[size] = '0';
          size++;
         }
-        else if (*input == '\t'){ //nahrazeni mezery \032
+        else if (*input == '\t'){ //nahrazeni tab \032
          output[size] = '\\';
          size++;
          output[size] = '0';
@@ -725,6 +725,16 @@ char * convert_str_to_ifjcode_str(char * input){
          output[size] = '0';
          size++;
          output[size] = '9';
+         size++;
+        }
+        else if (*input == '#'){ //nahrazeni tab \032
+         output[size] = '\\';
+         size++;
+         output[size] = '0';
+         size++;
+         output[size] = '3';
+         size++;
+         output[size] = '5';
          size++;
         }
         else
