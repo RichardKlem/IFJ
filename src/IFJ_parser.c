@@ -261,13 +261,15 @@ void stat(){
         tStack_string tmp_stack; //pomocny zasobnik na vypsani instrukci ve spravne poradi (obraceni)
         stack_init_string(&tmp_stack);
 
-        while (!stack_empty_string(&stack_instructions)){
-            stack_push_string(&tmp_stack, stack_top_string(&stack_instructions));
-            stack_pop_string(&stack_instructions);
-        }
-        while (!stack_empty_string(&tmp_stack)){
-            printf("%s", stack_top_string(&tmp_stack));
-            stack_pop_string(&tmp_stack);
+        if (!in_cycle){
+            while (!stack_empty_string(&stack_instructions)){
+                stack_push_string(&tmp_stack, stack_top_string(&stack_instructions));
+                stack_pop_string(&stack_instructions);
+            }
+            while (!stack_empty_string(&tmp_stack)){
+                printf("%s", stack_top_string(&tmp_stack));
+                stack_pop_string(&tmp_stack);
+            }
         }
 
         if (next_token.type == TOKEN_DEDENT)
@@ -285,6 +287,7 @@ void stat(){
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == IF){
         int if_unique_label = unique_number;
         unique_number++;
+        in_cycle++;
 
         print_instruction("\n#zpracovani vyrazu\n");
 
@@ -313,7 +316,6 @@ void stat(){
         in_block = false;
 
         print_instruction("JUMP IF_END%d\n", if_unique_label);
-
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
@@ -340,6 +342,21 @@ void stat(){
 
         print_instruction("LABEL IF_END%d\n", if_unique_label);
         print_instruction("CLEARS\n");
+        in_cycle--;
+        //zde se vypise telo cyklu (az po vypisu definici pouzitych promenny)
+        tStack_string tmp_stack; //pomocny zasobnik na vypsani instrukci ve spravne poradi (obraceni)
+        stack_init_string(&tmp_stack);
+        
+        if (!in_cycle){
+            while (!stack_empty_string(&stack_instructions)){
+                stack_push_string(&tmp_stack, stack_top_string(&stack_instructions));
+                stack_pop_string(&stack_instructions);
+            }
+            while (!stack_empty_string(&tmp_stack)){
+                printf("%s", stack_top_string(&tmp_stack));
+                stack_pop_string(&tmp_stack);
+            }
+        }
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -489,12 +506,12 @@ void expr_or_assign() {
     else if (next_token.type == TOKEN_ASSIGNMENT) {
         next_token = get_token(stdin);
         //ulozeni jmena promenne, jelikoz nejdrive semanticky zkontroluje vyraz
-        char * tmp = first.value.string;
+        //char * tmp = first.value.string;
 
         fun_or_expr();
 
         //bylo prirazeno do promenne, je nutna vlozit ji do stack_semantic
-        stack_sem_push(&stack_semantic, VAR_DEF, tmp);
+        stack_sem_push(&stack_semantic, VAR_DEF, assign_to.value.string);
 
         if (print_assign_fun) {
             if (get_frame(assign_to.value.string))
@@ -505,10 +522,11 @@ void expr_or_assign() {
         }
 
         if (print_pop) {
-            if (get_frame(tmp))
-                print_instruction("POPS GF@%s\n", tmp);
+            if (get_frame(assign_to.value.string))
+                print_instruction("POPS GF@%s\n", assign_to.value.string);
             else
-                print_instruction("POPS LF@%s\n", tmp);
+                print_instruction("POPS LF@%s\n", assign_to.value.string);
+            print_instruction("CLEARS\n");
             print_pop = 0;
         }
 
@@ -780,12 +798,14 @@ void fun_or_expr_2() {
             second = next_token;
             /*****PSA*******/
             next_token = expressionParse(stdin, &first, &second, 2);
-
+            /*
             if (get_frame(assign_to.value.string))
                 print_instruction("\nPOPS GF@%s\n", assign_to.value.string);
             else
                 print_instruction("\nPOPS LF@%s\n", assign_to.value.string);
-            print_instruction("CLEARS\n");
+            print_instruction("CLEARS\n");*/
+            print_pop = 1;
+
 
     }
     //pravidlo 21

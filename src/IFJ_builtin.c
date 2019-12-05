@@ -145,10 +145,10 @@ void generate_builtin()
     print_instruction("ADD LF@param3 LF@param3 LF@param2\n");
     print_instruction("DEFVAR LF@$tmp\n");
     print_instruction("LABEL $while_substr\n");
-    print_instruction("LT LF@tmp LF@param2 LF@param3\n");
-    print_instruction("JUMPIFNEQ $end_while_substr LF@tmp bool@true\n");
-    print_instruction("GETCHAR LF@tmp LF@param1 LF@param2\n");
-    print_instruction("CONCAT LF@%cret LF@%cret LF@tmp\n", '%', '%');
+    print_instruction("LT LF@$tmp LF@param2 LF@param3\n");
+    print_instruction("JUMPIFNEQ $end_while_substr LF@$tmp bool@true\n");
+    print_instruction("GETCHAR LF@$tmp LF@param1 LF@param2\n");
+    print_instruction("CONCAT LF@%cret LF@%cret LF@$tmp\n", '%', '%');
     print_instruction("ADD LF@param2 LF@param2 int@1\n");
     print_instruction("JUMP $while_substr\n");
     print_instruction("LABEL $end_while_substr\n");
@@ -707,7 +707,7 @@ char * convert_str_to_ifjcode_str(char * input){
          output[size] = '2';
          size++;
         }
-        else if (*input == '\n'){ //nahrazeni EOL \032
+        else if (*input == '\n'){ //nahrazeni EOL \010
          output[size] = '\\';
          size++;
          output[size] = '0';
@@ -717,7 +717,7 @@ char * convert_str_to_ifjcode_str(char * input){
          output[size] = '0';
          size++;
         }
-        else if (*input == '\t'){ //nahrazeni tab \032
+        else if (*input == '\t'){ //nahrazeni tab \009
          output[size] = '\\';
          size++;
          output[size] = '0';
@@ -727,7 +727,17 @@ char * convert_str_to_ifjcode_str(char * input){
          output[size] = '9';
          size++;
         }
-        else if (*input == '#'){ //nahrazeni tab \032
+        else if (*input == '\\'){ //nahrazeni \\ \092
+         output[size] = '\\';
+         size++;
+         output[size] = '0';
+         size++;
+         output[size] = '9';
+         size++;
+         output[size] = '2';
+         size++;
+        }
+        else if (*input == '#'){ //nahrazeni # \035
          output[size] = '\\';
          size++;
          output[size] = '0';
