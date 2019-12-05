@@ -11,6 +11,8 @@
 #ifndef IFJ_PARSER_H_INCLUDED
 #define IFJ_PARSER_H_INCLUDED
 
+#include "IFJ_stack_string.h"
+
 void prog();
 void st_list();
 void stat();
@@ -23,6 +25,22 @@ void arg_list();
 void arg_next();
 void fun_or_expr();
 void fun_or_expr_2();
+
+extern int in_cycle;
+extern tStack_string stack_instructions;
+
+#define print_instruction(...) if (in_cycle){                           \
+                                    char buffer[200];                   \
+                                    /* zde muze nastat problem s velikosti bufferu - TODO */ \
+                                    sprintf(buffer, __VA_ARGS__);       \
+                                    char *tmp = malloc(strlen(buffer) + 1); \
+                                    if (!tmp) error_exit(ERROR_INTERNAL); \
+                                    strcpy(tmp, buffer); \
+                                    stack_push_string(&stack_instructions, tmp); \
+                                }                                       \
+                                else                                    \
+                                    printf(__VA_ARGS__)
+
 
 #endif // IFJ_PARSER_H_INCLUDED
 

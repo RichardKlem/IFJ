@@ -36,6 +36,7 @@ LL tabulka
 #include "IFJ_precedence_syntactic_analysis.h"
 #include "IFJ_builtin.h"
 #include <string.h>
+#include "IFJ_stack_string.h"
 
 #define debug_print(...)
 //printf(__VA_ARGS__)
@@ -49,12 +50,14 @@ tStack_sem stack_semantic_params; //pomocny zasobnik pro zpracovani parametru
 int param_num, arg_num; //pocitadla argumentu (u volani fce) a parametru (u definice fce)
 bool in_function = false, in_block = false;
 char * fun_name = NULL; //pomocna promenna, pro uchovani jmena funkce ve ktere jsme zanoreni
-int unique_number = 0; //unikatni pocitadlo pro geenrovani labelu
+int unique_number = 0; //unikatni pocitadlo pro generovani labelu
 token_t assign_to; //pomocna promenna pro uchovani jmena promenne, do ktere se prirazuje
+bool is_param = false;
 int print_pop = 0;
 int print_assign_one_var = 0;
 int print_assign_fun = 0;
-bool is_param = false;
+int in_cycle = 0;
+tStack_string stack_instructions;
 
 void prog(){
     debug_print("In main\n");
@@ -65,6 +68,7 @@ void prog(){
     //inicializace zasobniku na semantickou kontrolu
     stack_sem_init(&stack_semantic);
     stack_sem_init(&stack_semantic_params);
+    stack_init_string(&stack_instructions);
 
     //vypsani hlavicky a vestavenych funkci
     generate_builtin();
@@ -86,8 +90,6 @@ void prog(){
             eol_opt();
             st_list();
             if (next_token.type == TOKEN_EOF){ //pokud se korekne zpracovali vsechny tokeny, koncime
-
-
                 while (!stack_sem_empty(&stack_semantic))
                     stack_sem_pop(&stack_semantic);
                 symtable_dispose(&symtable);
@@ -103,9 +105,7 @@ void prog(){
 void st_list(){
     debug_print("In st_list\n");
     //pravidlo 4
-    if (next_token.type == TOKEN_DEDENT ||
-        //(next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) ||
-        next_token.type == TOKEN_EOF)
+    if (next_token.type == TOKEN_DEDENT || next_token.type == TOKEN_EOF)
         /*DO NOTHING*/;
     //pravidlo 2
     else if (next_token.type == TOKEN_STRING ||
@@ -173,11 +173,11 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        printf("\nJUMP %s_END\n", fun_name);
-        printf("LABEL %s\n", fun_name);
-        printf("PUSHFRAME\n");
-        printf("DEFVAR LF@%%ret\n");
-        printf("MOVE LF@%%ret nil@nil\n");
+        print_instruction("\nJUMP %s_END\n", fun_name);
+        print_instruction("LABEL %s\n", fun_name);
+        print_instruction("PUSHFRAME\n");
+        print_instruction("DEFVAR LF@%%ret\n");
+        print_instruction("MOVE LF@%%ret nil@nil\n");
 
         param_num = 0; //vynuluje pocet parametru
         param_list();
@@ -202,7 +202,7 @@ void stat(){
         in_function = true;
         in_block = true;
 
-        printf("\n#telo funkce\n\n");
+        print_instruction("\n#telo funkce\n\n");
 
         st_list();
 
@@ -210,9 +210,9 @@ void stat(){
         in_function = false;
         stack_sem_pop_until_block_start(&stack_semantic);
 
-        printf("POPFRAME\n");
-        printf("RETURN\n");
-        printf("LABEL %s_END\n", fun_name);
+        print_instruction("POPFRAME\n");
+        print_instruction("RETURN\n");
+        print_instruction("LABEL %s_END\n", fun_name);
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -223,18 +223,19 @@ void stat(){
         int while_unique_label = unique_number;
         unique_number++;
 
-        printf("\nLABEL WHILE%d\n", while_unique_label);
-        printf("#zpracovani vyrazu\n");
+        in_cycle++;
+        print_instruction("\nLABEL WHILE%d\n", while_unique_label);
+        print_instruction("#zpracovani vyrazu\n");
 
         next_token = get_token(stdin);
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
 
-        printf("PUSHS int@0\n");
-        printf("JUMPIFEQS WHILE_END%d\n", while_unique_label);
-        printf("CLEARS\n");
-        printf("\n#telo while\n\n");
+        print_instruction("PUSHS int@0\n");
+        print_instruction("JUMPIFEQS WHILE_END%d\n", while_unique_label);
+        print_instruction("CLEARS\n");
+        print_instruction("\n#telo while\n\n");
 
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
@@ -251,9 +252,23 @@ void stat(){
         st_list();
         in_block = false;
 
-        printf("JUMP WHILE%d\n", while_unique_label);
-        printf("LABEL WHILE_END%d\n", while_unique_label);
-        printf("CLEARS\n");
+        print_instruction("JUMP WHILE%d\n", while_unique_label);
+        print_instruction("LABEL WHILE_END%d\n", while_unique_label);
+        print_instruction("CLEARS\n");
+
+        in_cycle--;
+        //zde se vypise telo cyklu (az po vypisu definici pouzitych promenny)
+        tStack_string tmp_stack; //pomocny zasobnik na vypsani instrukci ve spravne poradi (obraceni)
+        stack_init_string(&tmp_stack);
+
+        while (!stack_empty_string(&stack_instructions)){
+            stack_push_string(&tmp_stack, stack_top_string(&stack_instructions));
+            stack_pop_string(&stack_instructions);
+        }
+        while (!stack_empty_string(&tmp_stack)){
+            printf("%s", stack_top_string(&tmp_stack));
+            stack_pop_string(&tmp_stack);
+        }
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -271,16 +286,16 @@ void stat(){
         int if_unique_label = unique_number;
         unique_number++;
 
-        printf("\n#zpracovani vyrazu\n");
+        print_instruction("\n#zpracovani vyrazu\n");
 
         next_token = get_token(stdin);
         first = next_token;
         /*****PSA*******/
         next_token = expressionParse(stdin, &first, NULL, 1);
 
-        printf("PUSHS int@0\n");
-        printf("JUMPIFEQS ELSE%d\n", if_unique_label);
-        printf("\n#telo then\n\n");
+        print_instruction("PUSHS int@0\n");
+        print_instruction("JUMPIFEQS ELSE%d\n", if_unique_label);
+        print_instruction("\n#telo then\n\n");
 
         if (next_token.type == TOKEN_COLON)
             next_token = get_token(stdin);
@@ -297,7 +312,7 @@ void stat(){
         st_list();
         in_block = false;
 
-        printf("JUMP IF_END%d\n", if_unique_label);
+        print_instruction("JUMP IF_END%d\n", if_unique_label);
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -316,15 +331,15 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        printf("LABEL ELSE%d\n", if_unique_label);
-        printf("\n#telo else\n\n");
+        print_instruction("LABEL ELSE%d\n", if_unique_label);
+        print_instruction("\n#telo else\n\n");
 
         in_block = true;
         st_list();
         in_block = false;
 
-        printf("LABEL IF_END%d\n", if_unique_label);
-        printf("CLEARS\n");
+        print_instruction("LABEL IF_END%d\n", if_unique_label);
+        print_instruction("CLEARS\n");
 
         if (next_token.type == TOKEN_DEDENT)
             next_token = get_token(stdin);
@@ -365,8 +380,8 @@ void ret(){
     debug_print("In ret\n");
     //pravidlo 8
     if (next_token.type == TOKEN_DEDENT) {
-        printf("POPFRAME\n");
-        printf("RETURN\n");
+        print_instruction("POPFRAME\n");
+        print_instruction("RETURN\n");
     }
     //pravidlo 7
     else if (next_token.type == TOKEN_KEYWORD && next_token.value.keyword_value == RETURN) {
@@ -376,9 +391,9 @@ void ret(){
             first = next_token;
             next_token = expressionParse(stdin, &first, NULL, 1);
 
-            printf("POPS LF@%%ret\n");
-            printf("POPFRAME\n");
-            printf("RETURN\n");
+            print_instruction("POPS LF@%%ret\n");
+            print_instruction("POPFRAME\n");
+            print_instruction("RETURN\n");
         }
         if (next_token.type == TOKEN_EOL) {
             next_token = get_token(stdin);
@@ -398,8 +413,8 @@ void param_list(){
         param_num++;
         stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
 
-        printf("DEFVAR LF@%s\n", next_token.value.string);
-        printf("MOVE LF@%s LF@%%%d\n", next_token.value.string, param_num);
+        print_instruction("DEFVAR LF@%s\n", next_token.value.string);
+        print_instruction("MOVE LF@%s LF@%%%d\n", next_token.value.string, param_num);
 
         next_token = get_token(stdin);
         param_next();
@@ -423,8 +438,8 @@ void param_next(){
             param_num++;
             stack_sem_push(&stack_semantic_params, DO_NOTHING, next_token.value.string);
 
-            printf("DEFVAR LF@%s\n", next_token.value.string);
-            printf("MOVE LF@%s LF@%%%d\n", next_token.value.string, param_num);
+            print_instruction("DEFVAR LF@%s\n", next_token.value.string);
+            print_instruction("MOVE LF@%s LF@%%%d\n", next_token.value.string, param_num);
 
             next_token = get_token(stdin);
             param_next();
@@ -453,14 +468,14 @@ void expr_or_assign() {
         next_token = get_token(stdin);
 
         if (strcmp(first.value.string, "print"))
-            printf("\nCREATEFRAME\n");
+            print_instruction("\nCREATEFRAME\n");
 
         arg_num = 0;
         arg_list();
         stack_sem_push(&stack_semantic, FUN_CALL, first.value.string);
 
         if (strcmp(first.value.string, "print"))
-            printf("CALL %s\n", first.value.string);
+            print_instruction("CALL %s\n", first.value.string);
 
         if (next_token.type == TOKEN_RIGHT_BRACKET) {
             next_token = get_token(stdin);
@@ -483,30 +498,30 @@ void expr_or_assign() {
 
         if (print_assign_fun) {
             if (get_frame(assign_to.value.string))
-                printf("MOVE GF@%s TF@%%ret\n", assign_to.value.string);
+                print_instruction("MOVE GF@%s TF@%%ret\n", assign_to.value.string);
             else
-                printf("MOVE LF@%s TF@%%ret\n", assign_to.value.string);
+                print_instruction("MOVE LF@%s TF@%%ret\n", assign_to.value.string);
             print_assign_fun = 0;
         }
 
         if (print_pop) {
             if (get_frame(tmp))
-                printf("POPS GF@%s\n", tmp);
+                print_instruction("POPS GF@%s\n", tmp);
             else
-                printf("POPS LF@%s\n", tmp);
+                print_instruction("POPS LF@%s\n", tmp);
             print_pop = 0;
         }
 
         if (print_assign_one_var) {
             if (get_frame(assign_to.value.string))
-                printf("\nMOVE GF@%s ", assign_to.value.string);
+                print_instruction("\nMOVE GF@%s ", assign_to.value.string);
             else
-                printf("\nMOVE LF@%s ", assign_to.value.string);
+                print_instruction("\nMOVE LF@%s ", assign_to.value.string);
 
             if (get_frame(first.value.string))
-                printf("GF@%s\n", first.value.string);
+                print_instruction("GF@%s\n", first.value.string);
             else
-                printf("LF@%s\n", first.value.string);
+                print_instruction("LF@%s\n", first.value.string);
             print_assign_one_var = 0;
         }
     }
@@ -521,15 +536,15 @@ void arg_list() {
         arg_num++;
 
         if (!strcmp(first.value.string, "print")) {
-            printf("CREATEFRAME\n");
+            print_instruction("CREATEFRAME\n");
             arg_num = 1;
         }
 
-        printf("DEFVAR TF@%%%d\n", arg_num);
-        printf("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
+        print_instruction("DEFVAR TF@%%%d\n", arg_num);
+        print_instruction("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
 
         if (!strcmp(first.value.string, "print"))
-            printf("CALL print\n");
+            print_instruction("CALL print\n");
 
         next_token = get_token(stdin);
         arg_next();
@@ -538,15 +553,15 @@ void arg_list() {
         arg_num++;
 
         if (!strcmp(first.value.string, "print")) {
-            printf("CREATEFRAME\n");
+            print_instruction("CREATEFRAME\n");
             arg_num = 1;
         }
 
-        printf("DEFVAR TF@%%%d\n", arg_num);
-        printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
+        print_instruction("DEFVAR TF@%%%d\n", arg_num);
+        print_instruction("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
 
         if (!strcmp(first.value.string, "print"))
-            printf("CALL print\n");
+            print_instruction("CALL print\n");
 
         next_token = get_token(stdin);
         arg_next();
@@ -555,15 +570,15 @@ void arg_list() {
         arg_num++;
 
         if (!strcmp(first.value.string, "print")) {
-            printf("CREATEFRAME\n");
+            print_instruction("CREATEFRAME\n");
             arg_num = 1;
         }
 
-        printf("DEFVAR TF@%%%d\n", arg_num);
-        printf("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
+        print_instruction("DEFVAR TF@%%%d\n", arg_num);
+        print_instruction("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
 
         if (!strcmp(first.value.string, "print"))
-            printf("CALL print\n");
+            print_instruction("CALL print\n");
 
         next_token = get_token(stdin);
         arg_next();
@@ -572,15 +587,15 @@ void arg_list() {
         arg_num++;
 
         if (!strcmp(first.value.string, "print")) {
-            printf("CREATEFRAME\n");
+            print_instruction("CREATEFRAME\n");
             arg_num = 1;
         }
 
-        printf("DEFVAR TF@%%%d\n", arg_num);
-        printf("MOVE TF@%%%d nil@nil\n", arg_num);
+        print_instruction("DEFVAR TF@%%%d\n", arg_num);
+        print_instruction("MOVE TF@%%%d nil@nil\n", arg_num);
 
         if (!strcmp(first.value.string, "print"))
-            printf("CALL print\n");
+            print_instruction("CALL print\n");
 
         next_token = get_token(stdin);
         arg_next();
@@ -590,25 +605,28 @@ void arg_list() {
         stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
 
         if (!strcmp(first.value.string, "print")) {
-            printf("CREATEFRAME\n");
+            print_instruction("CREATEFRAME\n");
             arg_num = 1;
         }
 
-        printf("DEFVAR TF@%%%d\n", arg_num);
+        print_instruction("DEFVAR TF@%%%d\n", arg_num);
         if (get_frame(next_token.value.string))
-            printf("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
+            print_instruction("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
         else
-            printf("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);
+            print_instruction("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);
 
         if (!strcmp(first.value.string, "print"))
-            printf("CALL print\n");
+            print_instruction("CALL print\n");
 
         next_token = get_token(stdin);
         arg_next();
     }
     //pravidlo 26
-    else if (next_token.type == TOKEN_RIGHT_BRACKET)
-        /*DO NOTHING*/;
+    else if (next_token.type == TOKEN_RIGHT_BRACKET){
+        /*DO NOTHING*/
+        if (!strcmp(first.value.string, "print"))
+                print_instruction("WRITE string@\\010\n"); //vypsani odradkovani za kazdym printf
+    }
     else
         error_exit(ERROR_SYNTAX);
 }
@@ -616,8 +634,11 @@ void arg_list() {
 void arg_next() {
     debug_print("In arg_next\n");
     //pravidlo 27
-    if (next_token.type == TOKEN_RIGHT_BRACKET)
-        /*DO NOTHING*/;
+    if (next_token.type == TOKEN_RIGHT_BRACKET){
+        /*DO NOTHING*/
+        if (!strcmp(first.value.string, "print"))
+                print_instruction("WRITE string@\\010\n"); //vypsani odradkovani za kazdym printf
+    }
     //pravidlo 28*
     else if (next_token.type == TOKEN_COMMA) {
         next_token = get_token(stdin);
@@ -625,15 +646,16 @@ void arg_next() {
             arg_num++;
 
             if (!strcmp(first.value.string, "print")) {
-                printf("CREATEFRAME\n");
+                print_instruction("WRITE string@\\032\n"); //vypsani mezery mezi termy
+                print_instruction("CREATEFRAME\n");
                 arg_num = 1;
             }
 
-            printf("DEFVAR TF@%%%d\n", arg_num);
-            printf("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
+            print_instruction("DEFVAR TF@%%%d\n", arg_num);
+            print_instruction("MOVE TF@%%%d string@%s\n", arg_num, convert_str_to_ifjcode_str(next_token.value.string));
 
             if (!strcmp(first.value.string, "print"))
-                printf("CALL print\n");
+                print_instruction("CALL print\n");
 
             next_token = get_token(stdin);
             arg_next();
@@ -642,15 +664,16 @@ void arg_next() {
             arg_num++;
 
             if (!strcmp(first.value.string, "print")) {
-                printf("CREATEFRAME\n");
+                print_instruction("WRITE string@\\032\n"); //vypsani mezery mezi termy
+                print_instruction("CREATEFRAME\n");
                 arg_num = 1;
             }
 
-            printf("DEFVAR TF@%%%d\n", arg_num);
-            printf("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
+            print_instruction("DEFVAR TF@%%%d\n", arg_num);
+            print_instruction("MOVE TF@%%%d float@%a\n", arg_num, next_token.value.double_value);
 
             if (!strcmp(first.value.string, "print"))
-                printf("CALL print\n");
+                print_instruction("CALL print\n");
 
             next_token = get_token(stdin);
             arg_next();
@@ -659,15 +682,16 @@ void arg_next() {
             arg_num++;
 
             if (!strcmp(first.value.string, "print")) {
-                printf("CREATEFRAME\n");
+                print_instruction("WRITE string@\\032\n"); //vypsani mezery mezi termy
+                print_instruction("CREATEFRAME\n");
                 arg_num = 1;
             }
 
-            printf("DEFVAR TF@%%%d\n", arg_num);
-            printf("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
+            print_instruction("DEFVAR TF@%%%d\n", arg_num);
+            print_instruction("MOVE TF@%%%d int@%d\n", arg_num, next_token.value.int_value);
 
             if (!strcmp(first.value.string, "print"))
-                printf("CALL print\n");
+                print_instruction("CALL print\n");
 
             next_token = get_token(stdin);
             arg_next();
@@ -676,15 +700,16 @@ void arg_next() {
             arg_num++;
 
             if (!strcmp(first.value.string, "print")) {
-                printf("CREATEFRAME\n");
+                print_instruction("WRITE string@\\032\n"); //vypsani mezery mezi termy
+                print_instruction("CREATEFRAME\n");
                 arg_num = 1;
             }
 
-            printf("DEFVAR TF@%%%d\n", arg_num);
-            printf("MOVE TF@%%%d nil@nil\n", arg_num);
+            print_instruction("DEFVAR TF@%%%d\n", arg_num);
+            print_instruction("MOVE TF@%%%d nil@nil\n", arg_num);
 
             if (!strcmp(first.value.string, "print"))
-                printf("CALL print\n");
+                print_instruction("CALL print\n");
 
             next_token = get_token(stdin);
             arg_next();
@@ -694,18 +719,19 @@ void arg_next() {
             stack_sem_push(&stack_semantic, VAR_USE, next_token.value.string);
 
             if (!strcmp(first.value.string, "print")) {
-                printf("CREATEFRAME\n");
+                print_instruction("WRITE string@\\032\n"); //vypsani mezery mezi termy
+                print_instruction("CREATEFRAME\n");
                 arg_num = 1;
             }
 
-            printf("DEFVAR TF@%%%d\n", arg_num);
+            print_instruction("DEFVAR TF@%%%d\n", arg_num);
             if (get_frame(next_token.value.string))
-                printf("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
+                print_instruction("MOVE TF@%%%d GF@%s\n", arg_num, next_token.value.string);
             else
-                printf("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);
+                print_instruction("MOVE TF@%%%d LF@%s\n", arg_num, next_token.value.string);
 
             if (!strcmp(first.value.string, "print"))
-                printf("CALL print\n");
+                print_instruction("CALL print\n");
 
             next_token = get_token(stdin);
             arg_next();
@@ -756,10 +782,10 @@ void fun_or_expr_2() {
             next_token = expressionParse(stdin, &first, &second, 2);
 
             if (get_frame(assign_to.value.string))
-                printf("\nPOPS GF@%s\n", assign_to.value.string);
+                print_instruction("\nPOPS GF@%s\n", assign_to.value.string);
             else
-                printf("\nPOPS LF@%s\n", assign_to.value.string);
-            printf("CLEARS\n");
+                print_instruction("\nPOPS LF@%s\n", assign_to.value.string);
+            print_instruction("CLEARS\n");
 
     }
     //pravidlo 21
@@ -767,7 +793,7 @@ void fun_or_expr_2() {
         next_token = get_token(stdin);
 
         if (strcmp(first.value.string, "print"))
-            printf("\nCREATEFRAME\n");
+            print_instruction("\nCREATEFRAME\n");
 
         arg_num = 0;
         arg_list();
@@ -775,7 +801,7 @@ void fun_or_expr_2() {
         arg_num = 0;
 
         if (strcmp(first.value.string, "print"))
-            printf("CALL %s\n", first.value.string);
+            print_instruction("CALL %s\n", first.value.string);
 
         print_assign_fun = 1;
 
