@@ -346,7 +346,7 @@ void stat(){
         //zde se vypise telo cyklu (az po vypisu definici pouzitych promenny)
         tStack_string tmp_stack; //pomocny zasobnik na vypsani instrukci ve spravne poradi (obraceni)
         stack_init_string(&tmp_stack);
-        
+
         if (!in_cycle){
             while (!stack_empty_string(&stack_instructions)){
                 stack_push_string(&tmp_stack, stack_top_string(&stack_instructions));
@@ -610,7 +610,7 @@ void arg_list() {
         }
 
         print_instruction("DEFVAR TF@%%%d\n", arg_num);
-        print_instruction("MOVE TF@%%%d nil@nil\n", arg_num);
+        print_instruction("MOVE TF@%%%d string@None\n", arg_num);
 
         if (!strcmp(first.value.string, "print"))
             print_instruction("CALL print\n");
@@ -724,7 +724,7 @@ void arg_next() {
             }
 
             print_instruction("DEFVAR TF@%%%d\n", arg_num);
-            print_instruction("MOVE TF@%%%d nil@nil\n", arg_num);
+            print_instruction("MOVE TF@%%%d string@None\n", arg_num);
 
             if (!strcmp(first.value.string, "print"))
                 print_instruction("CALL print\n");

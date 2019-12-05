@@ -1,0 +1,4 @@
+def nevolan():
+    a = 'str' - 1
+
+print(1)

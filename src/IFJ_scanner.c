@@ -231,6 +231,7 @@ token_t get_token(FILE* src_file) {
     static int start_with_indentation = 1;
     static tStack stack_indent;
     static int eof_was_loaded = 0;
+    int zero_was_loaded = 0;
 
 
     if (first_token) {
@@ -488,8 +489,14 @@ token_t get_token(FILE* src_file) {
         case STATE_INT:
             chars_loaded_cnt++;
 
-            if (isdigit(next_char))
+            if (isdigit(next_char)) {
+                if (zero_was_loaded) {
+                    error_exit(ERROR_LEX);
+                }
+                if (next_char == '0')
+                    zero_was_loaded++;
                 state = STATE_INT;
+            }
             else if (next_char == '.')
                 state = STATE_DOUBLE_DECIMAL_POINT;
             else if (next_char == 'E' || next_char == 'e')

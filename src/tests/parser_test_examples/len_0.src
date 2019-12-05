@@ -1,0 +1,2 @@
+a = len('\n0\Z')
+print(a)
