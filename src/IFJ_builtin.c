@@ -226,7 +226,7 @@ void generate_builtin()
     print_instruction("JUMPIFNEQ $operation_plus_notsame LF@param2$type LF@param3$type\n");
     print_instruction("JUMPIFEQ $operation_plus_same_int LF@param2$type string@int\n");
     print_instruction("JUMPIFEQ $operation_plus_same_int LF@param2$type string@float\n");
-    print_instruction("CONCAT LF@tmp LF@param2 LF@param3\n");
+    print_instruction("CONCAT LF@tmp LF@param3 LF@param2\n");
     print_instruction("PUSHS LF@tmp\n");
     print_instruction("JUMP $end_do_operation\n");
     print_instruction("LABEL $operation_plus_same_int\n");
@@ -760,7 +760,7 @@ void print_stack(token_t *sem_array)
                 print_instruction("PUSHS float@%a\n", sem_array->value.double_value);
                 break;
             case TOKEN_STRING:
-                print_instruction("PUSHS string@%s\n", sem_array->value.string);
+                print_instruction("PUSHS string@%s\n", convert_str_to_ifjcode_str(sem_array->value.string));
                 break;
             case TOKEN_ID:
                 ;
