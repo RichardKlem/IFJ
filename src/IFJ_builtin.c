@@ -420,8 +420,8 @@ void generate_builtin()
     print_instruction("JUMPIFEQ $operation_greater_false bool@false LF@tmp_bool\n");
 
     print_instruction("LABEL $operation_greater_notsame\n");
-    print_instruction("JUMPIFNEQ $operation_error LF@param2$type string@string\n");
-    print_instruction("JUMPIFNEQ $operation_error LF@param3$type string@string\n");
+    print_instruction("JUMPIFEQ $operation_error LF@param2$type string@string\n");
+    print_instruction("JUMPIFEQ $operation_error LF@param3$type string@string\n");
 
     print_instruction("JUMPIFEQ $operation_greater_notsame_1int LF@param2$type string@int\n");
     print_instruction("INT2FLOAT LF@param3 LF@param3\n");
