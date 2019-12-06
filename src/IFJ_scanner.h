@@ -50,7 +50,8 @@ typedef enum {
     STATE_STRING_HEX_START,
     STATE_STRING_HEX_END,
     STATE_CRLF,
-    STATE_MULTI_LINE_LITERAL
+    STATE_MULTI_LINE_LITERAL,
+    STATE_ZERO
 } states;
 
 typedef enum {

@@ -231,7 +231,6 @@ token_t get_token(FILE* src_file) {
     static int start_with_indentation = 1;
     static tStack stack_indent;
     static int eof_was_loaded = 0;
-    int zero_was_loaded = 0;
 
 
     if (first_token) {
@@ -278,6 +277,7 @@ token_t get_token(FILE* src_file) {
             if (next_char == '(') {state = STATE_LEFT_BRACKET; break;}
             if (next_char == ')') {state = STATE_RIGHT_BRACKET; break;}
             if (next_char == EOF) {state = STATE_EOF; break;}
+            if (next_char == '0') {state = STATE_ZERO; chars_loaded_cnt++; break;}
             if (isdigit(next_char)) {state = STATE_INT; chars_loaded_cnt++; break;}
             if (next_char == ',') {state = STATE_COMMA; break;}
             if (next_char == ':') {state = STATE_COLON; break;}
@@ -297,6 +297,22 @@ token_t get_token(FILE* src_file) {
                 break;
             }
             error_exit(ERROR_LEX); //jiny vstupni znak -> CHYBA
+
+        case STATE_ZERO:
+            chars_loaded_cnt++;
+            if (isdigit(next_char)) //pokud nasleduje dalsi cislice -> CHYBA
+                error_exit(ERROR_LEX);
+            else if (next_char == '.')
+                state = STATE_DOUBLE_DECIMAL_POINT;
+            else if (next_char == 'E' || next_char == 'e')
+                state = STATE_DOUBLE_EXP;
+            else {
+                push_char_back(chars_loaded_cnt);
+                chars_loaded_cnt--;
+                value.string = load_to_str(src_file, chars_loaded_cnt);
+                return create_token(TOKEN_INT, value);
+            }
+            break;
 
         case STATE_MULTI_LINE_LITERAL:
           chars_loaded_cnt++;
@@ -489,14 +505,8 @@ token_t get_token(FILE* src_file) {
         case STATE_INT:
             chars_loaded_cnt++;
 
-            if (isdigit(next_char)) {
-                if (zero_was_loaded) {
-                    error_exit(ERROR_LEX);
-                }
-                if (next_char == '0')
-                    zero_was_loaded++;
+            if (isdigit(next_char))
                 state = STATE_INT;
-            }
             else if (next_char == '.')
                 state = STATE_DOUBLE_DECIMAL_POINT;
             else if (next_char == 'E' || next_char == 'e')
