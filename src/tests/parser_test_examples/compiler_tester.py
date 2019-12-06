@@ -18,7 +18,7 @@ class Bcolors:
 
 def main():
 
-    path = os.getcwd() + "/tests/parser_test_examples"
+    path = os.getcwd() + "/"
     input_files = []
     expected_output_files = []
     src_ext = ('.ifj19', '.src')
@@ -48,7 +48,7 @@ def main():
         elif file.endswith('.src'):
             error_code = file[-5]
 
-        command = subprocess.run("./compiler < {}".format(file), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        command = subprocess.run("./../../compiler < {}".format(file), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         test_file_name = str(file.split('/')[-1])
 

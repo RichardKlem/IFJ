@@ -9,7 +9,7 @@
  * ************************************************************************** */
 
 #include <stdio.h>
-#include "IFJ_scanner.h"
+#include "../IFJ_scanner.h"
 
 int main (int argc, char *argv[]) {
     if (argc != 2){
