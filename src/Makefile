@@ -6,3 +6,12 @@ all:
 
 clean:
 	rm -rf $(OBJ) infer-out/ compiler
+
+test: parser
+
+parser:
+	cd tests/parser_test_examples && python3 compiler-tester.py
+
+zip:
+	zip xberan46.zip *.c *.h rozdeleni tests/ Makefile
+
