@@ -9,3 +9,11 @@ test_app: ${src_c} ${src_h}
 
 clean:
 	rm -f scanner_test_app
+
+test: parser
+
+parser:
+	cd tests/parser_test_examples && python3 compiler-tester.py
+
+zip:
+	zip xberan46.zip *.c *.h rozdeleni tests/ Makefile
