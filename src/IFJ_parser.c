@@ -58,6 +58,7 @@ int print_assign_one_var = 0;
 int print_assign_fun = 0;
 int in_cycle = 0;
 tStack_string stack_instructions;
+char*buffer;
 
 void prog(){
     debug_print("In main\n");
@@ -69,6 +70,11 @@ void prog(){
     stack_sem_init(&stack_semantic);
     stack_sem_init(&stack_semantic_params);
     stack_init_string(&stack_instructions);
+
+    buffer = malloc(1024);
+    if (!buffer) {
+        error_exit(ERROR_INTERNAL);
+    }
 
     //vypsani hlavicky a vestavenych funkci
     generate_builtin();

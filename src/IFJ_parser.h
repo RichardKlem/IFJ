@@ -28,9 +28,9 @@ void fun_or_expr_2();
 
 extern int in_cycle;
 extern tStack_string stack_instructions;
+extern char *buffer;
 
 #define print_instruction(...) if (in_cycle){                           \
-                                    char buffer[200];                   \
                                     /* zde muze nastat problem s velikosti bufferu - TODO */ \
                                     sprintf(buffer, __VA_ARGS__);       \
                                     char *tmp = malloc(strlen(buffer) + 1); \
