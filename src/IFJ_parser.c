@@ -610,7 +610,7 @@ void arg_list() {
         }
 
         print_instruction("DEFVAR TF@%%%d\n", arg_num);
-        print_instruction("MOVE TF@%%%d string@None\n", arg_num);
+        print_instruction("MOVE TF@%%%d nil@nil\n", arg_num);
 
         if (!strcmp(first.value.string, "print"))
             print_instruction("CALL print\n");
@@ -724,7 +724,7 @@ void arg_next() {
             }
 
             print_instruction("DEFVAR TF@%%%d\n", arg_num);
-            print_instruction("MOVE TF@%%%d string@None\n", arg_num);
+            print_instruction("MOVE TF@%%%d nil@nil\n", arg_num);
 
             if (!strcmp(first.value.string, "print"))
                 print_instruction("CALL print\n");
