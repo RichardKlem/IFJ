@@ -130,6 +130,11 @@ void generate_builtin()
     print_instruction("MOVE LF@%cret nil@nil\n", '%');
     print_instruction("DEFVAR LF@param\n");
     print_instruction("MOVE LF@param LF@%c1\n", '%');
+
+    print_instruction("DEFVAR LF@param$type\n");
+    print_instruction("TYPE LF@param$type LF@param\n");
+    print_instruction("JUMPIFNEQ $operation_error LF@param$type string@string\n");
+
     print_instruction("STRLEN LF@%cret LF@param\n", '%');
     print_instruction("POPFRAME\n");
     print_instruction("RETURN\n");
