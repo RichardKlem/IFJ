@@ -1,3 +1,12 @@
+/* ******************************* IFJ_stack.c ****************************
+ *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
+ *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
+ *  Autori: Beranek Tomas (xberan46) - vedouci
+ *          Haderka Martin (xhader00)
+ *          Slobodnik Simon (xslobo06)
+ *          Klem Richard (xklemr00)
+ *  Datum vytvoreni: 15.10.2019
+ * ************************************************************************** */
 #include "IFJ_stack.h"
 #include "IFJ_error.h"
 #include <stdlib.h>
@@ -46,3 +55,4 @@ void stackPush (tStack* s, int data) {
         s->top = insert;
 	}
 }
+/* konec souboru IFJ_stack.c */

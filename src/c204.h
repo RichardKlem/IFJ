@@ -1,4 +1,14 @@
-
+/* ******************************* c204.h ****************************
+ *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
+ *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
+ *  Autori: Beranek Tomas (xberan46) - vedouci
+ *          Haderka Martin (xhader00)
+ *          Slobodnik Simon (xslobo06)
+ *          Klem Richard (xklemr00)
+ *  Datum vytvoreni: 27.11.2019
+ *
+ *  Převzáno z:
+ *
 /* ******************************* c204.h *********************************** */
 /*  Předmět: Algoritmy (IAL) - FIT VUT v Brně                                 */
 /*  Úkol: c204 - Převod infixového výrazu na postfixový (s využitím c202)     */
@@ -25,3 +35,4 @@ void infix2postfix (token_t * input_infix_stack, token_t * postfix_array, int ma
 #endif
 
 /* Konec hlavičkového souboru c204.h */
+/* konec souboru u c204.h */

@@ -1,3 +1,12 @@
+/* ******************************* IFJ_stack_string.h ****************************
+ *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
+ *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
+ *  Autori: Beranek Tomas (xberan46) - vedouci
+ *          Haderka Martin (xhader00)
+ *          Slobodnik Simon (xslobo06)
+ *          Klem Richard (xklemr00)
+ *  Datum vytvoreni: 30.11.2019
+ * ************************************************************************** */
 #ifndef IFJ_STACK_STRING_H_INCLUDED
 #define IFJ_STACK_STRING_H_INCLUDED
 
@@ -17,3 +26,4 @@ void stack_pop_string (tStack_string* s);
 void stack_push_string (tStack_string* s, char * data);
 
 #endif // IFJ_STACK_STRING_H_INCLUDED
+/* konec souboru IFJ_stack_string.h */

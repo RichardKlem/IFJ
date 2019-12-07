@@ -50,4 +50,4 @@ bool get_frame(char * name);
 
 #endif // SYMTABLE_H_INCLUDED
 
-/* konec souboru IFJ_scanner.h */
+/* konec souboru symtable.h */

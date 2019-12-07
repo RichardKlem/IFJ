@@ -1,19 +1,12 @@
-/* ******************************* IFJ_scanner.c ****************************
+/* ******************************* IFJ_precedence_table.c ****************************
  *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
  *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
  *  Autori: Beranek Tomas (xberan46) - vedouci
  *          Haderka Martin (xhader00)
  *          Slobodnik Simon (xslobo06)
  *          Klem Richard (xklemr00)
- *  Datum vytvoreni: 12.10.2019
+ *  Datum vytvoreni: 27.11.2019
  * ************************************************************************** */
- /**
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * ______________!!! W I P !!!______________
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- */
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -146,3 +139,5 @@ precedence_rule precedence_table[8][8] =
 /*|  fc    |*/ {ERROR,  ERROR,  EQUAL,  ERROR,  ERROR,  ERROR,  ERROR,  REDUCE},
 /*|  var   |*/ {REDUCE, REDUCE, ERROR,  REDUCE, REDUCE, ERROR,  ERROR,  REDUCE},
 /*|   $    |*/ {SHIFT,  SHIFT,  SHIFT,  ERROR,  SHIFT,  SHIFT,  SHIFT,  ERROR }};
+
+/* konec souboru IFJ_precedence_table.c */

@@ -14,11 +14,7 @@
 #include "IFJ_parser.h"
 
 int main () {
-    /*
-    FILE* src_file = fopen("test.src", "r");
-    if (src_file == NULL)
-        error_exit(ERROR_INTERNAL);
-    */
+
 
     prog();
 

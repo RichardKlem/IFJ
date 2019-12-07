@@ -1,10 +1,12 @@
-/**
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * ______________!!! W I P !!!______________
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- */
+/* ******************************* IFJ_precedence_table.h ****************************
+ *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
+ *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
+ *  Autori: Beranek Tomas (xberan46) - vedouci
+ *          Haderka Martin (xhader00)
+ *          Slobodnik Simon (xslobo06)
+ *          Klem Richard (xklemr00)
+ *  Datum vytvoreni: 27.11.2019
+ * ************************************************************************** */
 
 #ifndef IFJ_PRECEDENCE_TABLE_H
 #define IFJ_PRECEDENCE_TABLE_H
@@ -56,3 +58,4 @@ void genStackPop (tGenStack * s);
 void genStackPush (tGenStack * s, token_t item);
 
 #endif //IFJ_PRECEDENCE_TABLE_H
+/* konec souboru IFJ_precedence_table.h */

@@ -1,3 +1,12 @@
+/* ******************************* symtable.c ***********************************
+ *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
+ *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
+ *  Autori: Beranek Tomas (xberan46) - vedouci
+ *          Haderka Martin (xhader00)
+ *          Slobodnik Simon (xslobo06)
+ *          Klem Richard (xklemr00)
+ *  Datum vytvoreni: 23.11.2019
+ * ************************************************************************** */
 #include "symtable.h"
 #include <string.h>
 #include "IFJ_error.h"
@@ -198,3 +207,4 @@ bool get_frame(char * name) {
     else
         return true;
 }
+/* konec souboru symtable.c */

@@ -1,20 +1,13 @@
-/* ******************************* IFJ_scanner.c ****************************
+/* ******************************* IFJ_precedence_syntactic_analysis.c ****************************
  *  Predmet: Formalni jazyky a prekladace (IFJ) - FIT VUT v Brne
  *  Nazev projektu: Implementace prekladace imperativniho jazyka IFJ19
  *  Autori: Beranek Tomas (xberan46) - vedouci
  *          Haderka Martin (xhader00)
  *          Slobodnik Simon (xslobo06)
  *          Klem Richard (xklemr00)
- *  Datum vytvoreni: 12.10.2019
+ *  Datum vytvoreni: 27.11.2019
  * ************************************************************************** */
 
-/**
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * ______________!!! W I P !!!______________
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- */
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -462,3 +455,4 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
+/* konec souboru IFJ_precedence_syntactic_analysis.h */
