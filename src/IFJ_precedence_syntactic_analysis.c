@@ -235,7 +235,6 @@ void reduce_bin_op(tExprStack * stack)
 {
     if (stack == NULL)
         error_exit(ERROR_INTERNAL);
-    //TODO kontolovat operator
     exprStackPop(stack);
     exprStackPop(stack);
     stack->top->exprToken.terminal = false;
