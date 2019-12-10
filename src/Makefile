@@ -20,6 +20,9 @@ scanner_tester:
 parser:
 	cd tests/parser_test_examples && python3 compiler_tester.py
 
-zip:
+zip_test:
 	zip -r xberan46.zip *.c *.h rozdeleni tests/ Makefile
+
+zip:
+	zip xberan46.zip *.c *.h rozdeleni dokumentace.pdf Makefile
 
