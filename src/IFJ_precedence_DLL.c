@@ -34,7 +34,7 @@ void exprDLDisposeList (tExprDLList *L) {
         do
         {
             L->Act = L->Last->lptr;
-            free(L->Last);
+            //free(L->Last);
             L->Last = L->Act;
         } while(L->Last != NULL);
         L->First = NULL;
@@ -43,7 +43,7 @@ void exprDLDisposeList (tExprDLList *L) {
 
 void exprDLInsertFirst (tExprDLList *L, expr_token_t exprToken) {
 
-    tExprDLElemPtr newElem = (tExprDLElemPtr) malloc (sizeof(tExprDLElemPtr));// tExprDLElemPtr je struktura definovaná jako pointer, jak tedy mallocovat
+        tExprDLElemPtr newElem = malloc(sizeof(struct tExprDLElem));
     if (newElem == NULL)    //Ověření zda alokace proběhla úspěšně
     {
         exprDLError();
@@ -130,7 +130,7 @@ void exprDLDeleteFirst (tExprDLList *L) {
             L->Act = NULL;
         if(L->First == L->Last)
         {
-            free(L->First);
+            //free(L->First);
             L->First = NULL;
             L->Last = NULL;
         }
@@ -138,7 +138,7 @@ void exprDLDeleteFirst (tExprDLList *L) {
         {
             (L->First->rptr)->lptr = NULL;
             L->First = L->First->rptr;
-            free((L->First)->lptr);
+            //free((L->First)->lptr);
         }
     }
 }
@@ -157,7 +157,7 @@ void exprDLDeleteLast (tExprDLList *L) {
     tempElem = L->Last;
     L->Last = L->Last->lptr;
     L->Last->rptr = NULL;
-    free(tempElem);
+    //free(tempElem);
 }
 
 void exprDLPostDelete (tExprDLList *L) {
@@ -168,7 +168,7 @@ void exprDLPostDelete (tExprDLList *L) {
     }
     if(L->Act->rptr == L->Last)
     {
-        free(L->Act->rptr);
+        //free(L->Act->rptr);
         L->Last = L->Act;
         L->Act->rptr = NULL;
     }
@@ -178,7 +178,7 @@ void exprDLPostDelete (tExprDLList *L) {
         tempElem = L->Act->rptr;
         L->Act->rptr = L->Act->rptr->rptr;
         L->Act->rptr->rptr->lptr = L->Act;
-        free(tempElem);
+        //free(tempElem);
     }
 }
 
@@ -190,7 +190,7 @@ void exprDLPreDelete (tExprDLList *L) {
     }
     if(L->Act->lptr == L->First)
     {
-        free(L->Act->lptr);
+        //free(L->Act->lptr);
         L->First = L->Act;
         L->Act->lptr = NULL;
     }
@@ -200,7 +200,7 @@ void exprDLPreDelete (tExprDLList *L) {
         tempElem = L->Act->lptr;
         L->Act->lptr = L->Act->lptr->lptr;
         L->Act->lptr->lptr->rptr = L->Act;
-        free(tempElem);
+        //free(tempElem);
     }
 }
 

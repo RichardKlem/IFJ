@@ -453,6 +453,12 @@ token_t expressionParse(FILE * src_file, token_t * first, token_t * second, int 
     } while (top_terminal->token.type != TOKEN_DOLAR || input->token.type != TOKEN_DOLAR);
     ////printf("\nJDU VEN\n");
     print_stack(postfix_array);//volani generovani mezikodu k zpracovani postfix vyrazu
+
+
+    exprDLDisposeList(&psa_exprDLL);
+    while(!exprStackEmpty(&psa_stack))
+        exprStackPop(&psa_stack);
+
     return last_token; // kdyz vse probehne v poradku, vratim posledni token, aby mohl pokracovat RS
 }
 /* konec souboru IFJ_precedence_syntactic_analysis.h */
