@@ -134,6 +134,7 @@ void symtable_dispose(tBSTNodePtr *RootPtr) {
     }
 }
 
+//vlozeni informaci o vestavenych funkcich do tabulky symbolu, funkce je vzdy volana na zacatku programu
 void insert_builtin_to_symtable() {
         char * name;
         Record tmp;

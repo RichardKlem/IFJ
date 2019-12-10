@@ -15,9 +15,8 @@
 
 int main () {
 
-
+    //zavolaní prvního pravidla
     prog();
-
 
     return 0;
 }

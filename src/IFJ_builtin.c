@@ -18,6 +18,7 @@
 #include "IFJ_parser.h"
 
 /*
+    //priklady kodu
     a = inputi     READ a int
     a = inputf      READ a float
     a = inputs      READ a string
@@ -699,6 +700,7 @@ void call_chr(char* arg)
     print_instruction("CALL $chr\n");
 }
 
+//funkce prevede retezec do formy pro IFJ_code (prepise nepripustne znaky do escape sekvenci)
 char * convert_str_to_ifjcode_str(char * input){
     int size = 0;
     char * input_cp = input;
@@ -776,10 +778,11 @@ char * convert_str_to_ifjcode_str(char * input){
         input++;
     }
     output[size] = '\0';
-    //free(input_cp);
     return output;
 }
 
+//funkce zpracovava pole tokenu v postfixové notaci
+//operandy a operace vklada na zasobnik a vola funkci $do_operation
 void print_stack(token_t *sem_array)
 {
     for (; sem_array->type != TOKEN_DOLAR; sem_array++) {

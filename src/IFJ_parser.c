@@ -66,7 +66,7 @@ void prog(){
 
     //inicializace tabulky symbolu
     symtable_init(&symtable);
-    //inicializace zasobniku na semantickou kontrolu
+    //inicializace zasobniku
     stack_sem_init(&stack_semantic);
     stack_sem_init(&stack_semantic_params);
     stack_init_string(&stack_instructions);
@@ -202,7 +202,6 @@ void stat(){
             next_token = get_token(stdin);
         else error_exit(ERROR_SYNTAX);
 
-        //VYTVORENI ZARAZKY PRED ZACATKEM BLOKU
         //stack_sem_push se interne diva na globalni promennou param_num a zaroven vlozi funkci na symtable
         stack_sem_push(&stack_semantic, FUN_DEF, fun_name);
         in_function = true;
@@ -511,14 +510,13 @@ void expr_or_assign() {
     //pravidlo 6
     else if (next_token.type == TOKEN_ASSIGNMENT) {
         next_token = get_token(stdin);
-        //ulozeni jmena promenne, jelikoz nejdrive semanticky zkontroluje vyraz
-        //char * tmp = first.value.string;
 
         fun_or_expr();
 
         //bylo prirazeno do promenne, je nutna vlozit ji do stack_semantic
         stack_sem_push(&stack_semantic, VAR_DEF, assign_to.value.string);
 
+        //v pripade, ze se jedna o prirazeni navratove hodnoty funkce
         if (print_assign_fun) {
             if (get_frame(assign_to.value.string))
                 print_instruction("MOVE GF@%s TF@%%ret\n", assign_to.value.string);
@@ -527,6 +525,7 @@ void expr_or_assign() {
             print_assign_fun = 0;
         }
 
+        //v pripade, ze je potreba ziskat vysledek vyrazu ze zasobniku
         if (print_pop) {
             if (get_frame(assign_to.value.string))
                 print_instruction("POPS GF@%s\n", assign_to.value.string);
@@ -536,6 +535,7 @@ void expr_or_assign() {
             print_pop = 0;
         }
 
+        //v pripade, ze se prarazovala pouze jedina promenna
         if (print_assign_one_var) {
             if (get_frame(assign_to.value.string))
                 print_instruction("\nMOVE GF@%s ", assign_to.value.string);
@@ -785,9 +785,6 @@ void fun_or_expr() {
         next_token = get_token(stdin);
         fun_or_expr_2();
     }
-    //pravidlo 29
-    //else if (next_token.type == TOKEN_EOL)
-    //    /*DO NOTHING*/;
     else
         error_exit(ERROR_SYNTAX);
 }
@@ -804,15 +801,8 @@ void fun_or_expr_2() {
             second = next_token;
             /*****PSA*******/
             next_token = expressionParse(stdin, &first, &second, 2);
-            /*
-            if (get_frame(assign_to.value.string))
-                print_instruction("\nPOPS GF@%s\n", assign_to.value.string);
-            else
-                print_instruction("\nPOPS LF@%s\n", assign_to.value.string);
-            print_instruction("CLEARS\n");*/
+
             print_pop = 1;
-
-
     }
     //pravidlo 21
     else if (next_token.type == TOKEN_LEFT_BRACKET) {

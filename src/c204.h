@@ -26,8 +26,6 @@
 #include <stdlib.h>
 #include "IFJ_scanner.h"
 #include "IFJ_precedence_table.h"
-//#include "c202.h"                          /* využívá příklad c202 - zásobník */
-
 
 /* Konverzní funkce */
 void infix2postfix (token_t * input_infix_stack, token_t * postfix_array, int max_len);

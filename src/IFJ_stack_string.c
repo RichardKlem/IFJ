@@ -38,7 +38,6 @@ void stack_pop_string(tStack_string* s) {
 	else if (!stack_empty_string(s)) {
             tElem_string* del = s->top;
             s->top = s->top->next;
-            //free (del);
         }
 }
 

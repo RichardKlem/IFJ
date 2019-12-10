@@ -56,7 +56,7 @@ void check_for_fun_def(char *name){
     if (stack_empty_string(tmp.undefined_functions))
         return;
 
-    //prochazime vsechny funkce, na kterych je aktualni funkce zavisla a kontrolujeem zda jsou definovane a jejich zavislosti taky
+    //prochazime vsechny funkce, na kterych je aktualni funkce zavisla a kontrolujeme zda jsou definovane a jejich zavislosti taky
     while (!stack_empty_string(tmp.undefined_functions)) {
         name = stack_top_string(tmp.undefined_functions);
         if (symtable_search(symtable, name, &tmp) && !tmp.is_variable && tmp.global && !tmp.forward_call)
@@ -65,8 +65,6 @@ void check_for_fun_def(char *name){
             error_exit(ERROR_SEM_UNDEF);
         stack_pop_string(tmp.undefined_functions);
     }
-
-
 }
 
 bool is_builtin(char * name) {
@@ -79,6 +77,7 @@ bool is_builtin(char * name) {
         return false;
 }
 
+//vlozeni polozky do semantickeho zasobniku a provedeni operaci k prislusne akci
 void stack_sem_push (tStack_sem* s, taction action, char * name) {
 	if (s == NULL)
 		error_exit(ERROR_INTERNAL);
@@ -213,7 +212,6 @@ void stack_sem_push (tStack_sem* s, taction action, char * name) {
             else
                 error_exit(ERROR_SEM_UNDEF);
         }
-
         break;
 
     case BLOCK_START:

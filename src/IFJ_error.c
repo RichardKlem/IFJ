@@ -52,13 +52,7 @@ void error_exit(int error_id) {
         break;
   }
 
-  /*    TODO
-   *    Zde se bude volat funkce garbage_collector, ktera vsechny alokovane zdroje, pre ukoncenim programu
-   *        -tabulku symbolu a jmena identifikatoru v ni
-   *        -tabulku retezcu a retezce v ni
-   */
-
-    //uvolneni zasobniku pro semnatickou analyzu
+    //uvolneni zasobniku pro sematickou analyzu
     while (!stack_sem_empty(&stack_semantic))
         stack_sem_pop(&stack_semantic);
 

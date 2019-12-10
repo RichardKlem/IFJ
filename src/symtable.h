@@ -35,7 +35,7 @@ typedef struct tBSTNode {
 } *tBSTNodePtr;
 
 
-//globalni tabulka symbolu - nutne pro soubor error.c, ktery ji v pripade
+//globalni struktura tabulka symbolu - nutne pro soubor error.c, ktery ji v pripade
 //chyby korektne uvolni
 extern tBSTNodePtr symtable;
 
